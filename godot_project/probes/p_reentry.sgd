@@ -1,0 +1,21 @@
+extends Node
+var hits: int = 0
+func pong() -> int:
+	hits += 1
+	return hits
+func ping(n: Node) -> int:
+	return n.pong()
+func ping2(n: Node) -> int:
+	return n.ping(self)
+func ping3(n: Node) -> int:
+	return n.ping2(self)
+func ping4(n: Node) -> int:
+	return n.ping3(self)
+func ping8(n: Node) -> int:
+	return n.ping7(self)
+func ping7(n: Node) -> int:
+	return n.ping6(self)
+func ping6(n: Node) -> int:
+	return n.ping5(self)
+func ping5(n: Node) -> int:
+	return n.ping4(self)

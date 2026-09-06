@@ -1,0 +1,744 @@
+# VRChat SDK extras: constraints, network stats, camera dolly, MIDI, economy, PhysBone, drones,
+# GPU readback, custom actions, input events and the remaining small types.
+
+type VRCConstraintBase : Behaviour kind=component gd=Node extern=VRCSDK3DynamicsConstraintComponentsVRCConstraintBase
+  IsActive: bool => U.constraint_get($0, "active", false)
+  set IsActive: bool => U.constraint_set($0, "active", $v)
+  GlobalWeight: float => U.constraint_get($0, "weight", 1.0)
+  set GlobalWeight: float => U.constraint_set($0, "weight", $v)
+  Locked: bool => U.constraint_get($0, "locked", false)
+  set Locked: bool => U.constraint_set($0, "locked", $v)
+  FreezeToWorld: bool => U.constraint_get($0, "freeze", false)
+  set FreezeToWorld: bool => U.constraint_set($0, "freeze", $v)
+  RebakeOffsetsWhenUnfrozen: bool => U.constraint_get($0, "rebake", false)
+  set RebakeOffsetsWhenUnfrozen: bool => U.constraint_set($0, "rebake", $v)
+  SolveInLocalSpace: bool => U.constraint_get($0, "local", false)
+  set SolveInLocalSpace: bool => U.constraint_set($0, "local", $v)
+  TargetTransform: Transform => U.constraint_get($0, "target", null)
+  set TargetTransform: Transform => U.constraint_set($0, "target", $v)
+  Sources: VRCConstraintSourceKeyableList => U.constraint_sources($0)
+  set Sources: VRCConstraintSourceKeyableList => U.constraint_set($0, "sources", $v)
+  ActivateConstraint(): void => U.constraint_set($0, "active", true)
+  DeactivateConstraint(): void => U.constraint_set($0, "active", false)
+  ZeroConstraint(): void => pass
+  ActivateOnFirstFrame(): void => U.constraint_set($0, "active", true)
+  RebakeOffsets(): void => pass
+
+type VRCAimConstraint : VRCConstraintBase kind=component gd=Node extern=VRCSDK3DynamicsConstraintComponentsVRCAimConstraint
+  AimAxis: Vector3 => U.constraint_get($0, "aimAxis", Vector3.FORWARD)
+  set AimAxis: Vector3 => U.constraint_set($0, "aimAxis", $v)
+  UpAxis: Vector3 => U.constraint_get($0, "upAxis", Vector3.UP)
+  set UpAxis: Vector3 => U.constraint_set($0, "upAxis", $v)
+  WorldUpVector: Vector3 => U.constraint_get($0, "worldUp", Vector3.UP)
+  set WorldUpVector: Vector3 => U.constraint_set($0, "worldUp", $v)
+  WorldUpTransform: Transform => U.constraint_get($0, "worldUpTransform", null)
+  set WorldUpTransform: Transform => U.constraint_set($0, "worldUpTransform", $v)
+  RotationAtRest: Vector3 => U.constraint_get($0, "rotationAtRest", Vector3.ZERO)
+  set RotationAtRest: Vector3 => U.constraint_set($0, "rotationAtRest", $v)
+  RotationOffset: Vector3 => U.constraint_get($0, "rotationOffset", Vector3.ZERO)
+  set RotationOffset: Vector3 => U.constraint_set($0, "rotationOffset", $v)
+  AffectsRotationX: bool => U.constraint_get($0, "affectX", true)
+  set AffectsRotationX: bool => U.constraint_set($0, "affectX", $v)
+  AffectsRotationY: bool => U.constraint_get($0, "affectY", true)
+  set AffectsRotationY: bool => U.constraint_set($0, "affectY", $v)
+  AffectsRotationZ: bool => U.constraint_get($0, "affectZ", true)
+  set AffectsRotationZ: bool => U.constraint_set($0, "affectZ", $v)
+
+type VRCLookAtConstraint : VRCConstraintBase kind=component gd=Node extern=VRCSDK3DynamicsConstraintComponentsVRCLookAtConstraint
+  Roll: float => U.constraint_get($0, "roll", 0.0)
+  set Roll: float => U.constraint_set($0, "roll", $v)
+  UseUpTransform: bool => U.constraint_get($0, "useUp", false)
+  set UseUpTransform: bool => U.constraint_set($0, "useUp", $v)
+  WorldUpTransform: Transform => U.constraint_get($0, "worldUpTransform", null)
+  set WorldUpTransform: Transform => U.constraint_set($0, "worldUpTransform", $v)
+  RotationAtRest: Vector3 => U.constraint_get($0, "rotationAtRest", Vector3.ZERO)
+  set RotationAtRest: Vector3 => U.constraint_set($0, "rotationAtRest", $v)
+  RotationOffset: Vector3 => U.constraint_get($0, "rotationOffset", Vector3.ZERO)
+  set RotationOffset: Vector3 => U.constraint_set($0, "rotationOffset", $v)
+
+type VRCParentConstraint : VRCConstraintBase kind=component gd=Node extern=VRCSDK3DynamicsConstraintComponentsVRCParentConstraint
+  PositionAtRest: Vector3 => U.constraint_get($0, "positionAtRest", Vector3.ZERO)
+  set PositionAtRest: Vector3 => U.constraint_set($0, "positionAtRest", $v)
+  RotationAtRest: Vector3 => U.constraint_get($0, "rotationAtRest", Vector3.ZERO)
+  set RotationAtRest: Vector3 => U.constraint_set($0, "rotationAtRest", $v)
+  AffectsPositionX: bool => U.constraint_get($0, "affectPX", true)
+  set AffectsPositionX: bool => U.constraint_set($0, "affectPX", $v)
+  AffectsPositionY: bool => U.constraint_get($0, "affectPY", true)
+  set AffectsPositionY: bool => U.constraint_set($0, "affectPY", $v)
+  AffectsPositionZ: bool => U.constraint_get($0, "affectPZ", true)
+  set AffectsPositionZ: bool => U.constraint_set($0, "affectPZ", $v)
+  AffectsRotationX: bool => U.constraint_get($0, "affectX", true)
+  set AffectsRotationX: bool => U.constraint_set($0, "affectX", $v)
+  AffectsRotationY: bool => U.constraint_get($0, "affectY", true)
+  set AffectsRotationY: bool => U.constraint_set($0, "affectY", $v)
+  AffectsRotationZ: bool => U.constraint_get($0, "affectZ", true)
+  set AffectsRotationZ: bool => U.constraint_set($0, "affectZ", $v)
+
+type VRCPositionConstraint : VRCConstraintBase kind=component gd=Node extern=VRCSDK3DynamicsConstraintComponentsVRCPositionConstraint
+  PositionAtRest: Vector3 => U.constraint_get($0, "positionAtRest", Vector3.ZERO)
+  set PositionAtRest: Vector3 => U.constraint_set($0, "positionAtRest", $v)
+  PositionOffset: Vector3 => U.constraint_get($0, "positionOffset", Vector3.ZERO)
+  set PositionOffset: Vector3 => U.constraint_set($0, "positionOffset", $v)
+  AffectsPositionX: bool => U.constraint_get($0, "affectPX", true)
+  set AffectsPositionX: bool => U.constraint_set($0, "affectPX", $v)
+  AffectsPositionY: bool => U.constraint_get($0, "affectPY", true)
+  set AffectsPositionY: bool => U.constraint_set($0, "affectPY", $v)
+  AffectsPositionZ: bool => U.constraint_get($0, "affectPZ", true)
+  set AffectsPositionZ: bool => U.constraint_set($0, "affectPZ", $v)
+
+type VRCRotationConstraint : VRCConstraintBase kind=component gd=Node extern=VRCSDK3DynamicsConstraintComponentsVRCRotationConstraint
+  RotationAtRest: Vector3 => U.constraint_get($0, "rotationAtRest", Vector3.ZERO)
+  set RotationAtRest: Vector3 => U.constraint_set($0, "rotationAtRest", $v)
+  RotationOffset: Vector3 => U.constraint_get($0, "rotationOffset", Vector3.ZERO)
+  set RotationOffset: Vector3 => U.constraint_set($0, "rotationOffset", $v)
+  AffectsRotationX: bool => U.constraint_get($0, "affectX", true)
+  set AffectsRotationX: bool => U.constraint_set($0, "affectX", $v)
+  AffectsRotationY: bool => U.constraint_get($0, "affectY", true)
+  set AffectsRotationY: bool => U.constraint_set($0, "affectY", $v)
+  AffectsRotationZ: bool => U.constraint_get($0, "affectZ", true)
+  set AffectsRotationZ: bool => U.constraint_set($0, "affectZ", $v)
+
+type VRCScaleConstraint : VRCConstraintBase kind=component gd=Node extern=VRCSDK3DynamicsConstraintComponentsVRCScaleConstraint
+  ScaleAtRest: Vector3 => U.constraint_get($0, "scaleAtRest", Vector3.ONE)
+  set ScaleAtRest: Vector3 => U.constraint_set($0, "scaleAtRest", $v)
+  ScaleOffset: Vector3 => U.constraint_get($0, "scaleOffset", Vector3.ONE)
+  set ScaleOffset: Vector3 => U.constraint_set($0, "scaleOffset", $v)
+  AffectsScaleX: bool => U.constraint_get($0, "affectSX", true)
+  set AffectsScaleX: bool => U.constraint_set($0, "affectSX", $v)
+  AffectsScaleY: bool => U.constraint_get($0, "affectSY", true)
+  set AffectsScaleY: bool => U.constraint_set($0, "affectSY", $v)
+  AffectsScaleZ: bool => U.constraint_get($0, "affectSZ", true)
+  set AffectsScaleZ: bool => U.constraint_set($0, "affectSZ", $v)
+
+type VRCConstraintSource kind=struct gd=Dictionary extern=VRCDynamicsVRCConstraintSource
+  ctor() => {"SourceTransform": null, "Weight": 1.0, "ParentPositionOffset": Vector3.ZERO, "ParentRotationOffset": Vector3.ZERO}
+  ctor(Transform, float) => {"SourceTransform": $1, "Weight": $2, "ParentPositionOffset": Vector3.ZERO, "ParentRotationOffset": Vector3.ZERO}
+  ctor(Transform, float, Vector3, Vector3) => {"SourceTransform": $1, "Weight": $2, "ParentPositionOffset": $3, "ParentRotationOffset": $4}
+  SourceTransform: Transform => $0.get("SourceTransform", null)
+  set SourceTransform: Transform => $0.SourceTransform = $v
+  Weight: float => $0.get("Weight", 1.0)
+  set Weight: float => $0.Weight = $v
+  ParentPositionOffset: Vector3 => $0.get("ParentPositionOffset", Vector3.ZERO)
+  set ParentPositionOffset: Vector3 => $0.ParentPositionOffset = $v
+  ParentRotationOffset: Vector3 => $0.get("ParentRotationOffset", Vector3.ZERO)
+  set ParentRotationOffset: Vector3 => $0.ParentRotationOffset = $v
+
+type VRCConstraintSourceKeyableList kind=class gd=Array extern=VRCDynamicsVRCConstraintSourceKeyableList
+  ctor() => []
+  ctor(int) => []
+  Count: int => $0.size()
+  this[int]: VRCConstraintSource => $0[$1]
+  Add(VRCConstraintSource): void => $0.append($1)
+  Insert(int, VRCConstraintSource): void => $0.insert($1, $2)
+  Remove(VRCConstraintSource): bool => U.array_remove($0, $1)
+  RemoveAt(int): void => $0.remove_at($1)
+  Clear(): void => $0.clear()
+  Contains(VRCConstraintSource): bool => $0.has($1)
+  IndexOf(VRCConstraintSource): int => $0.find($1)
+  SetSource(int, VRCConstraintSource): void => $0[$1] = $2
+  SetWeight(int, float): void => $0[$1].Weight = $2
+  GetWeight(int): float => $0[$1].get("Weight", 1.0)
+  SetSourceTransform(int, Transform): void => $0[$1].SourceTransform = $2
+  GetSourceTransform(int): Transform => $0[$1].get("SourceTransform", null)
+  ToArray(): VRCConstraintSource[] => $0.duplicate()
+
+type NetworkStats kind=static extern=VRCSDK3NetworkStats
+  static Ping: int => Udon.network_stat("ping", 0)
+  static Jitter: float => Udon.network_stat("jitter", 0.0)
+  static PacketLoss: float => Udon.network_stat("packet_loss", 0.0)
+  static UdonBehaviourCount: int => Udon.behaviours().size()
+  static VariableSyncIn: int => Udon.network_stat("var_in", 0)
+  static VariableSyncOut: int => Udon.network_stat("var_out", 0)
+  static EventSyncIn: int => Udon.network_stat("event_in", 0)
+  static EventSyncOut: int => Udon.network_stat("event_out", 0)
+  static InboundBytes: int => Udon.network_stat("bytes_in", 0)
+  static OutboundBytes: int => Udon.network_stat("bytes_out", 0)
+  static SentBytes: int => Udon.network_stat("bytes_out", 0)
+  static ReceivedBytes: int => Udon.network_stat("bytes_in", 0)
+  static InboundPackets: int => Udon.network_stat("packets_in", 0)
+  static OutboundPackets: int => Udon.network_stat("packets_out", 0)
+  static SentPackets: int => Udon.network_stat("packets_out", 0)
+  static ReceivedPackets: int => Udon.network_stat("packets_in", 0)
+  static BytesPerSecondIn: float => Udon.network_stat("bps_in", 0.0)
+  static BytesPerSecondOut: float => Udon.network_stat("bps_out", 0.0)
+  static SendRateLimited: bool => false
+  static Latency: float => (Udon.network_stat("ping", 0) / 1000.0)
+  static ObjectSyncCount: int => Udon.network_stat("object_sync_count", 0)
+  static PlayerObjectCount: int => Udon.player_count()
+  static TotalObjects: int => Udon.behaviours().size()
+  static ServerFrameTime: float => 0.0
+  static GetIsNetworkSettled(): bool => Udon.is_network_settled()
+  static GetNetworkQuality(): int => 0
+  static GetUdonBehaviourCount(): int => Udon.behaviours().size()
+
+type VRCCameraDollyAnimation : Behaviour kind=component gd=Node extern=VRCSDK3ComponentsVRCCameraDollyAnimation
+  IsPlaying: bool => U.dolly_get($0, "playing", false)
+  IsPaused: bool => U.dolly_get($0, "paused", false)
+  Duration: float => U.dolly_get($0, "duration", 0.0)
+  set Duration: float => U.dolly_set($0, "duration", $v)
+  Speed: float => U.dolly_get($0, "speed", 1.0)
+  set Speed: float => U.dolly_set($0, "speed", $v)
+  Loop: bool => U.dolly_get($0, "loop", false)
+  set Loop: bool => U.dolly_set($0, "loop", $v)
+  Path: VRCCameraDollyPath => U.dolly_get($0, "path", null)
+  set Path: VRCCameraDollyPath => U.dolly_set($0, "path", $v)
+  Play(): void => U.dolly_set($0, "playing", true)
+  Pause(): void => U.dolly_set($0, "paused", true)
+  Resume(): void => U.dolly_set($0, "paused", false)
+  Stop(): void => U.dolly_set($0, "playing", false)
+  Restart(): void => U.dolly_set($0, "playing", true)
+  SetTime(float): void => U.dolly_set($0, "time", $1)
+  GetTime(): float => U.dolly_get($0, "time", 0.0)
+
+type VRCCameraDollyPath : Behaviour kind=component gd=Path3D extern=VRCSDK3ComponentsVRCCameraDollyPath
+  Points: VRCCameraDollyPathPoint[] => U.dolly_get($0, "points", [])
+  set Points: VRCCameraDollyPathPoint[] => U.dolly_set($0, "points", $v)
+  Loop: bool => U.dolly_get($0, "loop", false)
+  set Loop: bool => U.dolly_set($0, "loop", $v)
+
+type VRCCameraDollyPathPoint kind=struct gd=Dictionary extern=VRCSDK3ComponentsVRCCameraDollyPathPoint
+  ctor() => {}
+  Position: Vector3 => $0.get("Position", Vector3.ZERO)
+  set Position: Vector3 => $0.Position = $v
+  Rotation: Quaternion => $0.get("Rotation", Quaternion())
+  set Rotation: Quaternion => $0.Rotation = $v
+  FieldOfView: float => $0.get("FieldOfView", 60.0)
+  set FieldOfView: float => $0.FieldOfView = $v
+  Duration: float => $0.get("Duration", 1.0)
+  set Duration: float => $0.Duration = $v
+  Speed: float => $0.get("Speed", 1.0)
+  set Speed: float => $0.Speed = $v
+  Zoom: float => $0.get("Zoom", 1.0)
+  set Zoom: float => $0.Zoom = $v
+  Aperture: float => $0.get("Aperture", 15.0)
+  set Aperture: float => $0.Aperture = $v
+  FocalDistance: float => $0.get("FocalDistance", 1.5)
+  set FocalDistance: float => $0.FocalDistance = $v
+  Exposure: float => $0.get("Exposure", 0.0)
+  set Exposure: float => $0.Exposure = $v
+  Hue: float => $0.get("Hue", 0.0)
+  set Hue: float => $0.Hue = $v
+  Saturation: float => $0.get("Saturation", 0.0)
+  set Saturation: float => $0.Saturation = $v
+  Lightness: float => $0.get("Lightness", 0.0)
+  set Lightness: float => $0.Lightness = $v
+  LookAtMeXOffset: float => $0.get("LookAtMeXOffset", 0.0)
+  set LookAtMeXOffset: float => $0.LookAtMeXOffset = $v
+  LookAtMeYOffset: float => $0.get("LookAtMeYOffset", 0.0)
+  set LookAtMeYOffset: float => $0.LookAtMeYOffset = $v
+  LookAtMeOffset: Vector2 => $0.get("LookAtMeOffset", Vector2.ZERO)
+  set LookAtMeOffset: Vector2 => $0.LookAtMeOffset = $v
+  EasingFunction: int => $0.get("EasingFunction", 0)
+  set EasingFunction: int => $0.EasingFunction = $v
+
+type VRCMidiPlayer : Behaviour kind=component gd=Node extern=VRCSDK3MidiVRCMidiPlayer
+  Play(): void => Udon.midi_command($0, "play", [])
+  Pause(): void => Udon.midi_command($0, "pause", [])
+  Stop(): void => Udon.midi_command($0, "stop", [])
+  IsPlaying(): bool => Udon.midi_command($0, "is_playing", [])
+  SetTime(float): void => Udon.midi_command($0, "set_time", [$1])
+  GetTime(): float => Udon.midi_command($0, "get_time", [])
+  midiData: MidiData => Udon.midi_command($0, "data", [])
+  set midiData: MidiData => Udon.midi_command($0, "set_data", [$v])
+  audioSource: AudioSource => U.get_component($0, "AudioStreamPlayer3D")
+  set audioSource: AudioSource => pass
+  udonBehaviour: UdonBehaviour => $0
+  set udonBehaviour: UdonBehaviour => pass
+
+type MidiData kind=class gd=Dictionary extern=VRCSDK3MidiMidiData
+  Tracks: MidiTrack[] => $0.get("tracks", [])
+  set Tracks: MidiTrack[] => $0.tracks = $v
+  Tempo: float => $0.get("tempo", 120.0)
+  set Tempo: float => $0.tempo = $v
+  TotalTime: float => $0.get("total_time", 0.0)
+  set TotalTime: float => $0.total_time = $v
+  MicrosecondsPerQuarterNote: int => $0.get("us_per_quarter", 500000)
+  set MicrosecondsPerQuarterNote: int => $0.us_per_quarter = $v
+alias MidiData.MidiTrack = MidiTrack
+alias MidiData.MidiBlock = MidiBlock
+
+type MidiTrack kind=class gd=Dictionary extern=VRCSDK3MidiMidiDataMidiTrack
+  Name: string => $0.get("name", "")
+  set Name: string => $0.name = $v
+  Blocks: MidiBlock[] => $0.get("blocks", [])
+  set Blocks: MidiBlock[] => $0.blocks = $v
+  Channel: int => $0.get("channel", 0)
+  set Channel: int => $0.channel = $v
+  Instrument: int => $0.get("instrument", 0)
+  set Instrument: int => $0.instrument = $v
+  StartTime: float => $0.get("start", 0.0)
+  set StartTime: float => $0.start = $v
+  EndTime: float => $0.get("end", 0.0)
+  set EndTime: float => $0.end = $v
+  ChannelNumber: int => $0.get("channel", 0)
+  set ChannelNumber: int => $0.channel = $v
+  ProgramNumber: int => $0.get("instrument", 0)
+  set ProgramNumber: int => $0.instrument = $v
+
+type MidiBlock kind=class gd=Dictionary extern=VRCSDK3MidiMidiDataMidiBlock
+  Note: int => $0.get("note", 0)
+  set Note: int => $0.note = $v
+  Velocity: int => $0.get("velocity", 0)
+  set Velocity: int => $0.velocity = $v
+  StartTime: float => $0.get("start", 0.0)
+  set StartTime: float => $0.start = $v
+  EndTime: float => $0.get("end", 0.0)
+  set EndTime: float => $0.end = $v
+  Length: float => ($0.get("end", 0.0) - $0.get("start", 0.0))
+  Channel: int => $0.get("channel", 0)
+  set Channel: int => $0.channel = $v
+  Track: int => $0.get("track", 0)
+  set Track: int => $0.track = $v
+  StartTimeMs: int => int($0.get("start", 0.0) * 1000.0)
+  set StartTimeMs: int => $0.start = $v / 1000.0
+  EndTimeMs: int => int($0.get("end", 0.0) * 1000.0)
+  set EndTimeMs: int => $0.end = $v / 1000.0
+  LengthMs: int => int(($0.get("end", 0.0) - $0.get("start", 0.0)) * 1000.0)
+
+type Store kind=static extern=VRCEconomyStore
+  static IsProductOwned(IProduct): bool => Udon.economy("is_owned", [$1])
+  static DoesPlayerOwnProduct(VRCPlayerApi, IProduct): bool => Udon.economy("player_owns", [$1, $2])
+  static DoesAnyPlayerOwnProduct(IProduct): bool => Udon.economy("any_owns", [$1])
+  static GetPlayersWhoOwnProduct(IProduct, VRCPlayerApi[]): VRCPlayerApi[] => Udon.economy("owners", [$1, $2])
+  static ListPurchases(UdonBehaviour): void => Udon.economy("list_purchases", [$1])
+  static ListProductOwners(UdonBehaviour, IProduct): void => Udon.economy("list_owners", [$1, $2])
+  static ListPlayerPurchases(UdonBehaviour, VRCPlayerApi): void => Udon.economy("list_player_purchases", [$1, $2])
+  static ListAvailableProducts(UdonBehaviour): void => Udon.economy("list_products", [$1])
+  static OpenListing(VRCUrl): void => Udon.economy("open_listing", [$1])
+  static OpenGroupPage(string): void => Udon.economy("open_group", [$1])
+  static OpenGroupStorePage(string): void => Udon.economy("open_group_store", [$1])
+  static ReleasePurchaseEvent(IProduct): void => Udon.economy("release_event", [$1])
+  static GetWorldProducts(): IProduct[] => Udon.economy("world_products", [])
+
+type IProduct kind=class gd=Dictionary extern=VRCEconomyIProduct
+  ID: string => $0.get("id", "")
+  Name: string => $0.get("name", "")
+  Description: string => $0.get("description", "")
+  Price: int => $0.get("price", 0)
+  Category: string => $0.get("category", "")
+
+type UdonProduct kind=class gd=Dictionary extern=VRCEconomyUdonProduct
+  ID: string => $0.get("id", "")
+  Name: string => $0.get("name", "")
+  Description: string => $0.get("description", "")
+  Price: int => $0.get("price", 0)
+  Category: string => $0.get("category", "")
+  ProductType: string => $0.get("type", "")
+  IsOwned: bool => Udon.economy("is_owned", [$0])
+
+type VRCPhysBone
+  isAnimated: bool => U.physbone_get($0, "isAnimated", false)
+  set isAnimated: bool => U.physbone_set($0, "isAnimated", $v)
+  pull: float => U.physbone_get($0, "pull", 0.2)
+  set pull: float => U.physbone_set($0, "pull", $v)
+  spring: float => U.physbone_get($0, "spring", 0.2)
+  set spring: float => U.physbone_set($0, "spring", $v)
+  stiffness: float => U.physbone_get($0, "stiffness", 0.2)
+  set stiffness: float => U.physbone_set($0, "stiffness", $v)
+  gravity: float => U.physbone_get($0, "gravity", 0.0)
+  set gravity: float => U.physbone_set($0, "gravity", $v)
+  gravityFalloff: float => U.physbone_get($0, "gravityFalloff", 0.0)
+  set gravityFalloff: float => U.physbone_set($0, "gravityFalloff", $v)
+  immobile: float => U.physbone_get($0, "immobile", 0.0)
+  set immobile: float => U.physbone_set($0, "immobile", $v)
+  radius: float => U.physbone_get($0, "radius", 0.0)
+  set radius: float => U.physbone_set($0, "radius", $v)
+  maxAngleX: float => U.physbone_get($0, "maxAngleX", 45.0)
+  set maxAngleX: float => U.physbone_set($0, "maxAngleX", $v)
+  maxAngleZ: float => U.physbone_get($0, "maxAngleZ", 45.0)
+  set maxAngleZ: float => U.physbone_set($0, "maxAngleZ", $v)
+  maxStretch: float => U.physbone_get($0, "maxStretch", 0.0)
+  set maxStretch: float => U.physbone_set($0, "maxStretch", $v)
+  maxSquish: float => U.physbone_get($0, "maxSquish", 0.0)
+  set maxSquish: float => U.physbone_set($0, "maxSquish", $v)
+  allowGrabbing: int => U.physbone_get($0, "allowGrabbing", 1)
+  set allowGrabbing: int => U.physbone_set($0, "allowGrabbing", $v)
+  allowPosing: int => U.physbone_get($0, "allowPosing", 1)
+  set allowPosing: int => U.physbone_set($0, "allowPosing", $v)
+  allowCollision: int => U.physbone_get($0, "allowCollision", 1)
+  set allowCollision: int => U.physbone_set($0, "allowCollision", $v)
+  grabMovement: float => U.physbone_get($0, "grabMovement", 0.5)
+  set grabMovement: float => U.physbone_set($0, "grabMovement", $v)
+  parameter: string => U.physbone_get($0, "parameter", "")
+  set parameter: string => U.physbone_set($0, "parameter", $v)
+  rootTransform: Transform => U.physbone_get($0, "rootTransform", $0)
+  set rootTransform: Transform => U.physbone_set($0, "rootTransform", $v)
+  ignoreTransforms: Transform[] => U.physbone_get($0, "ignoreTransforms", [])
+  set ignoreTransforms: Transform[] => U.physbone_set($0, "ignoreTransforms", $v)
+  colliders: Array => U.physbone_get($0, "colliders", [])
+  set colliders: Array => U.physbone_set($0, "colliders", $v)
+  GetGrabbedPlayers(): VRCPlayerApi[] => []
+  GetPoseCount(): int => 0
+  GetGrabCount(): int => 0
+  ResetPhysBone(): void => pass
+
+type VRCPhysBoneCollider : Behaviour kind=component gd=Node extern=VRCSDK3DynamicsPhysBoneComponentsVRCPhysBoneCollider
+  radius: float => U.physbone_get($0, "radius", 0.0)
+  set radius: float => U.physbone_set($0, "radius", $v)
+  height: float => U.physbone_get($0, "height", 0.0)
+  set height: float => U.physbone_set($0, "height", $v)
+  position: Vector3 => U.physbone_get($0, "position", Vector3.ZERO)
+  set position: Vector3 => U.physbone_set($0, "position", $v)
+  rotation: Quaternion => U.physbone_get($0, "rotation", Quaternion())
+  set rotation: Quaternion => U.physbone_set($0, "rotation", $v)
+  insideBounds: bool => U.physbone_get($0, "insideBounds", false)
+  set insideBounds: bool => U.physbone_set($0, "insideBounds", $v)
+  shapeType: int => U.physbone_get($0, "shapeType", 0)
+  set shapeType: int => U.physbone_set($0, "shapeType", $v)
+  rootTransform: Transform => U.physbone_get($0, "rootTransform", $0)
+  set rootTransform: Transform => U.physbone_set($0, "rootTransform", $v)
+
+type VRCPhysBoneGrabbedInfo kind=struct gd=Dictionary extern=VRCDynamicsPhysBoneGrabbedInfo
+  player: VRCPlayerApi => $0.get("player", null)
+  physBone: VRCPhysBone => $0.get("physBone", null)
+  transform: Transform => $0.get("transform", null)
+type VRCPhysBoneReleasedInfo kind=struct gd=Dictionary extern=VRCDynamicsPhysBoneReleasedInfo
+  player: VRCPlayerApi => $0.get("player", null)
+  physBone: VRCPhysBone => $0.get("physBone", null)
+type VRCPhysBonePosedInfo kind=struct gd=Dictionary extern=VRCDynamicsPhysBonePosedInfo
+  player: VRCPlayerApi => $0.get("player", null)
+  physBone: VRCPhysBone => $0.get("physBone", null)
+type VRCPhysBoneUnPosedInfo kind=struct gd=Dictionary extern=VRCDynamicsPhysBoneUnPosedInfo
+  player: VRCPlayerApi => $0.get("player", null)
+  physBone: VRCPhysBone => $0.get("physBone", null)
+
+type VRCContactReceiver
+  value: float => U.physbone_get($0, "value", 0.0)
+  radius: float => U.physbone_get($0, "radius", 0.0)
+  set radius: float => U.physbone_set($0, "radius", $v)
+  height: float => U.physbone_get($0, "height", 0.0)
+  set height: float => U.physbone_set($0, "height", $v)
+  position: Vector3 => U.physbone_get($0, "position", Vector3.ZERO)
+  set position: Vector3 => U.physbone_set($0, "position", $v)
+  rotation: Quaternion => U.physbone_get($0, "rotation", Quaternion())
+  set rotation: Quaternion => U.physbone_set($0, "rotation", $v)
+  parameter: string => U.physbone_get($0, "parameter", "")
+  set parameter: string => U.physbone_set($0, "parameter", $v)
+  receiverType: int => U.physbone_get($0, "receiverType", 0)
+  set receiverType: int => U.physbone_set($0, "receiverType", $v)
+  collisionTags: string[] => U.physbone_get($0, "collisionTags", [])
+  set collisionTags: string[] => U.physbone_set($0, "collisionTags", $v)
+  allowSelf: bool => U.physbone_get($0, "allowSelf", true)
+  set allowSelf: bool => U.physbone_set($0, "allowSelf", $v)
+  allowOthers: bool => U.physbone_get($0, "allowOthers", true)
+  set allowOthers: bool => U.physbone_set($0, "allowOthers", $v)
+  localOnly: bool => U.physbone_get($0, "localOnly", false)
+  set localOnly: bool => U.physbone_set($0, "localOnly", $v)
+  minVelocity: float => U.physbone_get($0, "minVelocity", 0.0)
+  set minVelocity: float => U.physbone_set($0, "minVelocity", $v)
+  shapeType: int => U.physbone_get($0, "shapeType", 0)
+  set shapeType: int => U.physbone_set($0, "shapeType", $v)
+
+type VRCContactSender
+  radius: float => U.physbone_get($0, "radius", 0.0)
+  set radius: float => U.physbone_set($0, "radius", $v)
+  height: float => U.physbone_get($0, "height", 0.0)
+  set height: float => U.physbone_set($0, "height", $v)
+  position: Vector3 => U.physbone_get($0, "position", Vector3.ZERO)
+  set position: Vector3 => U.physbone_set($0, "position", $v)
+  rotation: Quaternion => U.physbone_get($0, "rotation", Quaternion())
+  set rotation: Quaternion => U.physbone_set($0, "rotation", $v)
+  collisionTags: string[] => U.physbone_get($0, "collisionTags", [])
+  set collisionTags: string[] => U.physbone_set($0, "collisionTags", $v)
+  shapeType: int => U.physbone_get($0, "shapeType", 0)
+  set shapeType: int => U.physbone_set($0, "shapeType", $v)
+
+type VRCDynamicsContactSenderProxy kind=class gd=Dictionary extern=VRCDynamicsContactSenderProxy
+  player: VRCPlayerApi => $0.get("player", null)
+  sender: VRCContactSender => $0.get("sender", null)
+  contactSender: VRCContactSender => $0.get("sender", null)
+  gameObject: GameObject => $0.get("sender", null)
+  transform: Transform => $0.get("sender", null)
+  IsValid(): bool => $0.get("sender", null) != null
+
+type VRCDynamicsContactEnterInfo kind=struct gd=Dictionary extern=VRCDynamicsContactEnterInfo
+  contactPoint: Vector3 => $0.get("contactPoint", Vector3.ZERO)
+  contactSender: VRCDynamicsContactSenderProxy => $0.get("contactSender", {})
+  enterVelocity: Vector3 => $0.get("enterVelocity", Vector3.ZERO)
+  matchingTags: string[] => $0.get("matchingTags", [])
+type VRCDynamicsContactExitInfo kind=struct gd=Dictionary extern=VRCDynamicsContactExitInfo
+  contactSender: VRCDynamicsContactSenderProxy => $0.get("contactSender", {})
+
+type VRCDroneApi kind=class gd=Object extern=VRCSDKBaseVRCDroneApi
+  IsValid(): bool => Udon.is_valid($0)
+  IsActive(): bool => ($0 != null and $0.get("active") == true)
+  GetPosition(): Vector3 => $0.get("position")
+  GetRotation(): Quaternion => $0.get("rotation")
+  GetVelocity(): Vector3 => $0.get("velocity")
+  GetPlayer(): VRCPlayerApi => $0.get("player")
+  GetCamera(): Camera => $0.get("camera")
+  GetDroneTransform(): Transform => $0.get("node")
+  IsControlled(): bool => ($0 != null and $0.get("controlled") == true)
+  GetDroneId(): int => $0.get("id", 0)
+  TeleportTo(Vector3, Quaternion): void => $0.call("teleport_to", $1, $2)
+
+type VRCAsyncGPUReadback kind=static extern=VRCSDK3RenderingVRCAsyncGPUReadback
+  static Request(Texture, int, IUdonEventReceiver): VRCAsyncGPUReadbackRequest => U.gpu_readback($1, $2, $3)
+  static Request(Texture, int, TextureFormat, IUdonEventReceiver): VRCAsyncGPUReadbackRequest => U.gpu_readback($1, $2, $4)
+  static Request(Texture, int, int, int, int, int, int, int, int, IUdonEventReceiver): VRCAsyncGPUReadbackRequest => U.gpu_readback($1, $2, $10)
+
+type VRCAsyncGPUReadbackRequest kind=class gd=Dictionary extern=VRCSDK3RenderingVRCAsyncGPUReadbackRequest
+  hasError: bool => $0.get("hasError", false)
+  done: bool => $0.get("done", true)
+  width: int => $0.get("width", 0)
+  height: int => $0.get("height", 0)
+  depth: int => $0.get("depth", 1)
+  layerCount: int => 1
+  layerDataSize: int => $0.get("data", PackedByteArray()).size()
+  TryGetData(byte[]): bool => U.gpu_readback_copy($0, $1)
+  TryGetData(Color[]): bool => U.gpu_readback_copy_colors($0, $1)
+  TryGetData(Color32[]): bool => U.gpu_readback_copy_colors($0, $1)
+  TryGetData(float[]): bool => U.gpu_readback_copy_floats($0, $1)
+  TryGetData(int[]): bool => U.gpu_readback_copy($0, $1)
+  GetLayerDataSize(int): int => $0.get("data", PackedByteArray()).size()
+  WaitForCompletion(): void => pass
+  Update(): void => pass
+
+type TextureFormat kind=enum extern=UnityEngineTextureFormat
+  enum Alpha8 = 1
+  enum ARGB4444 = 2
+  enum RGB24 = 3
+  enum RGBA32 = 4
+  enum ARGB32 = 5
+  enum RGB565 = 7
+  enum R16 = 9
+  enum DXT1 = 10
+  enum DXT5 = 12
+  enum RGBA4444 = 13
+  enum BGRA32 = 14
+  enum RHalf = 15
+  enum RGHalf = 16
+  enum RGBAHalf = 17
+  enum RFloat = 18
+  enum RGFloat = 19
+  enum RGBAFloat = 20
+  enum R8 = 63
+
+type VRCCustomAction : Behaviour kind=component gd=Node extern=VRCSDKBaseVRCCustomAction
+  Execute(): void => U.send_custom_event($0, "Execute")
+  Execute(string): void => U.send_custom_event($0, $1)
+
+type VRCRenderTexture kind=class gd=Variant extern=VRCSDKBaseVRCRenderTexture
+  static GetTemporary(int, int): RenderTexture => U.new_render_texture($1, $2)
+  static GetTemporary(int, int, int): RenderTexture => U.new_render_texture($1, $2)
+  static ReleaseTemporary(RenderTexture): void => pass
+
+type VRCTMPDropdownExtension : Behaviour kind=component gd=OptionButton extern=VRCSDK3ComponentsVRCTMPDropdownExtension
+  Show(): void => $0.show_popup()
+  Hide(): void => $0.get_popup().hide()
+  RefreshShownValue(): void => pass
+
+type VRCOpenMenu : Behaviour kind=component gd=Node extern=VRCSDK3ComponentsVRCOpenMenu
+  OpenMenu(): void => Udon.open_menu($0)
+
+type PlayerDataInfo kind=struct gd=Dictionary extern=VRCSDK3PersistencePlayerDataInfo
+  Key: string => $0.get("Key", "")
+  State: int => $0.get("State", 0)
+  Owner: VRCPlayerApi => $0.get("Owner", null)
+
+type PlayerData
+  static SetColor32(string, Color32): void => Udon.player_data_set($1, $2)
+  static SetVector2(string, Vector2): void => Udon.player_data_set($1, $2)
+  static SetVector4(string, Vector4): void => Udon.player_data_set($1, $2)
+  static SetShort(string, short): void => Udon.player_data_set($1, $2)
+  static SetByte(string, byte): void => Udon.player_data_set($1, $2)
+  static SetUInt(string, uint): void => Udon.player_data_set($1, $2)
+  static SetUShort(string, ushort): void => Udon.player_data_set($1, $2)
+  static SetULong(string, ulong): void => Udon.player_data_set($1, $2)
+  static SetSByte(string, sbyte): void => Udon.player_data_set($1, $2)
+  static GetColor32(VRCPlayerApi, string): Color32 => Udon.player_data_get($1, $2, Color.WHITE)
+  static GetVector2(VRCPlayerApi, string): Vector2 => Udon.player_data_get($1, $2, Vector2.ZERO)
+  static GetVector4(VRCPlayerApi, string): Vector4 => Udon.player_data_get($1, $2, Vector4.ZERO)
+  static GetShort(VRCPlayerApi, string): short => int(Udon.player_data_get($1, $2, 0))
+  static GetByte(VRCPlayerApi, string): byte => int(Udon.player_data_get($1, $2, 0))
+  static GetUInt(VRCPlayerApi, string): uint => int(Udon.player_data_get($1, $2, 0))
+  static GetUShort(VRCPlayerApi, string): ushort => int(Udon.player_data_get($1, $2, 0))
+  static GetULong(VRCPlayerApi, string): ulong => int(Udon.player_data_get($1, $2, 0))
+  static GetSByte(VRCPlayerApi, string): sbyte => int(Udon.player_data_get($1, $2, 0))
+  static TryGetDouble(VRCPlayerApi, string, out double): bool => $3 = float(Udon.player_data_get($1, $2, 0.0)) ;; Udon.player_data_has($1, $2)
+  static TryGetLong(VRCPlayerApi, string, out long): bool => $3 = int(Udon.player_data_get($1, $2, 0)) ;; Udon.player_data_has($1, $2)
+  static TryGetVector3(VRCPlayerApi, string, out Vector3): bool => $3 = Udon.player_data_get($1, $2, Vector3.ZERO) ;; Udon.player_data_has($1, $2)
+  static TryGetQuaternion(VRCPlayerApi, string, out Quaternion): bool => $3 = Udon.player_data_get($1, $2, Quaternion()) ;; Udon.player_data_has($1, $2)
+  static TryGetColor(VRCPlayerApi, string, out Color): bool => $3 = Udon.player_data_get($1, $2, Color.WHITE) ;; Udon.player_data_has($1, $2)
+  static TryGetBytes(VRCPlayerApi, string, out byte[]): bool => $3 = Udon.player_data_get($1, $2, []) ;; Udon.player_data_has($1, $2)
+  static GetAll(VRCPlayerApi): PlayerDataInfo[] => Udon.player_data_all($1)
+  static HasKey(string): bool => Udon.player_data_has(Udon.local_player(), $1)
+
+type VRCPlayerObject kind=static extern=VRCSDK3PersistenceVRCPlayerObject
+  static Initialize(GameObject): void => Udon.player_object_init($1)
+
+type VRCUrlInputField
+  SetUrl(VRCUrl): void => $0.text = $1
+  GetUrl(): VRCUrl => $0.text
+  placeholder: Graphic => $0
+  set placeholder: Graphic => pass
+  characterLimit: int => $0.max_length
+  set characterLimit: int => $0.max_length = $v
+  textComponent: Text => $0
+  set textComponent: Text => pass
+  readOnly: bool => not $0.editable
+  set readOnly: bool => $0.editable = not $v
+  isFocused: bool => $0.has_focus()
+  caretPosition: int => $0.caret_column
+  set caretPosition: int => $0.caret_column = $v
+  ActivateInputField(): void => $0.grab_focus()
+  DeactivateInputField(): void => $0.release_focus()
+  Select(): void => $0.grab_focus()
+
+type VRCPlayerApi
+  SetVoiceGain(float, bool): void => $0.set_voice("gain", $1)
+  GetPlayersInRange(Vector3, float): VRCPlayerApi[] => Udon.players_in_range($1, $2)
+  IsPickupInHand(PickupHand): bool => ($0.get_pickup_in_hand($1) != null)
+  SetAvatarEyeHeightByMultiplier(float, bool): void => $0.set_avatar_eye_height($0.get_avatar_eye_height() * $1)
+  GetDrone(int): VRCDroneApi => null
+  static GetPlayerByIdSafe(int): VRCPlayerApi => Udon.get_player_by_id($1)
+  static IsValidPlayer(VRCPlayerApi): bool => Udon.is_valid($1)
+  static sPlayers: object => Udon.get_players([])
+
+type VRCPlayerApiExtensions kind=static extern=VRCSDKBaseVRCPlayerApiExtensions
+  static IsValid(VRCPlayerApi): bool => Udon.is_valid($1)
+  static Teleport(VRCPlayerApi, Vector3, Quaternion): void => $1.teleport_to($2, $3, 0, false)
+
+type UdonInputEventArgs
+  buttonValue: bool => $0.get("boolValue", false)
+  axisValue: float => $0.get("floatValue", 0.0)
+
+type UdonBehaviour
+  ProgramSource: object => null
+  set ProgramSource: object => pass
+  RunProgram(string): void => U.send_custom_event($0, $1)
+  SendCustomEventDelayedSeconds(string, float, EventTiming, bool): void => U.send_custom_event_delayed_seconds($0, $1, $2, $3)
+  SendCustomEventDelayedFrames(string, int, EventTiming, bool): void => U.send_custom_event_delayed_frames($0, $1, $2, $3)
+  GetProgramVariableType(string): Type => U.type_of($0.get($1))
+  HasEventInterface(string): bool => $0.has_method($1)
+  ClearAllEvents(): void => pass
+
+type IUdonEventReceiver
+  RunEvent(string): void => U.send_custom_event($0, $1)
+
+type Networking
+  static IsClogged: bool => Udon.is_clogged()
+  static LocalPlayerIsMaster: bool => Udon.is_master()
+  static GetPlayerObjects(VRCPlayerApi): GameObject[] => Udon.get_player_objects($1)
+  static IsOwner(GameObject, VRCPlayerApi): bool => Udon.is_owner_player($2, $1)
+  static SetOwnerRequested(VRCPlayerApi, GameObject): void => Udon.transfer_owner($1, $2)
+  static GetPlayerCount(): int => Udon.player_count()
+  static IsNetworkSettled: bool => Udon.is_network_settled()
+  static SceneEventHandler: object => null
+  static GetEventDispatcher(): object => null
+
+type NetworkCalling
+  static SendCustomNetworkEvent(UdonBehaviour, NetworkEventTarget, string, params object[]): void => U.send_custom_network_event($1, $2, $3, $params)
+  static CallingPlayer: VRCPlayerApi => Udon.calling_player()
+
+type VRCUrl
+  Equals(VRCUrl): bool => $0 == $1
+  GetHashCode(): int => $0.hash()
+  op ==(VRCUrl, VRCUrl): bool => $1 == $2
+  op !=(VRCUrl, VRCUrl): bool => $1 != $2
+
+type VRCGraphics
+  static Blit(Texture, RenderTexture, Vector2, Vector2): void => pass
+  static DrawMeshInstanced(Mesh, int, Material, Matrix4x4[], int, MaterialPropertyBlock): void => pass
+  static DrawMeshInstancedProcedural(Mesh, int, Material, Bounds, int): void => pass
+
+type VRCQualitySettings
+  static ShadowDistance: float => 100.0
+  static set ShadowDistance: float => pass
+  static VSyncCount: int => 1
+  static set VSyncCount: int => pass
+  static AntiAliasing: int => 4
+  static ShadowResolution: int => 2
+  static PixelLightCount: int => 4
+  static LodBias: float => 1.0
+  static MasterTextureLimit: int => 0
+  static GetQualityLevel(): int => 0
+
+type VRCCameraSettings
+  set Position: Vector3 => pass
+  set Rotation: Quaternion => pass
+  set FieldOfView: float => pass
+  set NearClipPlane: float => pass
+  set FarClipPlane: float => pass
+  set Active: bool => pass
+  ViewMatrix: Matrix4x4 => Transform3D()
+  ProjectionMatrix: Matrix4x4 => Transform3D()
+  CullingMask: int => -1
+  set CullingMask: int => pass
+  BackgroundColor: Color => Color.BLACK
+  set BackgroundColor: Color => pass
+  ClearFlags: int => 1
+  set ClearFlags: int => pass
+  AllowHDR: bool => true
+  set AllowHDR: bool => pass
+  Depth: float => 0.0
+  set Depth: float => pass
+  Orthographic: bool => false
+  set Orthographic: bool => pass
+  OrthographicSize: float => 5.0
+  set OrthographicSize: float => pass
+  Aspect: float => 1.777
+  WorldToScreenPoint(Vector3): Vector3 => U.world_to_screen(U.main_camera(), $1)
+  ScreenToWorldPoint(Vector3): Vector3 => U.screen_to_world(U.main_camera(), $1)
+  ScreenPointToRay(Vector3): Ray => U.screen_point_to_ray(U.main_camera(), $1)
+  WorldToViewportPoint(Vector3): Vector3 => U.world_to_viewport(U.main_camera(), $1)
+  ViewportToWorldPoint(Vector3): Vector3 => U.viewport_to_world(U.main_camera(), $1)
+  ViewportPointToRay(Vector3): Ray => U.viewport_point_to_ray(U.main_camera(), $1)
+  static PhotoCamera: VRCCameraSettings => Udon.screen_camera()
+  static SetTrackedTransform(int, Transform): void => pass
+
+type VRCImageDownloader
+  ctor(int) => Udon.new_image_downloader()
+  DownloadImage(VRCUrl, Material, UdonBehaviour, TextureInfo, string): object => $0.download_image($1, $2, $3, $4)
+
+type VRCStringDownloader
+  static LoadUrl(VRCUrl, IUdonEventReceiver, string): object => Udon.load_url_string($1, $2)
+
+type VRCJson
+  static TrySerializeToJson(DataToken, JsonExportType, out DataToken, out DataError): bool => $3 = JSON.stringify($1, ("\t" if $2 == 1 else "")) ;; $4 = 0 ;; true
+  static TryDeserializeFromJson(string, out DataToken, out DataError): bool => $2 = U.json_parse($1) ;; $3 = (0 if $2 != null else 5) ;; ($2 != null)
+
+type DataToken
+  static Error(DataError): DataToken => {"error": $1}
+  ctor(char) => $1
+  ctor(uint) => $1
+  ctor(ulong) => $1
+  ctor(sbyte) => $1
+  ctor(ushort) => $1
+  SByte: sbyte => int($0)
+  UShort: ushort => int($0)
+  ULong: ulong => int($0)
+  Char: char => str($0)
+  IsString: bool => (typeof($0) == TYPE_STRING)
+  IsBoolean: bool => (typeof($0) == TYPE_BOOL)
+  IsDataList: bool => (typeof($0) == TYPE_ARRAY)
+  IsDataDictionary: bool => (typeof($0) == TYPE_DICTIONARY and not $0.has("error"))
+  IsReference: bool => (typeof($0) == TYPE_OBJECT)
+  Clone(): DataToken => ($0.duplicate(true) if typeof($0) == TYPE_ARRAY or typeof($0) == TYPE_DICTIONARY else $0)
+  ShallowClone(): DataToken => ($0.duplicate(false) if typeof($0) == TYPE_ARRAY or typeof($0) == TYPE_DICTIONARY else $0)
+  DeepClone(): DataToken => ($0.duplicate(true) if typeof($0) == TYPE_ARRAY or typeof($0) == TYPE_DICTIONARY else $0)
+  GetHashCode(): int => hash($0)
+  Equals(object): bool => $0 == $1
+  op <(DataToken, DataToken): bool => $1 < $2
+  op >(DataToken, DataToken): bool => $1 > $2
+  op <=(DataToken, DataToken): bool => $1 <= $2
+  op >=(DataToken, DataToken): bool => $1 >= $2
+
+type DataList
+  ctor(object) => Array($1)
+  AddRange(DataToken[]): void => $0.append_array($1)
+  IndexOf(DataToken, int, int): int => U.array_index_of_range($0, $1, $2, $3)
+  LastIndexOf(DataToken, int): int => U.array_last_index_of($0, $1, $2)
+  LastIndexOf(DataToken, int, int): int => U.array_last_index_of($0, $1, $2)
+  Sort(int, int): void => U.array_sort_range($0, $1, $2)
+  GetRange(int, int): DataList => $0.slice($1, $1 + $2)
+  Reverse(int, int): void => U.array_reverse_range($0, $1, $2)
+  Capacity: int => $0.size()
+  set Capacity: int => pass
+  set Count: int => $0.resize($v)
+
+type DataDictionary
+  ctor(DataDictionary) => $1.duplicate()
+  Remove(DataToken, out DataToken): bool => $2 = $0.get($1, null) ;; $0.erase($1)
+  GetValues(): DataList => $0.values()
+  Equals(DataDictionary): bool => $0 == $1

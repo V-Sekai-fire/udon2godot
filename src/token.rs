@@ -1,0 +1,445 @@
+//! C# token definitions for the UdonSharp subset.
+
+use crate::diag::Span;
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Lit {
+    Int(i64),
+    /// Unsigned 32-bit (suffix `u`/`U`)
+    UInt(u64),
+    /// Signed 64-bit (suffix `l`/`L`)
+    Long(i64),
+    /// Unsigned 64-bit (suffix `ul`/`UL`)
+    ULong(u64),
+    Float(f64),
+    Double(f64),
+    Str(String),
+    Char(char),
+    Bool(bool),
+    Null,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Tok {
+    Ident(String),
+    Keyword(Kw),
+    Lit(Lit),
+    /// An interpolated string `$"..."` is lexed as a sequence of parts.
+    /// Text parts and expression source parts (re-lexed by the parser).
+    InterpStr(Vec<InterpPart>),
+    Punct(P),
+    Eof,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum InterpPart {
+    Text(String),
+    /// Raw expression source, optional format specifier (after ':'), optional alignment.
+    Expr { source: String, format: Option<String>, span: Span },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Kw {
+    Abstract,
+    As,
+    Base,
+    Bool,
+    Break,
+    Byte,
+    Case,
+    Catch,
+    Char,
+    Checked,
+    Class,
+    Const,
+    Continue,
+    Decimal,
+    Default,
+    Delegate,
+    Do,
+    Double,
+    Else,
+    Enum,
+    Event,
+    Explicit,
+    Extern,
+    False,
+    Finally,
+    Fixed,
+    Float,
+    For,
+    Foreach,
+    Goto,
+    If,
+    Implicit,
+    In,
+    Int,
+    Interface,
+    Internal,
+    Is,
+    Lock,
+    Long,
+    Namespace,
+    New,
+    Null,
+    Object,
+    Operator,
+    Out,
+    Override,
+    Params,
+    Private,
+    Protected,
+    Public,
+    Readonly,
+    Ref,
+    Return,
+    Sbyte,
+    Sealed,
+    Short,
+    Sizeof,
+    Stackalloc,
+    Static,
+    String,
+    Struct,
+    Switch,
+    This,
+    Throw,
+    True,
+    Try,
+    Typeof,
+    Uint,
+    Ulong,
+    Unchecked,
+    Unsafe,
+    Ushort,
+    Using,
+    Virtual,
+    Void,
+    Volatile,
+    While,
+}
+
+impl Kw {
+    pub fn from_str(s: &str) -> Option<Kw> {
+        Some(match s {
+            "abstract" => Kw::Abstract,
+            "as" => Kw::As,
+            "base" => Kw::Base,
+            "bool" => Kw::Bool,
+            "break" => Kw::Break,
+            "byte" => Kw::Byte,
+            "case" => Kw::Case,
+            "catch" => Kw::Catch,
+            "char" => Kw::Char,
+            "checked" => Kw::Checked,
+            "class" => Kw::Class,
+            "const" => Kw::Const,
+            "continue" => Kw::Continue,
+            "decimal" => Kw::Decimal,
+            "default" => Kw::Default,
+            "delegate" => Kw::Delegate,
+            "do" => Kw::Do,
+            "double" => Kw::Double,
+            "else" => Kw::Else,
+            "enum" => Kw::Enum,
+            "event" => Kw::Event,
+            "explicit" => Kw::Explicit,
+            "extern" => Kw::Extern,
+            "false" => Kw::False,
+            "finally" => Kw::Finally,
+            "fixed" => Kw::Fixed,
+            "float" => Kw::Float,
+            "for" => Kw::For,
+            "foreach" => Kw::Foreach,
+            "goto" => Kw::Goto,
+            "if" => Kw::If,
+            "implicit" => Kw::Implicit,
+            "in" => Kw::In,
+            "int" => Kw::Int,
+            "interface" => Kw::Interface,
+            "internal" => Kw::Internal,
+            "is" => Kw::Is,
+            "lock" => Kw::Lock,
+            "long" => Kw::Long,
+            "namespace" => Kw::Namespace,
+            "new" => Kw::New,
+            "null" => Kw::Null,
+            "object" => Kw::Object,
+            "operator" => Kw::Operator,
+            "out" => Kw::Out,
+            "override" => Kw::Override,
+            "params" => Kw::Params,
+            "private" => Kw::Private,
+            "protected" => Kw::Protected,
+            "public" => Kw::Public,
+            "readonly" => Kw::Readonly,
+            "ref" => Kw::Ref,
+            "return" => Kw::Return,
+            "sbyte" => Kw::Sbyte,
+            "sealed" => Kw::Sealed,
+            "short" => Kw::Short,
+            "sizeof" => Kw::Sizeof,
+            "stackalloc" => Kw::Stackalloc,
+            "static" => Kw::Static,
+            "string" => Kw::String,
+            "struct" => Kw::Struct,
+            "switch" => Kw::Switch,
+            "this" => Kw::This,
+            "throw" => Kw::Throw,
+            "true" => Kw::True,
+            "try" => Kw::Try,
+            "typeof" => Kw::Typeof,
+            "uint" => Kw::Uint,
+            "ulong" => Kw::Ulong,
+            "unchecked" => Kw::Unchecked,
+            "unsafe" => Kw::Unsafe,
+            "ushort" => Kw::Ushort,
+            "using" => Kw::Using,
+            "virtual" => Kw::Virtual,
+            "void" => Kw::Void,
+            "volatile" => Kw::Volatile,
+            "while" => Kw::While,
+            _ => return None,
+        })
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Kw::Abstract => "abstract",
+            Kw::As => "as",
+            Kw::Base => "base",
+            Kw::Bool => "bool",
+            Kw::Break => "break",
+            Kw::Byte => "byte",
+            Kw::Case => "case",
+            Kw::Catch => "catch",
+            Kw::Char => "char",
+            Kw::Checked => "checked",
+            Kw::Class => "class",
+            Kw::Const => "const",
+            Kw::Continue => "continue",
+            Kw::Decimal => "decimal",
+            Kw::Default => "default",
+            Kw::Delegate => "delegate",
+            Kw::Do => "do",
+            Kw::Double => "double",
+            Kw::Else => "else",
+            Kw::Enum => "enum",
+            Kw::Event => "event",
+            Kw::Explicit => "explicit",
+            Kw::Extern => "extern",
+            Kw::False => "false",
+            Kw::Finally => "finally",
+            Kw::Fixed => "fixed",
+            Kw::Float => "float",
+            Kw::For => "for",
+            Kw::Foreach => "foreach",
+            Kw::Goto => "goto",
+            Kw::If => "if",
+            Kw::Implicit => "implicit",
+            Kw::In => "in",
+            Kw::Int => "int",
+            Kw::Interface => "interface",
+            Kw::Internal => "internal",
+            Kw::Is => "is",
+            Kw::Lock => "lock",
+            Kw::Long => "long",
+            Kw::Namespace => "namespace",
+            Kw::New => "new",
+            Kw::Null => "null",
+            Kw::Object => "object",
+            Kw::Operator => "operator",
+            Kw::Out => "out",
+            Kw::Override => "override",
+            Kw::Params => "params",
+            Kw::Private => "private",
+            Kw::Protected => "protected",
+            Kw::Public => "public",
+            Kw::Readonly => "readonly",
+            Kw::Ref => "ref",
+            Kw::Return => "return",
+            Kw::Sbyte => "sbyte",
+            Kw::Sealed => "sealed",
+            Kw::Short => "short",
+            Kw::Sizeof => "sizeof",
+            Kw::Stackalloc => "stackalloc",
+            Kw::Static => "static",
+            Kw::String => "string",
+            Kw::Struct => "struct",
+            Kw::Switch => "switch",
+            Kw::This => "this",
+            Kw::Throw => "throw",
+            Kw::True => "true",
+            Kw::Try => "try",
+            Kw::Typeof => "typeof",
+            Kw::Uint => "uint",
+            Kw::Ulong => "ulong",
+            Kw::Unchecked => "unchecked",
+            Kw::Unsafe => "unsafe",
+            Kw::Ushort => "ushort",
+            Kw::Using => "using",
+            Kw::Virtual => "virtual",
+            Kw::Void => "void",
+            Kw::Volatile => "volatile",
+            Kw::While => "while",
+        }
+    }
+
+    /// Keywords naming a builtin type.
+    pub fn is_builtin_type(self) -> bool {
+        matches!(
+            self,
+            Kw::Bool
+                | Kw::Byte
+                | Kw::Char
+                | Kw::Decimal
+                | Kw::Double
+                | Kw::Float
+                | Kw::Int
+                | Kw::Long
+                | Kw::Object
+                | Kw::Sbyte
+                | Kw::Short
+                | Kw::String
+                | Kw::Uint
+                | Kw::Ulong
+                | Kw::Ushort
+                | Kw::Void
+        )
+    }
+}
+
+/// Punctuation and operators.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum P {
+    LParen,
+    RParen,
+    LBrace,
+    RBrace,
+    LBracket,
+    RBracket,
+    Semi,
+    Comma,
+    Dot,
+    Question,
+    QuestionDot,
+    QuestionQuestion,
+    QuestionQuestionEq,
+    Colon,
+    ColonColon,
+    Arrow, // =>
+    Tilde,
+    Bang,
+    BangEq,
+    Eq,
+    EqEq,
+    Plus,
+    PlusPlus,
+    PlusEq,
+    Minus,
+    MinusMinus,
+    MinusEq,
+    Star,
+    StarEq,
+    Slash,
+    SlashEq,
+    Percent,
+    PercentEq,
+    Amp,
+    AmpAmp,
+    AmpEq,
+    Pipe,
+    PipePipe,
+    PipeEq,
+    Caret,
+    CaretEq,
+    Lt,
+    LtEq,
+    LtLt,
+    LtLtEq,
+    Gt,
+    GtEq,
+    // `>>` and `>>=` are not produced by the lexer (they conflict with generics);
+    // the parser combines two `Gt` tokens when they are adjacent.
+    Hash,
+}
+
+impl P {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            P::LParen => "(",
+            P::RParen => ")",
+            P::LBrace => "{",
+            P::RBrace => "}",
+            P::LBracket => "[",
+            P::RBracket => "]",
+            P::Semi => ";",
+            P::Comma => ",",
+            P::Dot => ".",
+            P::Question => "?",
+            P::QuestionDot => "?.",
+            P::QuestionQuestion => "??",
+            P::QuestionQuestionEq => "??=",
+            P::Colon => ":",
+            P::ColonColon => "::",
+            P::Arrow => "=>",
+            P::Tilde => "~",
+            P::Bang => "!",
+            P::BangEq => "!=",
+            P::Eq => "=",
+            P::EqEq => "==",
+            P::Plus => "+",
+            P::PlusPlus => "++",
+            P::PlusEq => "+=",
+            P::Minus => "-",
+            P::MinusMinus => "--",
+            P::MinusEq => "-=",
+            P::Star => "*",
+            P::StarEq => "*=",
+            P::Slash => "/",
+            P::SlashEq => "/=",
+            P::Percent => "%",
+            P::PercentEq => "%=",
+            P::Amp => "&",
+            P::AmpAmp => "&&",
+            P::AmpEq => "&=",
+            P::Pipe => "|",
+            P::PipePipe => "||",
+            P::PipeEq => "|=",
+            P::Caret => "^",
+            P::CaretEq => "^=",
+            P::Lt => "<",
+            P::LtEq => "<=",
+            P::LtLt => "<<",
+            P::LtLtEq => "<<=",
+            P::Gt => ">",
+            P::GtEq => ">=",
+            P::Hash => "#",
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Token {
+    pub tok: Tok,
+    pub span: Span,
+    /// Byte offset of the token start in the source (used to detect adjacency of `>` `>`).
+    pub offset: usize,
+    /// Byte length of the token.
+    pub len: usize,
+    /// Documentation comment (`///`) text immediately preceding this token, if any.
+    pub doc: Option<String>,
+}
+
+impl Token {
+    pub fn describe(&self) -> String {
+        match &self.tok {
+            Tok::Ident(s) => format!("identifier `{}`", s),
+            Tok::Keyword(k) => format!("keyword `{}`", k.as_str()),
+            Tok::Lit(l) => format!("literal {:?}", l),
+            Tok::InterpStr(_) => "interpolated string".to_string(),
+            Tok::Punct(p) => format!("`{}`", p.as_str()),
+            Tok::Eof => "end of file".to_string(),
+        }
+    }
+}

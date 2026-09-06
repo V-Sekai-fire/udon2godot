@@ -1,0 +1,2249 @@
+# UnityEngine extras: camera, mesh, renderers, materials/textures, particle modules, joints,
+# character controller, navigation, render settings, audio effects, UI layout, TextMesh, video,
+# Cinemachine.
+
+type Camera
+  transform: Transform => $0
+  cameraType: int => 1
+  set cameraType: int => pass
+  focalLength: float => (36.0 / (2.0 * tan(deg_to_rad($0.fov) / 2.0)))
+  set focalLength: float => $0.fov = rad_to_deg(2.0 * atan(36.0 / (2.0 * $v)))
+  sensorSize: Vector2 => Vector2(36.0, 24.0)
+  set sensorSize: Vector2 => pass
+  lensShift: Vector2 => $0.frustum_offset
+  set lensShift: Vector2 => $0.frustum_offset = $v
+  usePhysicalProperties: bool => false
+  set usePhysicalProperties: bool => pass
+  projectionMatrix: Matrix4x4 => U.camera_projection($0)
+  set projectionMatrix: Matrix4x4 => pass
+  worldToCameraMatrix: Matrix4x4 => $0.global_transform.affine_inverse()
+  set worldToCameraMatrix: Matrix4x4 => pass
+  cameraToWorldMatrix: Matrix4x4 => $0.global_transform
+  nonJitteredProjectionMatrix: Matrix4x4 => U.camera_projection($0)
+  set nonJitteredProjectionMatrix: Matrix4x4 => pass
+  previousViewProjectionMatrix: Matrix4x4 => U.camera_projection($0)
+  velocity: Vector3 => Vector3.ZERO
+  scaledPixelWidth: int => U.camera_pixel_size($0).x
+  scaledPixelHeight: int => U.camera_pixel_size($0).y
+  pixelRect: Rect => Rect2(Vector2.ZERO, Vector2(U.camera_pixel_size($0)))
+  set pixelRect: Rect => pass
+  layerCullDistances: float[] => U.new_array(32, 0.0)
+  set layerCullDistances: float[] => pass
+  layerCullSpherical: bool => false
+  set layerCullSpherical: bool => pass
+  eventMask: int => -1
+  set eventMask: int => pass
+  renderingPath: int => -1
+  set renderingPath: int => pass
+  actualRenderingPath: int => 1
+  transparencySortMode: int => 0
+  set transparencySortMode: int => pass
+  transparencySortAxis: Vector3 => Vector3(0.0, 0.0, 1.0)
+  set transparencySortAxis: Vector3 => pass
+  opaqueSortMode: int => 0
+  set opaqueSortMode: int => pass
+  forceIntoRenderTexture: bool => false
+  set forceIntoRenderTexture: bool => pass
+  allowDynamicResolution: bool => false
+  set allowDynamicResolution: bool => pass
+  depthTextureMode: int => 0
+  set depthTextureMode: int => pass
+  clearStencilAfterLightingPass: bool => false
+  set clearStencilAfterLightingPass: bool => pass
+  stereoEnabled: bool => false
+  stereoSeparation: float => 0.022
+  set stereoSeparation: float => pass
+  stereoConvergence: float => 10.0
+  set stereoConvergence: float => pass
+  areVRStereoViewMatricesWithinSingleCullTolerance: bool => false
+  activeTexture: RenderTexture => null
+  targetDisplay: int => 0
+  set targetDisplay: int => pass
+  scene: Scene => null
+  set scene: Scene => pass
+  useJitteredProjectionMatrixForTransparentRendering: bool => true
+  set useJitteredProjectionMatrixForTransparentRendering: bool => pass
+  commandBufferCount: int => 0
+  Render(): void => pass
+  RenderWithShader(Shader, string): void => pass
+  RenderToCubemap(Cubemap): bool => false
+  RenderToCubemap(Cubemap, int): bool => false
+  RenderToCubemap(RenderTexture): bool => false
+  RenderToCubemap(RenderTexture, int): bool => false
+  RenderToCubemap(RenderTexture, int, int): bool => false
+  ResetWorldToCameraMatrix(): void => pass
+  ResetProjectionMatrix(): void => pass
+  ResetCullingMatrix(): void => pass
+  ResetReplacementShader(): void => pass
+  ResetTransparencySortSettings(): void => pass
+  ResetStereoProjectionMatrices(): void => pass
+  ResetStereoViewMatrices(): void => pass
+  SetReplacementShader(Shader, string): void => pass
+  SetTargetBuffers(object, object): void => pass
+  CalculateFrustumCorners(Rect, float, int, Vector3[]): void => U.camera_frustum_corners($0, $2, $4)
+  CalculateObliqueMatrix(Vector4): Matrix4x4 => U.camera_projection($0)
+  CopyFrom(Camera): void => U.camera_copy_from($0, $1)
+  CopyStereoDeviceProjectionMatrixToNonJittered(int): void => pass
+  GetGateFittedFieldOfView(): float => $0.fov
+  GetGateFittedLensShift(): Vector2 => $0.frustum_offset
+  GetStereoProjectionMatrix(int): Matrix4x4 => U.camera_projection($0)
+  GetStereoViewMatrix(int): Matrix4x4 => $0.global_transform.affine_inverse()
+  GetStereoNonJitteredProjectionMatrix(int): Matrix4x4 => U.camera_projection($0)
+  SetStereoProjectionMatrix(int, Matrix4x4): void => pass
+  SetStereoViewMatrix(int, Matrix4x4): void => pass
+  ScreenToViewportPoint(Vector3): Vector3 => U.screen_to_viewport($0, $1)
+  ViewportToScreenPoint(Vector3): Vector3 => U.viewport_to_screen($0, $1)
+  ViewportPointToRay(Vector3, int): Ray => U.viewport_point_to_ray($0, $1)
+  ScreenPointToRay(Vector3, int): Ray => U.screen_point_to_ray($0, $1)
+  WorldToScreenPoint(Vector3, int): Vector3 => U.world_to_screen($0, $1)
+  WorldToViewportPoint(Vector3, int): Vector3 => U.world_to_viewport($0, $1)
+  ScreenToWorldPoint(Vector3, int): Vector3 => U.screen_to_world($0, $1)
+  ViewportToWorldPoint(Vector3, int): Vector3 => U.viewport_to_world($0, $1)
+  static allCameras: Camera[] => U.all_cameras()
+  static GetAllCameras(Camera[]): int => U.array_copy(U.all_cameras(), 0, $1, 0, mini($1.size(), U.all_cameras().size())) ;; mini($1.size(), U.all_cameras().size())
+  static FieldOfViewToFocalLength(float, float): float => ($2 / (2.0 * tan(deg_to_rad($1) / 2.0)))
+  static FocalLengthToFieldOfView(float, float): float => rad_to_deg(2.0 * atan($2 / (2.0 * $1)))
+  static HorizontalToVerticalFieldOfView(float, float): float => rad_to_deg(2.0 * atan(tan(deg_to_rad($1) / 2.0) / $2))
+  static VerticalToHorizontalFieldOfView(float, float): float => rad_to_deg(2.0 * atan(tan(deg_to_rad($1) / 2.0) * $2))
+  static CalculateProjectionMatrixFromPhysicalProperties(float, Vector2, float, float, float, Vector2): Matrix4x4 => Transform3D()
+
+type CameraClearFlags kind=enum extern=UnityEngineCameraClearFlags
+  enum Skybox = 1
+  enum Color = 2
+  enum SolidColor = 2
+  enum Depth = 3
+  enum Nothing = 4
+
+type Mesh
+  vertices: Vector3[] => U.mesh_vertices($0)
+  set vertices: Vector3[] => U.mesh_set_arrays($0, "vertices", $v)
+  normals: Vector3[] => U.mesh_normals($0)
+  set normals: Vector3[] => U.mesh_set_arrays($0, "normals", $v)
+  triangles: int[] => U.mesh_triangles($0)
+  set triangles: int[] => U.mesh_set_arrays($0, "triangles", $v)
+  uv: Vector2[] => U.mesh_array($0, 4)
+  set uv: Vector2[] => U.mesh_set_arrays($0, "uv", $v)
+  uv2: Vector2[] => U.mesh_array($0, 5)
+  set uv2: Vector2[] => U.mesh_set_arrays($0, "uv2", $v)
+  colors: Color[] => U.mesh_array($0, 3)
+  set colors: Color[] => U.mesh_set_arrays($0, "colors", $v)
+  colors32: Color32[] => U.mesh_array($0, 3)
+  set colors32: Color32[] => U.mesh_set_arrays($0, "colors", $v)
+  tangents: Vector4[] => U.mesh_tangents($0)
+  set tangents: Vector4[] => U.mesh_set_arrays($0, "tangents", $v)
+  boneWeights: Array => []
+  set boneWeights: Array => pass
+  bindposes: Matrix4x4[] => []
+  set bindposes: Matrix4x4[] => pass
+  vertexBufferCount: int => 1
+  vertexAttributeCount: int => 4
+  indexFormat: int => 0
+  set indexFormat: int => pass
+  isReadable: bool => true
+  blendShapeCount: int => $0.get_blend_shape_count() if $0 is ArrayMesh else 0
+  subMeshCount: int => $0.get_surface_count()
+  set subMeshCount: int => pass
+  ctor() => ArrayMesh.new()
+  Clear(): void => U.mesh_clear($0)
+  Clear(bool): void => U.mesh_clear($0)
+  RecalculateNormals(): void => pass
+  RecalculateTangents(): void => pass
+  RecalculateBounds(): void => pass
+  MarkDynamic(): void => pass
+  Optimize(): void => pass
+  OptimizeIndexBuffers(): void => pass
+  OptimizeReorderVertexBuffer(): void => pass
+  UploadMeshData(bool): void => pass
+  MarkModified(): void => pass
+  GetVertices(Array): void => $1.assign(U.mesh_vertices($0))
+  SetVertices(Array): void => U.mesh_set_arrays($0, "vertices", $1)
+  GetNormals(Array): void => $1.assign(U.mesh_normals($0))
+  SetNormals(Array): void => U.mesh_set_arrays($0, "normals", $1)
+  GetTriangles(int): int[] => U.mesh_triangles($0, $1)
+  GetTriangles(Array, int): void => $1.assign(U.mesh_triangles($0, $2))
+  SetTriangles(int[], int): void => U.mesh_set_arrays($0, "triangles", $1)
+  GetIndices(int): int[] => U.mesh_triangles($0, $1)
+  SetIndices(int[], int, int): void => U.mesh_set_arrays($0, "triangles", $1)
+  GetUVs(int, Array): void => $2.assign(U.mesh_array($0, 4 if $1 == 0 else 5))
+  SetUVs(int, Array): void => U.mesh_set_arrays($0, "uv" if $1 == 0 else "uv2", $2)
+  GetColors(Array): void => $1.assign(U.mesh_array($0, 3))
+  SetColors(Array): void => U.mesh_set_arrays($0, "colors", $1)
+  GetTangents(Array): void => $1.assign(U.mesh_tangents($0))
+  SetTangents(Array): void => U.mesh_set_arrays($0, "tangents", $1)
+  GetSubMesh(int): object => {}
+  GetTopology(int): int => 0
+  GetIndexCount(int): uint => U.mesh_triangles($0, $1).size()
+  GetIndexStart(int): uint => 0
+  GetBaseVertex(int): uint => 0
+  GetBlendShapeName(int): string => String($0.get_blend_shape_name($1)) if $0 is ArrayMesh else ""
+  GetBlendShapeIndex(string): int => U.mesh_blend_shape_index($0, $1)
+  GetBlendShapeFrameCount(int): int => 1
+  GetBlendShapeFrameWeight(int, int): float => 100.0
+  CombineMeshes(Array): void => pass
+  CombineMeshes(Array, bool): void => pass
+  CombineMeshes(Array, bool, bool): void => pass
+  GetNativeVertexBufferPtr(int): object => null
+  GetNativeIndexBufferPtr(): object => null
+
+type SkinnedMeshRenderer
+  bones: Transform[] => []
+  set bones: Transform[] => pass
+  quality: int => 0
+  set quality: int => pass
+  updateWhenOffscreen: bool => true
+  set updateWhenOffscreen: bool => pass
+  skinnedMotionVectors: bool => true
+  set skinnedMotionVectors: bool => pass
+  localBounds: Bounds => $0.get_aabb()
+  set localBounds: Bounds => $0.custom_aabb = $v
+  forceMatrixRecalculationPerRender: bool => false
+  set forceMatrixRecalculationPerRender: bool => pass
+  BakeMesh(Mesh): void => pass
+  BakeMesh(Mesh, bool): void => pass
+
+type Renderer
+  allowOcclusionWhenDynamic: bool => true
+  set allowOcclusionWhenDynamic: bool => pass
+  isPartOfStaticBatch: bool => false
+  lightProbeUsage: int => 1
+  set lightProbeUsage: int => pass
+  reflectionProbeUsage: int => 1
+  set reflectionProbeUsage: int => pass
+  motionVectorGenerationMode: int => 0
+  set motionVectorGenerationMode: int => pass
+  probeAnchor: Transform => null
+  set probeAnchor: Transform => pass
+  lightProbeProxyVolumeOverride: GameObject => null
+  set lightProbeProxyVolumeOverride: GameObject => pass
+  realtimeLightmapIndex: int => -1
+  set realtimeLightmapIndex: int => pass
+  lightmapScaleOffset: Vector4 => Vector4(1.0, 1.0, 0.0, 0.0)
+  set lightmapScaleOffset: Vector4 => pass
+  realtimeLightmapScaleOffset: Vector4 => Vector4(1.0, 1.0, 0.0, 0.0)
+  set realtimeLightmapScaleOffset: Vector4 => pass
+  rendererPriority: int => 0
+  set rendererPriority: int => pass
+  renderingLayerMask: uint => $0.layers
+  set renderingLayerMask: uint => $0.layers = $v
+  sortingLayerID: int => 0
+  set sortingLayerID: int => pass
+  sortingLayerName: string => "Default"
+  set sortingLayerName: string => pass
+  worldToLocalMatrix: Matrix4x4 => $0.global_transform.affine_inverse()
+  localToWorldMatrix: Matrix4x4 => $0.global_transform
+  staticShadowCaster: bool => false
+  set staticShadowCaster: bool => pass
+  rayTracingMode: int => 0
+  set rayTracingMode: int => pass
+  HasPropertyBlock(): bool => false
+  GetMaterials(Array): void => $1.assign(U.renderer_materials($0))
+  GetSharedMaterials(Array): void => $1.assign(U.renderer_materials($0))
+  GetClosestReflectionProbes(Array): void => pass
+  ResetBounds(): void => pass
+  ResetLocalBounds(): void => pass
+
+type MeshRenderer
+  additionalVertexStreams: Mesh => null
+  set additionalVertexStreams: Mesh => pass
+  enlightenVertexStream: Mesh => null
+  set enlightenVertexStream: Mesh => pass
+  subMeshStartIndex: int => 0
+
+type LineRenderer
+  numCornerVertices: int => 0
+  set numCornerVertices: int => pass
+  numCapVertices: int => 0
+  set numCapVertices: int => pass
+  alignment: int => 0
+  set alignment: int => pass
+  textureMode: int => 0
+  set textureMode: int => pass
+  generateLightingData: bool => false
+  set generateLightingData: bool => pass
+  widthCurve: AnimationCurve => U.curve_linear(0.0, U.line_get_prop($0, "startWidth", 0.1), 1.0, U.line_get_prop($0, "endWidth", 0.1))
+  set widthCurve: AnimationCurve => U.line_set_prop($0, "startWidth", $v.sample(0.0)) ;; U.line_set_prop($0, "endWidth", $v.sample(1.0))
+  colorGradient: Gradient => U.line_gradient($0)
+  set colorGradient: Gradient => U.line_set_prop($0, "startColor", $v.sample(0.0)) ;; U.line_set_prop($0, "endColor", $v.sample(1.0))
+  shadowBias: float => 0.5
+  set shadowBias: float => pass
+  Simplify(float): void => pass
+  BakeMesh(Mesh, bool): void => pass
+  BakeMesh(Mesh, Camera, bool): void => pass
+  SetColors(Color, Color): void => U.line_set_prop($0, "startColor", $1) ;; U.line_set_prop($0, "endColor", $2)
+  SetVertexCount(int): void => U.line_set_count($0, $1)
+
+type TrailRenderer
+  numCornerVertices: int => 0
+  set numCornerVertices: int => pass
+  numCapVertices: int => 0
+  set numCapVertices: int => pass
+  alignment: int => 0
+  set alignment: int => pass
+  textureMode: int => 0
+  set textureMode: int => pass
+  minVertexDistance: float => U.line_get_prop($0, "minVertexDistance", 0.1)
+  set minVertexDistance: float => U.line_set_prop($0, "minVertexDistance", $v)
+  autodestruct: bool => false
+  set autodestruct: bool => pass
+  generateLightingData: bool => false
+  set generateLightingData: bool => pass
+  widthCurve: AnimationCurve => U.curve_linear(0.0, U.line_get_prop($0, "startWidth", 0.1), 1.0, U.line_get_prop($0, "endWidth", 0.1))
+  set widthCurve: AnimationCurve => U.line_set_prop($0, "startWidth", $v.sample(0.0)) ;; U.line_set_prop($0, "endWidth", $v.sample(1.0))
+  colorGradient: Gradient => U.line_gradient($0)
+  set colorGradient: Gradient => U.line_set_prop($0, "startColor", $v.sample(0.0)) ;; U.line_set_prop($0, "endColor", $v.sample(1.0))
+  shadowBias: float => 0.5
+  set shadowBias: float => pass
+  GetPosition(int): Vector3 => U.line_get_position($0, $1)
+  GetPositions(Vector3[]): int => U.line_get_positions($0, $1)
+  SetPosition(int, Vector3): void => U.line_set_position($0, $1, $2)
+  SetPositions(Vector3[]): void => U.line_set_positions($0, $1)
+  AddPosition(Vector3): void => U.line_add_position($0, $1)
+  AddPositions(Vector3[]): void => U.line_add_positions($0, $1)
+  BakeMesh(Mesh, bool): void => pass
+  BakeMesh(Mesh, Camera, bool): void => pass
+
+type Texture2D
+  format: TextureFormat => 4
+  mipmapCount: int => 1
+  isReadable: bool => true
+  requestedMipmapLevel: int => 0
+  set requestedMipmapLevel: int => pass
+  streamingMipmaps: bool => false
+  ctor(int, int, TextureFormat, bool) => U.new_texture($1, $2)
+  ctor(int, int, TextureFormat, bool, bool) => U.new_texture($1, $2)
+  GetPixels(int, int, int, int): Color[] => U.texture_get_pixels_rect($0, $1, $2, $3, $4)
+  GetPixels32(): Color32[] => U.texture_get_pixels($0)
+  GetPixels32(int): Color32[] => U.texture_get_pixels($0)
+  SetPixels32(Color32[]): void => U.texture_set_pixels($0, $1)
+  SetPixels(int, int, int, int, Color[]): void => U.texture_set_pixels_rect($0, $1, $2, $3, $4, $5)
+  GetRawTextureData(): byte[] => Array($0.get_image().get_data()) if $0.get_image() != null else []
+  LoadRawTextureData(byte[]): void => U.texture_load_raw($0, $1)
+  Resize(int, int): bool => U.texture_resize($0, $1, $2)
+  Reinitialize(int, int): bool => U.texture_resize($0, $1, $2)
+  Compress(bool): void => pass
+  PackTextures(Texture2D[], int): Rect[] => []
+  static normalTexture: Texture2D => U.white_texture()
+  static grayTexture: Texture2D => U.white_texture()
+  static redTexture: Texture2D => U.white_texture()
+  static linearGrayTexture: Texture2D => U.white_texture()
+
+type RenderTexture
+  width: int => U.rt_get($0, "width", 256)
+  set width: int => U.rt_set($0, "width", $v)
+  height: int => U.rt_get($0, "height", 256)
+  set height: int => U.rt_set($0, "height", $v)
+  depth: int => 0
+  set depth: int => pass
+  format: int => 0
+  set format: int => pass
+  antiAliasing: int => 1
+  set antiAliasing: int => pass
+  useMipMap: bool => false
+  set useMipMap: bool => pass
+  autoGenerateMips: bool => false
+  set autoGenerateMips: bool => pass
+  enableRandomWrite: bool => false
+  set enableRandomWrite: bool => pass
+  volumeDepth: int => 1
+  set volumeDepth: int => pass
+  dimension: int => 2
+  set dimension: int => pass
+  sRGB: bool => true
+  useDynamicScale: bool => false
+  set useDynamicScale: bool => pass
+  vrUsage: int => 0
+  set vrUsage: int => pass
+  memorylessMode: int => 0
+  set memorylessMode: int => pass
+  descriptor: RenderTextureDescriptor => {"width": U.rt_get($0, "width", 256), "height": U.rt_get($0, "height", 256)}
+  set descriptor: RenderTextureDescriptor => pass
+  colorBuffer: object => null
+  depthBuffer: object => null
+  ctor(RenderTexture) => $1
+  ctor(int, int, int, int) => U.new_render_texture($1, $2)
+  ctor(int, int, int, int, int) => U.new_render_texture($1, $2)
+  ctor(RenderTextureDescriptor) => U.new_render_texture(int($1.get("width", 256)), int($1.get("height", 256)))
+  IsCreated(): bool => true
+  DiscardContents(): void => pass
+  DiscardContents(bool, bool): void => pass
+  MarkRestoreExpected(): void => pass
+  GenerateMips(): void => pass
+  ConvertToEquirect(RenderTexture): void => pass
+  ConvertToEquirect(RenderTexture, int): void => pass
+  SetGlobalShaderProperty(string): void => pass
+  static GetTemporary(int, int): RenderTexture => U.new_render_texture($1, $2)
+  static GetTemporary(int, int, int): RenderTexture => U.new_render_texture($1, $2)
+  static GetTemporary(int, int, int, int): RenderTexture => U.new_render_texture($1, $2)
+  static GetTemporary(RenderTextureDescriptor): RenderTexture => U.new_render_texture(int($1.get("width", 256)), int($1.get("height", 256)))
+  static ReleaseTemporary(RenderTexture): void => pass
+  static SupportsStencil(RenderTexture): bool => false
+
+type RenderTextureDescriptor kind=struct gd=Dictionary extern=UnityEngineRenderTextureDescriptor
+  ctor(int, int) => {"width": $1, "height": $2}
+  ctor(int, int, int) => {"width": $1, "height": $2}
+  ctor(int, int, int, int) => {"width": $1, "height": $2}
+  width: int => $0.get("width", 256)
+  set width: int => $0.width = $v
+  height: int => $0.get("height", 256)
+  set height: int => $0.height = $v
+  msaaSamples: int => 1
+  set msaaSamples: int => pass
+  volumeDepth: int => 1
+  set volumeDepth: int => pass
+  colorFormat: int => 0
+  set colorFormat: int => pass
+  depthBufferBits: int => 0
+  set depthBufferBits: int => pass
+  dimension: int => 2
+  set dimension: int => pass
+  sRGB: bool => true
+  set sRGB: bool => pass
+  useMipMap: bool => false
+  set useMipMap: bool => pass
+  autoGenerateMips: bool => false
+  set autoGenerateMips: bool => pass
+  enableRandomWrite: bool => false
+  set enableRandomWrite: bool => pass
+
+type Material
+  passCount: int => 1
+  enabledKeywords: Array => []
+  set enabledKeywords: Array => pass
+  shaderKeywords: string[] => []
+  set shaderKeywords: string[] => pass
+  globalIlluminationFlags: int => 0
+  set globalIlluminationFlags: int => pass
+  doubleSidedGI: bool => false
+  set doubleSidedGI: bool => pass
+  enableInstancing: bool => false
+  set enableInstancing: bool => pass
+  GetPassName(int): string => "Forward"
+  SetPass(int): bool => true
+  GetShaderPassEnabled(string): bool => true
+  FindPass(string): int => 0
+  GetTag(string, bool): string => ""
+  GetTag(string, bool, string): string => $3
+  GetPropertyNameIDs(): int[] => []
+  GetPropertyNames(int): string[] => []
+  GetTexturePropertyNames(): string[] => ["_MainTex"]
+  GetTexturePropertyNameIDs(): int[] => [U.string_to_hash("_MainTex")]
+  GetFloatArray(string): float[] => U.mat_get($0, $1, [])
+  GetVectorArray(string): Vector4[] => U.mat_get($0, $1, [])
+  GetColorArray(string): Color[] => U.mat_get($0, $1, [])
+  GetMatrixArray(string): Matrix4x4[] => U.mat_get($0, $1, [])
+  GetMatrix(string): Matrix4x4 => U.mat_get($0, $1, Transform3D())
+  SetMatrixArray(string, Matrix4x4[]): void => U.mat_set($0, $1, $2)
+  SetBuffer(string, object): void => pass
+  SetConstantBuffer(string, object, int, int): void => pass
+  HasFloat(string): bool => U.mat_has($0, $1)
+  HasInt(string): bool => U.mat_has($0, $1)
+  HasColor(string): bool => U.mat_has($0, $1)
+  HasVector(string): bool => U.mat_has($0, $1)
+  HasTexture(string): bool => U.mat_has($0, $1)
+  HasMatrix(string): bool => U.mat_has($0, $1)
+  HasBuffer(string): bool => false
+  IsKeywordEnabled(int): bool => false
+  SetKeyword(int, bool): void => pass
+  EnableKeyword(int): void => pass
+  DisableKeyword(int): void => pass
+  SetLocalKeyword(string, bool): void => U.mat_set($0, "keyword_" + $1, $2)
+  ComputeCRC(): int => hash($0)
+  CopyMatchingPropertiesFromMaterial(Material): void => U.mat_copy($0, $1)
+
+type Matrix4x4
+  determinant: float => $0.basis.determinant()
+  decomposeProjection: object => {}
+  isIdentity: bool => $0.is_equal_approx(Transform3D())
+  this[int, int]: float => U.matrix_get($0, $1, $2)
+  this[int]: float => U.matrix_get($0, $1 % 4, $1 / 4)
+  ctor(Vector4, Vector4, Vector4, Vector4) => U.matrix_from_columns($1, $2, $3, $4)
+  SetColumn(int, Vector4): void => $0 = U.matrix_set_column($0, $1, $2)
+  SetRow(int, Vector4): void => $0 = U.matrix_set_row($0, $1, $2)
+  SetTRS(Vector3, Quaternion, Vector3): void => $0 = Transform3D(Basis($2).scaled($3), $1)
+  ValidTRS(): bool => true
+  TransformPlane(Plane): Plane => $0 * $1
+  static Ortho(float, float, float, float, float, float): Matrix4x4 => Transform3D()
+  static Perspective(float, float, float, float): Matrix4x4 => Transform3D()
+  static LookAt(Vector3, Vector3, Vector3): Matrix4x4 => Transform3D(Basis(U.look_rotation($2 - $1, $3)), $1)
+  static Frustum(float, float, float, float, float, float): Matrix4x4 => Transform3D()
+  static Determinant(Matrix4x4): float => $1.basis.determinant()
+  static Transpose(Matrix4x4): Matrix4x4 => Transform3D($1.basis.transposed(), Vector3.ZERO)
+  static Inverse3DAffine(Matrix4x4, out Matrix4x4): bool => $2 = $1.affine_inverse() ;; true
+  op *(Matrix4x4, Vector4): Vector4 => U.matrix_mul_vec4($1, $2)
+  op ==(Matrix4x4, Matrix4x4): bool => $1.is_equal_approx($2)
+  op !=(Matrix4x4, Matrix4x4): bool => not $1.is_equal_approx($2)
+
+type Light
+  colorTemperature: float => 6570.0
+  set colorTemperature: float => pass
+  useColorTemperature: bool => false
+  set useColorTemperature: bool => pass
+  innerSpotAngle: float => (U.light_get_spot_angle($0) * 0.8)
+  set innerSpotAngle: float => pass
+  shadowStrength: float => 1.0 - $0.shadow_opacity if false else 1.0
+  set shadowStrength: float => pass
+  shadowResolution: int => -1
+  set shadowResolution: int => pass
+  shadowBias: float => $0.shadow_bias
+  set shadowBias: float => $0.shadow_bias = $v
+  shadowNormalBias: float => $0.shadow_normal_bias
+  set shadowNormalBias: float => $0.shadow_normal_bias = $v
+  shadowNearPlane: float => 0.2
+  set shadowNearPlane: float => pass
+  shadowCustomResolution: int => -1
+  set shadowCustomResolution: int => pass
+  shadowMatrixOverride: Matrix4x4 => Transform3D()
+  set shadowMatrixOverride: Matrix4x4 => pass
+  useShadowMatrixOverride: bool => false
+  set useShadowMatrixOverride: bool => pass
+  cookie: Texture => null
+  set cookie: Texture => pass
+  cookieSize: float => 10.0
+  set cookieSize: float => pass
+  flare: object => null
+  set flare: object => pass
+  renderMode: int => 0
+  set renderMode: int => pass
+  renderingLayerMask: int => $0.light_cull_mask
+  set renderingLayerMask: int => $0.light_cull_mask = $v
+  lightShadowCasterMode: int => 0
+  set lightShadowCasterMode: int => pass
+  layerShadowCullDistances: float[] => U.new_array(32, 0.0)
+  set layerShadowCullDistances: float[] => pass
+  shape: int => 0
+  set shape: int => pass
+  spotAngle: float => U.light_get_spot_angle($0)
+  bakingOutput: object => {}
+  set bakingOutput: object => pass
+  boundingSphereOverride: Vector4 => Vector4.ZERO
+  set boundingSphereOverride: Vector4 => pass
+  useBoundingSphereOverride: bool => false
+  set useBoundingSphereOverride: bool => pass
+  useViewFrustumForShadowCasterCull: bool => true
+  set useViewFrustumForShadowCasterCull: bool => pass
+  forceVisible: bool => false
+  set forceVisible: bool => pass
+  areaSize: Vector2 => Vector2.ONE
+  set areaSize: Vector2 => pass
+  commandBufferCount: int => 0
+  Reset(): void => pass
+  SetLightDirty(): void => pass
+  RemoveAllCommandBuffers(): void => pass
+  static GetLights(int, int): Light[] => []
+
+type LightShadows kind=enum extern=UnityEngineLightShadows
+  enum None = 0
+  enum Hard = 1
+  enum Soft = 2
+
+type ReflectionProbe
+  size: Vector3 => $0.size
+  set size: Vector3 => $0.size = $v
+  center: Vector3 => $0.origin_offset
+  set center: Vector3 => $0.origin_offset = $v
+  nearClipPlane: float => 0.3
+  set nearClipPlane: float => pass
+  farClipPlane: float => $0.max_distance
+  set farClipPlane: float => $0.max_distance = $v
+  resolution: int => 128
+  set resolution: int => pass
+  hdr: bool => true
+  set hdr: bool => pass
+  shadowDistance: float => 100.0
+  set shadowDistance: float => pass
+  clearFlags: int => 1
+  set clearFlags: int => pass
+  backgroundColor: Color => Color.BLACK
+  set backgroundColor: Color => pass
+  cullingMask: int => $0.cull_mask
+  set cullingMask: int => $0.cull_mask = $v
+  boxProjection: bool => $0.box_projection
+  set boxProjection: bool => $0.box_projection = $v
+  blendDistance: float => 1.0
+  set blendDistance: float => pass
+  importance: int => 1
+  set importance: int => pass
+  bounds: Bounds => AABB($0.global_position - $0.size / 2.0, $0.size)
+  isFinishedRendering(int): bool => true
+  IsFinishedRendering(int): bool => true
+  texture: Texture => null
+  bakedTexture: Texture => null
+  set bakedTexture: Texture => pass
+  customBakedTexture: Texture => null
+  set customBakedTexture: Texture => pass
+  realtimeTexture: RenderTexture => null
+  set realtimeTexture: RenderTexture => pass
+  Reset(): void => pass
+  RenderProbe(RenderTexture): int => 0
+  static defaultTexture: Texture => null
+  static minBakedCubemapResolution: int => 16
+  static maxBakedCubemapResolution: int => 2048
+  static BlendCubemap(Texture, Texture, float, RenderTexture): bool => false
+  static UpdateCachedState(): void => pass
+
+type RenderSettings kind=static extern=UnityEngineRenderSettings
+  static ambientLight: Color => U.env_get("ambient_light_color", Color(0.2, 0.2, 0.2))
+  static set ambientLight: Color => U.env_set("ambient_light_color", $v)
+  static ambientIntensity: float => U.env_get("ambient_light_energy", 1.0)
+  static set ambientIntensity: float => U.env_set("ambient_light_energy", $v)
+  static ambientMode: int => U.env_get("ambient_light_source", 0)
+  static set ambientMode: int => U.env_set("ambient_light_source", $v)
+  static ambientSkyColor: Color => U.env_get("ambient_light_color", Color(0.2, 0.2, 0.2))
+  static set ambientSkyColor: Color => U.env_set("ambient_light_color", $v)
+  static ambientEquatorColor: Color => U.env_get("ambient_light_color", Color(0.2, 0.2, 0.2))
+  static set ambientEquatorColor: Color => pass
+  static ambientGroundColor: Color => U.env_get("ambient_light_color", Color(0.2, 0.2, 0.2))
+  static set ambientGroundColor: Color => pass
+  static ambientProbe: object => null
+  static set ambientProbe: object => pass
+  static fog: bool => U.env_get("fog_enabled", false)
+  static set fog: bool => U.env_set("fog_enabled", $v)
+  static fogColor: Color => U.env_get("fog_light_color", Color(0.5, 0.6, 0.7))
+  static set fogColor: Color => U.env_set("fog_light_color", $v)
+  static fogDensity: float => U.env_get("fog_density", 0.01)
+  static set fogDensity: float => U.env_set("fog_density", $v)
+  static fogMode: int => 1
+  static set fogMode: int => pass
+  static fogStartDistance: float => U.env_get("fog_depth_begin", 10.0)
+  static set fogStartDistance: float => U.env_set("fog_depth_begin", $v)
+  static fogEndDistance: float => U.env_get("fog_depth_end", 100.0)
+  static set fogEndDistance: float => U.env_set("fog_depth_end", $v)
+  static skybox: Material => U.env_get("sky", null)
+  static set skybox: Material => U.env_set_skybox($v)
+  static sun: Light => U.env_sun()
+  static set sun: Light => U.env_set_sun($v)
+  static reflectionIntensity: float => 1.0
+  static set reflectionIntensity: float => pass
+  static reflectionBounces: int => 1
+  static set reflectionBounces: int => pass
+  static defaultReflectionMode: int => 0
+  static set defaultReflectionMode: int => pass
+  static defaultReflectionResolution: int => 128
+  static set defaultReflectionResolution: int => pass
+  static customReflection: Texture => null
+  static set customReflection: Texture => pass
+  static customReflectionTexture: Texture => null
+  static set customReflectionTexture: Texture => pass
+  static haloStrength: float => 0.5
+  static set haloStrength: float => pass
+  static flareStrength: float => 1.0
+  static set flareStrength: float => pass
+  static flareFadeSpeed: float => 3.0
+  static set flareFadeSpeed: float => pass
+  static subtractiveShadowColor: Color => Color(0.42, 0.48, 0.63)
+  static set subtractiveShadowColor: Color => pass
+
+type SpringJoint : Joint kind=component gd=Generic6DOFJoint3D extern=UnityEngineSpringJoint
+  spring: float => U.joint_get($0, "spring", 10.0)
+  set spring: float => U.joint_set($0, "spring", $v)
+  damper: float => U.joint_get($0, "damper", 0.2)
+  set damper: float => U.joint_set($0, "damper", $v)
+  minDistance: float => U.joint_get($0, "minDistance", 0.0)
+  set minDistance: float => U.joint_set($0, "minDistance", $v)
+  maxDistance: float => U.joint_get($0, "maxDistance", 0.0)
+  set maxDistance: float => U.joint_set($0, "maxDistance", $v)
+  tolerance: float => 0.025
+  set tolerance: float => pass
+
+type FixedJoint : Joint kind=component gd=PinJoint3D extern=UnityEngineFixedJoint
+
+type CharacterJoint : Joint kind=component gd=ConeTwistJoint3D extern=UnityEngineCharacterJoint
+  swingAxis: Vector3 => Vector3.UP
+  set swingAxis: Vector3 => pass
+  twistLimitSpring: object => {}
+  set twistLimitSpring: object => pass
+  swingLimitSpring: object => {}
+  set swingLimitSpring: object => pass
+  lowTwistLimit: object => {"limit": -rad_to_deg($0.twist_span)}
+  set lowTwistLimit: object => $0.twist_span = deg_to_rad(absf(float($v.get("limit", 0.0))))
+  highTwistLimit: object => {"limit": rad_to_deg($0.twist_span)}
+  set highTwistLimit: object => $0.twist_span = deg_to_rad(absf(float($v.get("limit", 0.0))))
+  swing1Limit: object => {"limit": rad_to_deg($0.swing_span)}
+  set swing1Limit: object => $0.swing_span = deg_to_rad(absf(float($v.get("limit", 0.0))))
+  swing2Limit: object => {"limit": rad_to_deg($0.swing_span)}
+  set swing2Limit: object => pass
+  enableProjection: bool => false
+  set enableProjection: bool => pass
+  projectionDistance: float => 0.1
+  set projectionDistance: float => pass
+  projectionAngle: float => 180.0
+  set projectionAngle: float => pass
+  enableCollision: bool => not $0.exclude_nodes_from_collision
+  set enableCollision: bool => $0.exclude_nodes_from_collision = not $v
+
+type Joint
+  axis: Vector3 => Vector3.RIGHT
+  set axis: Vector3 => pass
+  autoConfigureConnectedAnchor: bool => true
+  set autoConfigureConnectedAnchor: bool => pass
+  enableCollision: bool => not $0.exclude_nodes_from_collision
+  set enableCollision: bool => $0.exclude_nodes_from_collision = not $v
+  enablePreprocessing: bool => true
+  set enablePreprocessing: bool => pass
+  massScale: float => 1.0
+  set massScale: float => pass
+  connectedMassScale: float => 1.0
+  set connectedMassScale: float => pass
+  currentForce: Vector3 => Vector3.ZERO
+  currentTorque: Vector3 => Vector3.ZERO
+  connectedArticulationBody: object => null
+  set connectedArticulationBody: object => pass
+
+type HingeJoint
+  useLimits: bool => $0.get_flag(0)
+  set useLimits: bool => $0.set_flag(0, $v)
+  limits: JointLimits => {"min": rad_to_deg($0.get_param(1)), "max": rad_to_deg($0.get_param(2))}
+  set limits: JointLimits => $0.set_param(1, deg_to_rad(float($v.get("min", 0.0)))) ;; $0.set_param(2, deg_to_rad(float($v.get("max", 0.0))))
+  useSpring: bool => false
+  set useSpring: bool => pass
+  spring: JointSpring => {"spring": 0.0, "damper": 0.0, "targetPosition": 0.0}
+  set spring: JointSpring => pass
+  velocity: float => rad_to_deg($0.get_param(6))
+  useAcceleration: bool => false
+  set useAcceleration: bool => pass
+  extendedLimits: bool => false
+  set extendedLimits: bool => pass
+
+type JointLimits kind=struct gd=Dictionary extern=UnityEngineJointLimits
+  min: float => $0.get("min", 0.0)
+  set min: float => $0.min = $v
+  max: float => $0.get("max", 0.0)
+  set max: float => $0.max = $v
+  bounciness: float => $0.get("bounciness", 0.0)
+  set bounciness: float => $0.bounciness = $v
+  bounceMinVelocity: float => $0.get("bounceMinVelocity", 0.2)
+  set bounceMinVelocity: float => $0.bounceMinVelocity = $v
+  contactDistance: float => $0.get("contactDistance", 0.0)
+  set contactDistance: float => $0.contactDistance = $v
+
+type ConfigurableJoint
+  xMotion: int => U.joint_get($0, "xMotion", 2)
+  set xMotion: int => U.joint_set($0, "xMotion", $v) ;; U.joint6_motion($0, 0, $v)
+  yMotion: int => U.joint_get($0, "yMotion", 2)
+  set yMotion: int => U.joint_set($0, "yMotion", $v) ;; U.joint6_motion($0, 1, $v)
+  zMotion: int => U.joint_get($0, "zMotion", 2)
+  set zMotion: int => U.joint_set($0, "zMotion", $v) ;; U.joint6_motion($0, 2, $v)
+  angularXMotion: int => U.joint_get($0, "angularXMotion", 2)
+  set angularXMotion: int => U.joint_set($0, "angularXMotion", $v) ;; U.joint6_angular($0, 0, $v)
+  angularYMotion: int => U.joint_get($0, "angularYMotion", 2)
+  set angularYMotion: int => U.joint_set($0, "angularYMotion", $v) ;; U.joint6_angular($0, 1, $v)
+  angularZMotion: int => U.joint_get($0, "angularZMotion", 2)
+  set angularZMotion: int => U.joint_set($0, "angularZMotion", $v) ;; U.joint6_angular($0, 2, $v)
+  linearLimit: SoftJointLimit => {"limit": U.joint_get($0, "linearLimit", 0.0)}
+  set linearLimit: SoftJointLimit => U.joint_set($0, "linearLimit", float($v.get("limit", 0.0))) ;; U.joint6_linear_limit($0, float($v.get("limit", 0.0)))
+  linearLimitSpring: SoftJointLimitSpring => {"spring": 0.0, "damper": 0.0}
+  set linearLimitSpring: SoftJointLimitSpring => pass
+  angularXLimitSpring: SoftJointLimitSpring => {"spring": 0.0, "damper": 0.0}
+  set angularXLimitSpring: SoftJointLimitSpring => pass
+  angularYZLimitSpring: SoftJointLimitSpring => {"spring": 0.0, "damper": 0.0}
+  set angularYZLimitSpring: SoftJointLimitSpring => pass
+  lowAngularXLimit: SoftJointLimit => {"limit": U.joint_get($0, "lowAngularXLimit", 0.0)}
+  set lowAngularXLimit: SoftJointLimit => U.joint_set($0, "lowAngularXLimit", float($v.get("limit", 0.0)))
+  highAngularXLimit: SoftJointLimit => {"limit": U.joint_get($0, "highAngularXLimit", 0.0)}
+  set highAngularXLimit: SoftJointLimit => U.joint_set($0, "highAngularXLimit", float($v.get("limit", 0.0)))
+  angularYLimit: SoftJointLimit => {"limit": U.joint_get($0, "angularYLimit", 0.0)}
+  set angularYLimit: SoftJointLimit => U.joint_set($0, "angularYLimit", float($v.get("limit", 0.0)))
+  angularZLimit: SoftJointLimit => {"limit": U.joint_get($0, "angularZLimit", 0.0)}
+  set angularZLimit: SoftJointLimit => U.joint_set($0, "angularZLimit", float($v.get("limit", 0.0)))
+  targetVelocity: Vector3 => U.joint_get($0, "targetVelocity", Vector3.ZERO)
+  set targetVelocity: Vector3 => U.joint_set($0, "targetVelocity", $v)
+  targetAngularVelocity: Vector3 => U.joint_get($0, "targetAngularVelocity", Vector3.ZERO)
+  set targetAngularVelocity: Vector3 => U.joint_set($0, "targetAngularVelocity", $v)
+  xDrive: JointDrive => U.joint_get($0, "xDrive", {})
+  set xDrive: JointDrive => U.joint_set($0, "xDrive", $v)
+  yDrive: JointDrive => U.joint_get($0, "yDrive", {})
+  set yDrive: JointDrive => U.joint_set($0, "yDrive", $v)
+  zDrive: JointDrive => U.joint_get($0, "zDrive", {})
+  set zDrive: JointDrive => U.joint_set($0, "zDrive", $v)
+  angularXDrive: JointDrive => U.joint_get($0, "angularXDrive", {})
+  set angularXDrive: JointDrive => U.joint_set($0, "angularXDrive", $v)
+  angularYZDrive: JointDrive => U.joint_get($0, "angularYZDrive", {})
+  set angularYZDrive: JointDrive => U.joint_set($0, "angularYZDrive", $v)
+  slerpDrive: JointDrive => U.joint_get($0, "slerpDrive", {})
+  set slerpDrive: JointDrive => U.joint_set($0, "slerpDrive", $v)
+  rotationDriveMode: int => 0
+  set rotationDriveMode: int => pass
+  projectionMode: int => 0
+  set projectionMode: int => pass
+  projectionDistance: float => 0.1
+  set projectionDistance: float => pass
+  projectionAngle: float => 180.0
+  set projectionAngle: float => pass
+  configuredInWorldSpace: bool => false
+  set configuredInWorldSpace: bool => pass
+  swapBodies: bool => false
+  set swapBodies: bool => pass
+  secondaryAxis: Vector3 => Vector3.UP
+  set secondaryAxis: Vector3 => pass
+
+type SoftJointLimit kind=struct gd=Dictionary extern=UnityEngineSoftJointLimit
+  limit: float => $0.get("limit", 0.0)
+  set limit: float => $0.limit = $v
+  bounciness: float => $0.get("bounciness", 0.0)
+  set bounciness: float => $0.bounciness = $v
+  contactDistance: float => $0.get("contactDistance", 0.0)
+  set contactDistance: float => $0.contactDistance = $v
+
+type SoftJointLimitSpring kind=struct gd=Dictionary extern=UnityEngineSoftJointLimitSpring
+  spring: float => $0.get("spring", 0.0)
+  set spring: float => $0.spring = $v
+  damper: float => $0.get("damper", 0.0)
+  set damper: float => $0.damper = $v
+
+type JointDrive kind=struct gd=Dictionary extern=UnityEngineJointDrive
+  positionSpring: float => $0.get("positionSpring", 0.0)
+  set positionSpring: float => $0.positionSpring = $v
+  positionDamper: float => $0.get("positionDamper", 0.0)
+  set positionDamper: float => $0.positionDamper = $v
+  maximumForce: float => $0.get("maximumForce", 3.4e38)
+  set maximumForce: float => $0.maximumForce = $v
+  useAcceleration: bool => $0.get("useAcceleration", false)
+  set useAcceleration: bool => $0.useAcceleration = $v
+
+type ConfigurableJointMotion kind=enum extern=UnityEngineConfigurableJointMotion
+  enum Locked = 0
+  enum Limited = 1
+  enum Free = 2
+
+type CharacterController : Collider kind=component gd=CharacterBody3D extern=UnityEngineCharacterController
+  velocity: Vector3 => $0.velocity
+  isGrounded: bool => $0.is_on_floor()
+  collisionFlags: int => U.cc_collision_flags($0)
+  radius: float => U.shape_get_radius($0)
+  set radius: float => U.shape_set_radius($0, $v)
+  height: float => U.shape_get_height($0)
+  set height: float => U.shape_set_height($0, $v)
+  center: Vector3 => U.shape_get_center($0)
+  set center: Vector3 => U.shape_set_center($0, $v)
+  slopeLimit: float => rad_to_deg($0.floor_max_angle)
+  set slopeLimit: float => $0.floor_max_angle = deg_to_rad($v)
+  stepOffset: float => $0.floor_snap_length
+  set stepOffset: float => $0.floor_snap_length = $v
+  skinWidth: float => $0.safe_margin
+  set skinWidth: float => $0.safe_margin = $v
+  minMoveDistance: float => 0.001
+  set minMoveDistance: float => pass
+  detectCollisions: bool => true
+  set detectCollisions: bool => pass
+  enableOverlapRecovery: bool => true
+  set enableOverlapRecovery: bool => pass
+  Move(Vector3): int => U.cc_move($0, $1)
+  SimpleMove(Vector3): bool => U.cc_simple_move($0, $1)
+
+type CollisionFlags kind=enum extern=UnityEngineCollisionFlags
+  enum None = 0
+  enum Sides = 1
+  enum Above = 2
+  enum Below = 4
+  enum CollidedSides = 1
+  enum CollidedAbove = 2
+  enum CollidedBelow = 4
+
+type NavMeshAgent : Behaviour kind=component gd=NavigationAgent3D extern=UnityEngineAINavMeshAgent
+  destination: Vector3 => $0.target_position
+  set destination: Vector3 => $0.target_position = $v
+  speed: float => $0.max_speed
+  set speed: float => $0.max_speed = $v
+  angularSpeed: float => U.nav_get($0, "angularSpeed", 120.0)
+  set angularSpeed: float => U.nav_set($0, "angularSpeed", $v)
+  acceleration: float => U.nav_get($0, "acceleration", 8.0)
+  set acceleration: float => U.nav_set($0, "acceleration", $v)
+  stoppingDistance: float => $0.target_desired_distance
+  set stoppingDistance: float => $0.target_desired_distance = $v
+  radius: float => $0.radius
+  set radius: float => $0.radius = $v
+  height: float => $0.height
+  set height: float => $0.height = $v
+  baseOffset: float => $0.path_height_offset
+  set baseOffset: float => $0.path_height_offset = $v
+  velocity: Vector3 => $0.velocity
+  set velocity: Vector3 => $0.velocity = $v
+  desiredVelocity: Vector3 => $0.velocity
+  remainingDistance: float => $0.distance_to_target()
+  isStopped: bool => U.nav_get($0, "stopped", false)
+  set isStopped: bool => U.nav_set_stopped($0, $v)
+  hasPath: bool => not $0.is_navigation_finished()
+  pathPending: bool => false
+  pathStatus: int => 0
+  isOnNavMesh: bool => true
+  isOnOffMeshLink: bool => false
+  isPathStale: bool => false
+  autoBraking: bool => U.nav_get($0, "autoBraking", true)
+  set autoBraking: bool => U.nav_set($0, "autoBraking", $v)
+  autoRepath: bool => true
+  set autoRepath: bool => pass
+  autoTraverseOffMeshLink: bool => true
+  set autoTraverseOffMeshLink: bool => pass
+  updatePosition: bool => U.nav_get($0, "updatePosition", true)
+  set updatePosition: bool => U.nav_set($0, "updatePosition", $v)
+  updateRotation: bool => U.nav_get($0, "updateRotation", true)
+  set updateRotation: bool => U.nav_set($0, "updateRotation", $v)
+  updateUpAxis: bool => true
+  set updateUpAxis: bool => pass
+  nextPosition: Vector3 => $0.get_next_path_position()
+  set nextPosition: Vector3 => pass
+  steeringTarget: Vector3 => $0.get_next_path_position()
+  pathEndPosition: Vector3 => $0.get_final_position()
+  path: NavMeshPath => {"corners": Array($0.get_current_navigation_path()), "status": 0}
+  set path: NavMeshPath => pass
+  areaMask: int => $0.navigation_layers
+  set areaMask: int => $0.navigation_layers = $v
+  avoidancePriority: int => $0.avoidance_priority
+  set avoidancePriority: int => $0.avoidance_priority = int($v)
+  obstacleAvoidanceType: int => (3 if $0.avoidance_enabled else 0)
+  set obstacleAvoidanceType: int => $0.avoidance_enabled = ($v != 0)
+  agentTypeID: int => 0
+  set agentTypeID: int => pass
+  currentOffMeshLinkData: object => {}
+  nextOffMeshLinkData: object => {}
+  SetDestination(Vector3): bool => $0.target_position = $1 ;; true
+  ResetPath(): void => $0.target_position = $0.get_parent().global_position if $0.get_parent() is Node3D else Vector3.ZERO
+  Stop(): void => U.nav_set_stopped($0, true)
+  Resume(): void => U.nav_set_stopped($0, false)
+  Warp(Vector3): bool => U.nav_warp($0, $1)
+  Move(Vector3): void => U.nav_move($0, $1)
+  SetPath(NavMeshPath): bool => true
+  CalculatePath(Vector3, NavMeshPath): bool => $2.corners = Array(NavigationServer3D.map_get_path($0.get_navigation_map(), U.nav_origin($0), $1, true)) ;; true
+  SamplePathPosition(int, float, out NavMeshHit): bool => $3 = {"position": $0.get_next_path_position(), "hit": true} ;; true
+  Raycast(Vector3, out NavMeshHit): bool => $2 = {"position": $1, "hit": false} ;; false
+  FindClosestEdge(out NavMeshHit): bool => $1 = {"position": U.nav_origin($0), "hit": false} ;; false
+  CompleteOffMeshLink(): void => pass
+  ActivateCurrentOffMeshLink(bool): void => pass
+  SetAreaCost(int, float): void => pass
+  GetAreaCost(int): float => 1.0
+
+type NavMeshPath kind=class gd=Dictionary extern=UnityEngineAINavMeshPath
+  ctor() => {"corners": [], "status": 0}
+  corners: Vector3[] => $0.get("corners", [])
+  status: int => $0.get("status", 0)
+  GetCornersNonAlloc(Vector3[]): int => U.array_copy($0.get("corners", []), 0, $1, 0, mini($1.size(), $0.get("corners", []).size())) ;; mini($1.size(), $0.get("corners", []).size())
+  ClearCorners(): void => $0.corners = []
+
+type NavMeshHit kind=struct gd=Dictionary extern=UnityEngineAINavMeshHit
+  position: Vector3 => $0.get("position", Vector3.ZERO)
+  set position: Vector3 => $0.position = $v
+  normal: Vector3 => $0.get("normal", Vector3.UP)
+  set normal: Vector3 => $0.normal = $v
+  distance: float => $0.get("distance", 0.0)
+  set distance: float => $0.distance = $v
+  mask: int => $0.get("mask", -1)
+  set mask: int => $0.mask = $v
+  hit: bool => $0.get("hit", false)
+  set hit: bool => $0.hit = $v
+
+type NavMesh kind=static extern=UnityEngineAINavMesh
+  static AllAreas: int => -1
+  static avoidancePredictionTime: float => 2.0
+  static set avoidancePredictionTime: float => pass
+  static pathfindingIterationsPerFrame: int => 100
+  static set pathfindingIterationsPerFrame: int => pass
+  static SamplePosition(Vector3, out NavMeshHit, float, int): bool => $2 = U.nav_sample($1, $3) ;; $2.get("hit", false)
+  static Raycast(Vector3, Vector3, out NavMeshHit, int): bool => $3 = {"position": $2, "hit": false} ;; false
+  static CalculatePath(Vector3, Vector3, int, NavMeshPath): bool => $4.corners = U.nav_path($1, $2) ;; not $4.corners.is_empty()
+  static FindClosestEdge(Vector3, out NavMeshHit, int): bool => $2 = U.nav_sample($1, 5.0) ;; $2.get("hit", false)
+  static GetAreaCost(int): float => 1.0
+  static SetAreaCost(int, float): void => pass
+  static GetAreaFromName(string): int => U.name_to_layer($1)
+  static CalculateTriangulation(): object => {}
+  static RemoveAllNavMeshData(): void => pass
+
+type NavMeshObstacle : Behaviour kind=component gd=NavigationObstacle3D extern=UnityEngineAINavMeshObstacle
+  radius: float => $0.radius
+  set radius: float => $0.radius = $v
+  height: float => $0.height
+  set height: float => $0.height = $v
+  center: Vector3 => Vector3.ZERO
+  set center: Vector3 => pass
+  size: Vector3 => Vector3($0.radius * 2.0, $0.height, $0.radius * 2.0)
+  set size: Vector3 => $0.radius = maxf($v.x, $v.z) / 2.0 ;; $0.height = $v.y
+  shape: int => 0
+  set shape: int => pass
+  carving: bool => $0.affect_navigation_mesh
+  set carving: bool => $0.affect_navigation_mesh = $v
+  carveOnlyStationary: bool => true
+  set carveOnlyStationary: bool => pass
+  carvingMoveThreshold: float => 0.1
+  set carvingMoveThreshold: float => pass
+  carvingTimeToStationary: float => 0.5
+  set carvingTimeToStationary: float => pass
+  velocity: Vector3 => $0.velocity
+  set velocity: Vector3 => $0.velocity = $v
+
+type NavMeshSurface : Behaviour kind=component gd=NavigationRegion3D extern=UnityAINavigationNavMeshSurface
+  agentTypeID: int => 0
+  set agentTypeID: int => pass
+  collectObjects: int => 0
+  set collectObjects: int => pass
+  size: Vector3 => Vector3.ZERO
+  set size: Vector3 => pass
+  center: Vector3 => Vector3.ZERO
+  set center: Vector3 => pass
+  layerMask: int => -1
+  set layerMask: int => pass
+  useGeometry: int => 0
+  set useGeometry: int => pass
+  defaultArea: int => 0
+  set defaultArea: int => pass
+  generateLinks: bool => false
+  set generateLinks: bool => pass
+  ignoreNavMeshAgent: bool => true
+  set ignoreNavMeshAgent: bool => pass
+  ignoreNavMeshObstacle: bool => true
+  set ignoreNavMeshObstacle: bool => pass
+  overrideTileSize: bool => false
+  set overrideTileSize: bool => pass
+  tileSize: int => 256
+  set tileSize: int => pass
+  overrideVoxelSize: bool => false
+  set overrideVoxelSize: bool => pass
+  voxelSize: float => 0.1
+  set voxelSize: float => pass
+  minRegionArea: float => 2.0
+  set minRegionArea: float => pass
+  buildHeightMesh: bool => false
+  set buildHeightMesh: bool => pass
+  navMeshData: object => $0.navigation_mesh
+  set navMeshData: object => $0.navigation_mesh = $v
+  BuildNavMesh(): void => $0.bake_navigation_mesh(false)
+  UpdateNavMesh(object): object => $0.bake_navigation_mesh(true) ;; null
+  RemoveData(): void => $0.navigation_mesh = null
+  AddData(): void => pass
+  GetBuildSettings(): object => {}
+  static activeSurfaces: NavMeshSurface[] => U.get_components_in_children(U.scene_root(), "NavigationRegion3D", true)
+
+type AudioReverbZone : Behaviour kind=component gd=Area3D extern=UnityEngineAudioReverbZone
+  minDistance: float => U.reverb_get($0, "minDistance", 10.0)
+  set minDistance: float => U.reverb_set($0, "minDistance", $v)
+  maxDistance: float => U.reverb_get($0, "maxDistance", 15.0)
+  set maxDistance: float => U.reverb_set($0, "maxDistance", $v)
+  reverbPreset: int => U.reverb_get($0, "preset", 0)
+  set reverbPreset: int => U.reverb_set($0, "preset", $v)
+  room: int => U.reverb_get($0, "room", -1000)
+  set room: int => U.reverb_set($0, "room", $v)
+  roomHF: int => U.reverb_get($0, "roomHF", -100)
+  set roomHF: int => U.reverb_set($0, "roomHF", $v)
+  roomLF: int => U.reverb_get($0, "roomLF", 0)
+  set roomLF: int => U.reverb_set($0, "roomLF", $v)
+  decayTime: float => U.reverb_get($0, "decayTime", 1.49)
+  set decayTime: float => U.reverb_set($0, "decayTime", $v)
+  decayHFRatio: float => U.reverb_get($0, "decayHFRatio", 0.83)
+  set decayHFRatio: float => U.reverb_set($0, "decayHFRatio", $v)
+  reflections: int => U.reverb_get($0, "reflections", -2602)
+  set reflections: int => U.reverb_set($0, "reflections", $v)
+  reflectionsDelay: float => U.reverb_get($0, "reflectionsDelay", 0.007)
+  set reflectionsDelay: float => U.reverb_set($0, "reflectionsDelay", $v)
+  reverb: int => U.reverb_get($0, "reverb", 200)
+  set reverb: int => U.reverb_set($0, "reverb", $v)
+  reverbDelay: float => U.reverb_get($0, "reverbDelay", 0.011)
+  set reverbDelay: float => U.reverb_set($0, "reverbDelay", $v)
+  HFReference: float => 5000.0
+  set HFReference: float => pass
+  LFReference: float => 250.0
+  set LFReference: float => pass
+  diffusion: float => U.reverb_get($0, "diffusion", 100.0)
+  set diffusion: float => U.reverb_set($0, "diffusion", $v)
+  density: float => U.reverb_get($0, "density", 100.0)
+  set density: float => U.reverb_set($0, "density", $v)
+
+type AudioReverbFilter : Behaviour kind=component gd=Node extern=UnityEngineAudioReverbFilter
+  reverbPreset: int => U.reverb_get($0, "preset", 0)
+  set reverbPreset: int => U.reverb_set($0, "preset", $v)
+  dryLevel: float => U.reverb_get($0, "dryLevel", 0.0)
+  set dryLevel: float => U.reverb_set($0, "dryLevel", $v)
+  room: float => U.reverb_get($0, "room", 0.0)
+  set room: float => U.reverb_set($0, "room", $v)
+  roomHF: float => U.reverb_get($0, "roomHF", 0.0)
+  set roomHF: float => U.reverb_set($0, "roomHF", $v)
+  roomLF: float => U.reverb_get($0, "roomLF", 0.0)
+  set roomLF: float => U.reverb_set($0, "roomLF", $v)
+  decayTime: float => U.reverb_get($0, "decayTime", 1.0)
+  set decayTime: float => U.reverb_set($0, "decayTime", $v)
+  decayHFRatio: float => U.reverb_get($0, "decayHFRatio", 0.5)
+  set decayHFRatio: float => U.reverb_set($0, "decayHFRatio", $v)
+  reflectionsLevel: float => U.reverb_get($0, "reflectionsLevel", -10000.0)
+  set reflectionsLevel: float => U.reverb_set($0, "reflectionsLevel", $v)
+  reflectionsDelay: float => U.reverb_get($0, "reflectionsDelay", 0.0)
+  set reflectionsDelay: float => U.reverb_set($0, "reflectionsDelay", $v)
+  reverbLevel: float => U.reverb_get($0, "reverbLevel", 0.0)
+  set reverbLevel: float => U.reverb_set($0, "reverbLevel", $v)
+  reverbDelay: float => U.reverb_get($0, "reverbDelay", 0.04)
+  set reverbDelay: float => U.reverb_set($0, "reverbDelay", $v)
+  diffusion: float => U.reverb_get($0, "diffusion", 100.0)
+  set diffusion: float => U.reverb_set($0, "diffusion", $v)
+  density: float => U.reverb_get($0, "density", 100.0)
+  set density: float => U.reverb_set($0, "density", $v)
+  hfReference: float => 5000.0
+  set hfReference: float => pass
+  lfReference: float => 250.0
+  set lfReference: float => pass
+
+type AudioLowPassFilter : Behaviour kind=component gd=Node extern=UnityEngineAudioLowPassFilter
+  cutoffFrequency: float => U.reverb_get($0, "cutoff", 5000.0)
+  set cutoffFrequency: float => U.reverb_set($0, "cutoff", $v)
+  lowpassResonanceQ: float => U.reverb_get($0, "resonance", 1.0)
+  set lowpassResonanceQ: float => U.reverb_set($0, "resonance", $v)
+  customCutoffCurve: AnimationCurve => null
+  set customCutoffCurve: AnimationCurve => pass
+
+type AudioHighPassFilter : Behaviour kind=component gd=Node extern=UnityEngineAudioHighPassFilter
+  cutoffFrequency: float => U.reverb_get($0, "cutoff", 5000.0)
+  set cutoffFrequency: float => U.reverb_set($0, "cutoff", $v)
+  highpassResonanceQ: float => U.reverb_get($0, "resonance", 1.0)
+  set highpassResonanceQ: float => U.reverb_set($0, "resonance", $v)
+
+type AudioEchoFilter : Behaviour kind=component gd=Node extern=UnityEngineAudioEchoFilter
+  delay: float => U.reverb_get($0, "delay", 500.0)
+  set delay: float => U.reverb_set($0, "delay", $v)
+  decayRatio: float => U.reverb_get($0, "decayRatio", 0.5)
+  set decayRatio: float => U.reverb_set($0, "decayRatio", $v)
+  dryMix: float => U.reverb_get($0, "dryMix", 1.0)
+  set dryMix: float => U.reverb_set($0, "dryMix", $v)
+  wetMix: float => U.reverb_get($0, "wetMix", 1.0)
+  set wetMix: float => U.reverb_set($0, "wetMix", $v)
+
+type AudioDistortionFilter : Behaviour kind=component gd=Node extern=UnityEngineAudioDistortionFilter
+  distortionLevel: float => U.reverb_get($0, "distortion", 0.5)
+  set distortionLevel: float => U.reverb_set($0, "distortion", $v)
+
+type AudioChorusFilter : Behaviour kind=component gd=Node extern=UnityEngineAudioChorusFilter
+  dryMix: float => U.reverb_get($0, "dryMix", 0.5)
+  set dryMix: float => U.reverb_set($0, "dryMix", $v)
+  wetMix1: float => U.reverb_get($0, "wetMix1", 0.5)
+  set wetMix1: float => U.reverb_set($0, "wetMix1", $v)
+  wetMix2: float => U.reverb_get($0, "wetMix2", 0.5)
+  set wetMix2: float => U.reverb_set($0, "wetMix2", $v)
+  wetMix3: float => U.reverb_get($0, "wetMix3", 0.5)
+  set wetMix3: float => U.reverb_set($0, "wetMix3", $v)
+  delay: float => U.reverb_get($0, "delay", 40.0)
+  set delay: float => U.reverb_set($0, "delay", $v)
+  rate: float => U.reverb_get($0, "rate", 0.8)
+  set rate: float => U.reverb_set($0, "rate", $v)
+  depth: float => U.reverb_get($0, "depth", 0.03)
+  set depth: float => U.reverb_set($0, "depth", $v)
+
+type AudioMixer : Object kind=class gd=String extern=UnityEngineAudioAudioMixer
+  SetFloat(string, float): bool => AudioServer.set_bus_volume_db(maxi(AudioServer.get_bus_index($1), 0), $2) ;; true
+  GetFloat(string, out float): bool => $2 = AudioServer.get_bus_volume_db(maxi(AudioServer.get_bus_index($1), 0)) ;; true
+  ClearFloat(string): bool => true
+  FindMatchingGroups(string): AudioMixerGroup[] => [$1]
+  FindSnapshot(string): object => $1
+  TransitionToSnapshots(Array, float[], float): void => pass
+  updateMode: int => 0
+  set updateMode: int => pass
+  outputAudioMixerGroup: AudioMixerGroup => "Master"
+  set outputAudioMixerGroup: AudioMixerGroup => pass
+
+type AudioMixerGroup
+  audioMixer: AudioMixer => "Master"
+
+type AudioSource
+  ignoreListenerPause: bool => false
+  set ignoreListenerPause: bool => pass
+  ignoreListenerVolume: bool => false
+  set ignoreListenerVolume: bool => pass
+  velocityUpdateMode: int => 0
+  set velocityUpdateMode: int => pass
+  reverbZoneMix: float => 1.0
+  set reverbZoneMix: float => pass
+  isVirtual: bool => false
+  gamepadSpeakerOutputType: int => 0
+  set gamepadSpeakerOutputType: int => pass
+  SetCustomCurve(int, AnimationCurve): void => pass
+  GetCustomCurve(int): AnimationCurve => U.curve_linear(0.0, 1.0, 1.0, 0.0)
+  GetAmbisonicDecoderFloat(int, out float): bool => $2 = 0.0 ;; false
+  SetAmbisonicDecoderFloat(int, float): bool => false
+  SetSpatializerFloat(int, float): bool => false
+  GetOutputData(float[], int): void => pass
+  GetSpectrumData(float[], int, int): void => pass
+  PlayOnGamepad(int): bool => false
+  DisableGamepadOutput(): bool => false
+  SetGamepadSpeakerMixLevel(int, int): bool => false
+  SetGamepadSpeakerMixLevelDefault(int): bool => false
+  SetGamepadSpeakerRestrictedAudio(int, bool): bool => false
+  static GamepadSpeakerSupportsOutputType(int): bool => false
+
+type AudioSettings kind=static extern=UnityEngineAudioSettings
+  static outputSampleRate: int => int(AudioServer.get_mix_rate())
+  static set outputSampleRate: int => pass
+  static speakerMode: int => 2
+  static set speakerMode: int => pass
+  static dspTime: double => AudioServer.get_time_since_last_mix()
+  static driverCapabilities: int => 2
+  static GetConfiguration(): object => {"sampleRate": int(AudioServer.get_mix_rate())}
+  static GetDSPBufferSize(out int, out int): void => $1 = 1024 ;; $2 = 2
+  static GetSpatializerPluginName(): string => ""
+  static GetSpatializerPluginNames(): string[] => []
+  static SetSpatializerPluginName(string): void => pass
+
+type AudioClip
+  loadState: int => 2
+  loadType: int => 0
+  preloadAudioData: bool => true
+  ambisonic: bool => false
+  loadInBackground: bool => false
+  LoadAudioData(): bool => true
+  UnloadAudioData(): bool => true
+  GetData(float[], int): bool => false
+  SetData(float[], int): bool => false
+
+type TextMesh : Component kind=component gd=Label3D extern=UnityEngineTextMesh
+  text: string => $0.text
+  set text: string => $0.text = $v
+  fontSize: int => $0.font_size
+  set fontSize: int => $0.font_size = $v
+  color: Color => $0.modulate
+  set color: Color => $0.modulate = $v
+  characterSize: float => $0.pixel_size * 100.0
+  set characterSize: float => $0.pixel_size = $v / 100.0
+  lineSpacing: float => $0.line_spacing
+  set lineSpacing: float => $0.line_spacing = $v
+  offsetZ: float => 0.0
+  set offsetZ: float => pass
+  alignment: int => $0.horizontal_alignment
+  set alignment: int => $0.horizontal_alignment = $v
+  anchor: int => 4
+  set anchor: int => pass
+  richText: bool => false
+  set richText: bool => pass
+  tabSize: float => 4.0
+  set tabSize: float => pass
+  fontStyle: int => 0
+  set fontStyle: int => pass
+  font: Font => $0.font
+  set font: Font => $0.font = $v
+
+type Font : Object kind=class gd=Font extern=UnityEngineFont
+  fontSize: int => 16
+  dynamic: bool => true
+  lineHeight: int => int($0.get_height())
+  fontNames: string[] => [$0.get_font_name()]
+  set fontNames: string[] => pass
+  HasCharacter(char): bool => $0.has_char($1.unicode_at(0))
+  GetCharacterInfo(char, out object): bool => $2 = {} ;; true
+  RequestCharactersInTexture(string): void => pass
+  RequestCharactersInTexture(string, int): void => pass
+  RequestCharactersInTexture(string, int, int): void => pass
+  static CreateDynamicFontFromOSFont(string, int): Font => ThemeDB.fallback_font
+  static GetOSInstalledFontNames(): string[] => Array(OS.get_system_fonts())
+  static GetMaxVertsForString(string): int => $1.length() * 4
+
+type VideoPlayer : Behaviour kind=component gd=VideoStreamPlayer extern=UnityEngineVideoVideoPlayer
+  url: string => U.video_get($0, "url", "")
+  set url: string => U.video_set_url($0, $v)
+  clip: object => $0.stream
+  set clip: object => $0.stream = $v
+  isPlaying: bool => $0.is_playing()
+  isPaused: bool => $0.paused
+  isPrepared: bool => $0.stream != null
+  isLooping: bool => $0.loop
+  set isLooping: bool => $0.loop = $v
+  playOnAwake: bool => $0.autoplay
+  set playOnAwake: bool => $0.autoplay = $v
+  waitForFirstFrame: bool => true
+  set waitForFirstFrame: bool => pass
+  time: double => $0.stream_position
+  set time: double => $0.stream_position = $v
+  frame: long => int($0.stream_position * 30.0)
+  set frame: long => $0.stream_position = $v / 30.0
+  frameCount: ulong => int($0.get_stream_length() * 30.0)
+  frameRate: float => 30.0
+  length: double => $0.get_stream_length()
+  playbackSpeed: float => 1.0
+  set playbackSpeed: float => pass
+  canSetPlaybackSpeed: bool => false
+  canSetTime: bool => true
+  canStep: bool => false
+  canSetDirectAudioVolume: bool => true
+  canSetSkipOnDrop: bool => false
+  skipOnDrop: bool => true
+  set skipOnDrop: bool => pass
+  width: uint => int($0.get_video_texture().get_width()) if $0.get_video_texture() != null else 0
+  height: uint => int($0.get_video_texture().get_height()) if $0.get_video_texture() != null else 0
+  texture: Texture => $0.get_video_texture()
+  targetTexture: RenderTexture => null
+  set targetTexture: RenderTexture => pass
+  renderMode: int => 0
+  set renderMode: int => pass
+  aspectRatio: int => 0
+  set aspectRatio: int => pass
+  source: int => 0
+  set source: int => pass
+  audioOutputMode: int => 0
+  set audioOutputMode: int => pass
+  audioTrackCount: ushort => 1
+  controlledAudioTrackCount: ushort => 1
+  set controlledAudioTrackCount: ushort => pass
+  targetCamera: Camera => null
+  set targetCamera: Camera => pass
+  targetMaterialRenderer: Renderer => null
+  set targetMaterialRenderer: Renderer => pass
+  targetMaterialProperty: string => "_MainTex"
+  set targetMaterialProperty: string => pass
+  targetCameraAlpha: float => 1.0
+  set targetCameraAlpha: float => pass
+  targetCamera3DLayout: int => 0
+  set targetCamera3DLayout: int => pass
+  sendFrameReadyEvents: bool => false
+  set sendFrameReadyEvents: bool => pass
+  externalReferenceTime: double => 0.0
+  set externalReferenceTime: double => pass
+  timeReference: int => 0
+  set timeReference: int => pass
+  timeUpdateMode: int => 0
+  set timeUpdateMode: int => pass
+  Play(): void => $0.play()
+  Pause(): void => $0.paused = true
+  Stop(): void => $0.stop()
+  Prepare(): void => pass
+  StepForward(): void => pass
+  GetDirectAudioVolume(ushort): float => db_to_linear($0.volume_db)
+  SetDirectAudioVolume(ushort, float): void => $0.volume_db = linear_to_db(maxf($2, 0.0001))
+  GetDirectAudioMute(ushort): bool => ($0.volume_db <= -79.0)
+  SetDirectAudioMute(ushort, bool): void => $0.volume_db = (-80.0 if $2 else 0.0)
+  GetTargetAudioSource(ushort): AudioSource => null
+  SetTargetAudioSource(ushort, AudioSource): void => pass
+  GetAudioLanguageCode(ushort): string => ""
+  GetAudioChannelCount(ushort): ushort => 2
+  GetAudioSampleRate(ushort): uint => 44100
+  EnableAudioTrack(ushort, bool): void => pass
+  IsAudioTrackEnabled(ushort): bool => true
+
+type HorizontalOrVerticalLayoutGroup : Behaviour kind=component gd=BoxContainer extern=UnityEngineUIHorizontalOrVerticalLayoutGroup
+  spacing: float => $0.get_theme_constant("separation")
+  set spacing: float => $0.add_theme_constant_override("separation", int($v))
+  childAlignment: int => $0.alignment
+  set childAlignment: int => $0.alignment = clampi($v / 3, 0, 2)
+  childForceExpandWidth: bool => U.layout_get($0, "childForceExpandWidth", true)
+  set childForceExpandWidth: bool => U.layout_set($0, "childForceExpandWidth", $v)
+  childForceExpandHeight: bool => U.layout_get($0, "childForceExpandHeight", true)
+  set childForceExpandHeight: bool => U.layout_set($0, "childForceExpandHeight", $v)
+  childControlWidth: bool => U.layout_get($0, "childControlWidth", false)
+  set childControlWidth: bool => U.layout_set($0, "childControlWidth", $v)
+  childControlHeight: bool => U.layout_get($0, "childControlHeight", false)
+  set childControlHeight: bool => U.layout_set($0, "childControlHeight", $v)
+  childScaleWidth: bool => false
+  set childScaleWidth: bool => pass
+  childScaleHeight: bool => false
+  set childScaleHeight: bool => pass
+  reverseArrangement: bool => false
+  set reverseArrangement: bool => pass
+  padding: object => {"left": 0, "right": 0, "top": 0, "bottom": 0}
+  set padding: object => pass
+  minWidth: float => $0.get_combined_minimum_size().x
+  minHeight: float => $0.get_combined_minimum_size().y
+  preferredWidth: float => $0.get_combined_minimum_size().x
+  preferredHeight: float => $0.get_combined_minimum_size().y
+  flexibleWidth: float => 1.0
+  flexibleHeight: float => 1.0
+  layoutPriority: int => 0
+  CalculateLayoutInputHorizontal(): void => pass
+  CalculateLayoutInputVertical(): void => pass
+  SetLayoutHorizontal(): void => pass
+  SetLayoutVertical(): void => pass
+
+type HorizontalLayoutGroup : HorizontalOrVerticalLayoutGroup kind=component gd=HBoxContainer extern=UnityEngineUIHorizontalLayoutGroup
+type VerticalLayoutGroup : HorizontalOrVerticalLayoutGroup kind=component gd=VBoxContainer extern=UnityEngineUIVerticalLayoutGroup
+
+type GridLayoutGroup : Behaviour kind=component gd=GridContainer extern=UnityEngineUIGridLayoutGroup
+  cellSize: Vector2 => U.layout_get($0, "cellSize", Vector2(100, 100))
+  set cellSize: Vector2 => U.layout_set($0, "cellSize", $v)
+  spacing: Vector2 => Vector2($0.get_theme_constant("h_separation"), $0.get_theme_constant("v_separation"))
+  set spacing: Vector2 => $0.add_theme_constant_override("h_separation", int($v.x)) ;; $0.add_theme_constant_override("v_separation", int($v.y))
+  constraint: int => 1
+  set constraint: int => pass
+  constraintCount: int => $0.columns
+  set constraintCount: int => $0.columns = maxi($v, 1)
+  startCorner: int => 0
+  set startCorner: int => pass
+  startAxis: int => 0
+  set startAxis: int => pass
+  childAlignment: int => 0
+  set childAlignment: int => pass
+  padding: object => {"left": 0, "right": 0, "top": 0, "bottom": 0}
+  set padding: object => pass
+  minWidth: float => $0.get_combined_minimum_size().x
+  minHeight: float => $0.get_combined_minimum_size().y
+  preferredWidth: float => $0.get_combined_minimum_size().x
+  preferredHeight: float => $0.get_combined_minimum_size().y
+
+type LayoutGroup : Behaviour kind=component gd=Container extern=UnityEngineUILayoutGroup
+  childAlignment: int => 0
+  set childAlignment: int => pass
+  padding: object => {"left": 0, "right": 0, "top": 0, "bottom": 0}
+  set padding: object => pass
+  minWidth: float => $0.get_combined_minimum_size().x
+  minHeight: float => $0.get_combined_minimum_size().y
+  preferredWidth: float => $0.get_combined_minimum_size().x
+  preferredHeight: float => $0.get_combined_minimum_size().y
+  flexibleWidth: float => 1.0
+  flexibleHeight: float => 1.0
+  layoutPriority: int => 0
+  CalculateLayoutInputHorizontal(): void => pass
+  CalculateLayoutInputVertical(): void => pass
+  SetLayoutHorizontal(): void => pass
+  SetLayoutVertical(): void => pass
+
+type ContentSizeFitter : Behaviour kind=component gd=Control extern=UnityEngineUIContentSizeFitter
+  horizontalFit: int => 0
+  set horizontalFit: int => pass
+  verticalFit: int => 0
+  set verticalFit: int => pass
+  SetLayoutHorizontal(): void => pass
+  SetLayoutVertical(): void => pass
+
+type CanvasScaler : Behaviour kind=component gd=CanvasLayer extern=UnityEngineUICanvasScaler
+  uiScaleMode: int => 0
+  set uiScaleMode: int => pass
+  scaleFactor: float => $0.scale.x
+  set scaleFactor: float => $0.scale = Vector2($v, $v)
+  referenceResolution: Vector2 => Vector2(1920, 1080)
+  set referenceResolution: Vector2 => pass
+  screenMatchMode: int => 0
+  set screenMatchMode: int => pass
+  matchWidthOrHeight: float => 0.0
+  set matchWidthOrHeight: float => pass
+  referencePixelsPerUnit: float => 100.0
+  set referencePixelsPerUnit: float => pass
+  dynamicPixelsPerUnit: float => 1.0
+  set dynamicPixelsPerUnit: float => pass
+  physicalUnit: int => 0
+  set physicalUnit: int => pass
+  fallbackScreenDPI: float => 96.0
+  set fallbackScreenDPI: float => pass
+  defaultSpriteDPI: float => 96.0
+  set defaultSpriteDPI: float => pass
+
+type CanvasRenderer : Component kind=component gd=CanvasItem extern=UnityEngineCanvasRenderer
+  cull: bool => not $0.visible
+  set cull: bool => $0.visible = not $v
+  hasMoved: bool => false
+  hasPopInstruction: bool => false
+  set hasPopInstruction: bool => pass
+  materialCount: int => 1
+  set materialCount: int => pass
+  popMaterialCount: int => 0
+  set popMaterialCount: int => pass
+  absoluteDepth: int => $0.z_index
+  hasRectClipping: bool => $0.clip_children != 0
+  relativeDepth: int => $0.z_index
+  cullTransparentMesh: bool => false
+  set cullTransparentMesh: bool => pass
+  clippingSoftness: Vector2 => Vector2.ZERO
+  set clippingSoftness: Vector2 => pass
+  SetColor(Color): void => $0.modulate = $1
+  GetColor(): Color => $0.modulate
+  SetAlpha(float): void => $0.modulate.a = $1
+  GetAlpha(): float => $0.modulate.a
+  SetMaterial(Material, int): void => $0.material = $1
+  GetMaterial(int): Material => $0.material
+  GetMaterial(): Material => $0.material
+  SetPopMaterial(Material, int): void => pass
+  GetPopMaterial(int): Material => null
+  SetTexture(Texture): void => pass
+  SetAlphaTexture(Texture): void => pass
+  SetMesh(Mesh): void => pass
+  Clear(): void => pass
+  EnableRectClipping(Rect): void => $0.clip_children = 1
+  DisableRectClipping(): void => $0.clip_children = 0
+  GetInheritedAlpha(): float => $0.modulate.a
+  static SplitUIVertexStreams(object, Array, Array, Array, Array, Array, Array, Array, Array, Array): void => pass
+  static CreateUIVertexStream(object, Array, Array, Array, Array, Array, Array, Array, Array, Array): void => pass
+  static AddUIVertexStream(object, Array, Array, Array, Array, Array, Array, Array, Array, Array): void => pass
+
+type MaskableGraphic : Graphic kind=component gd=Control extern=UnityEngineUIMaskableGraphic
+  maskable: bool => true
+  set maskable: bool => pass
+  isMaskingGraphic: bool => false
+  set isMaskingGraphic: bool => pass
+  RecalculateClipping(): void => pass
+  RecalculateMasking(): void => pass
+  Cull(Rect, bool): void => pass
+  SetClipRect(Rect, bool): void => pass
+  SetClipSoftness(Vector2): void => pass
+
+type CinemachineVirtualCameraBase : Behaviour kind=component gd=Camera3D extern=CinemachineCinemachineVirtualCameraBase
+  Priority: int => U.cine_get($0, "priority", 10)
+  set Priority: int => U.cine_set($0, "priority", $v)
+  Follow: Transform => U.cine_get($0, "follow", null)
+  set Follow: Transform => U.cine_set($0, "follow", $v)
+  LookAt: Transform => U.cine_get($0, "lookAt", null)
+  set LookAt: Transform => U.cine_set($0, "lookAt", $v)
+  State: object => {"position": $0.global_position, "rotation": U.get_global_rotation($0)}
+  IsLive: bool => $0.current
+  Name: string => String($0.name)
+  Description: string => ""
+  PreviousStateIsValid: bool => true
+  set PreviousStateIsValid: bool => pass
+  ParentCamera: CinemachineVirtualCameraBase => null
+  IsValid: bool => is_instance_valid($0)
+  MoveToTopOfPrioritySubqueue(): void => $0.make_current()
+  UpdateCameraState(Vector3, float): void => pass
+  InternalUpdateCameraState(Vector3, float): void => pass
+  OnTargetObjectWarped(Transform, Vector3): void => pass
+  ForceCameraPosition(Vector3, Quaternion): void => $0.global_position = $1 ;; U.set_global_rotation($0, $2)
+  IsLiveChild(object, bool): bool => false
+  ResolveFollow(Transform): Transform => $1
+  ResolveLookAt(Transform): Transform => $1
+
+type CinemachineVirtualCamera : CinemachineVirtualCameraBase kind=component gd=Camera3D extern=CinemachineCinemachineVirtualCamera
+  m_Lens: object => {"FieldOfView": $0.fov, "NearClipPlane": $0.near, "FarClipPlane": $0.far}
+  set m_Lens: object => $0.fov = float($v.get("FieldOfView", $0.fov)) ;; $0.near = float($v.get("NearClipPlane", $0.near)) ;; $0.far = float($v.get("FarClipPlane", $0.far))
+  m_Follow: Transform => U.cine_get($0, "follow", null)
+  set m_Follow: Transform => U.cine_set($0, "follow", $v)
+  m_LookAt: Transform => U.cine_get($0, "lookAt", null)
+  set m_LookAt: Transform => U.cine_set($0, "lookAt", $v)
+  m_Priority: int => U.cine_get($0, "priority", 10)
+  set m_Priority: int => U.cine_set($0, "priority", $v)
+  m_Transitions: object => {}
+  set m_Transitions: object => pass
+  GetCinemachineComponent(int): object => null
+  GetComponentPipeline(): Array => []
+  InvalidateComponentPipeline(): void => pass
+  GetComponentOwner(): Transform => $0
+  DestroyCinemachineComponent(int): void => pass
+
+type CinemachineBrain : Behaviour kind=component gd=Node extern=CinemachineCinemachineBrain
+  ActiveVirtualCamera: CinemachineVirtualCameraBase => U.main_camera()
+  ActiveBlend: object => null
+  IsBlending: bool => false
+  OutputCamera: Camera => U.main_camera()
+  DefaultWorldUp: Vector3 => Vector3.UP
+  m_DefaultBlend: object => {}
+  set m_DefaultBlend: object => pass
+  m_UpdateMethod: int => 0
+  set m_UpdateMethod: int => pass
+  m_ShowDebugText: bool => false
+  set m_ShowDebugText: bool => pass
+  m_IgnoreTimeScale: bool => false
+  set m_IgnoreTimeScale: bool => pass
+  m_WorldUpOverride: Transform => null
+  set m_WorldUpOverride: Transform => pass
+  ManualUpdate(): void => pass
+  IsLive(CinemachineVirtualCameraBase): bool => $1.current
+  IsLive(CinemachineVirtualCameraBase, bool): bool => $1.current
+  ResetState(): void => pass
+  static SoloCamera: CinemachineVirtualCameraBase => null
+  static set SoloCamera: CinemachineVirtualCameraBase => pass
+
+type CinemachineDollyCart : Behaviour kind=component gd=PathFollow3D extern=CinemachineCinemachineDollyCart
+  m_Path: CinemachinePathBase => $0.get_parent()
+  set m_Path: CinemachinePathBase => pass
+  m_Position: float => $0.progress
+  set m_Position: float => $0.progress = $v
+  m_Speed: float => U.cine_get($0, "speed", 0.0)
+  set m_Speed: float => U.cine_set($0, "speed", $v)
+  m_UpdateMethod: int => 0
+  set m_UpdateMethod: int => pass
+  m_PositionUnits: int => 1
+  set m_PositionUnits: int => pass
+
+type CinemachinePathBase : Behaviour kind=component gd=Path3D extern=CinemachineCinemachinePathBase
+  MinPos: float => 0.0
+  MaxPos: float => $0.curve.get_baked_length() if $0.curve != null else 0.0
+  Looped: bool => false
+  PathLength: float => $0.curve.get_baked_length() if $0.curve != null else 0.0
+  m_Appearance: object => {}
+  set m_Appearance: object => pass
+  m_Resolution: int => 20
+  set m_Resolution: int => pass
+  EvaluatePosition(float): Vector3 => U.path_position($0, $1)
+  EvaluatePositionAtUnit(float, int): Vector3 => U.path_position($0, $1)
+  EvaluateOrientation(float): Quaternion => U.path_orientation($0, $1)
+  EvaluateOrientationAtUnit(float, int): Quaternion => U.path_orientation($0, $1)
+  EvaluateTangent(float): Vector3 => U.path_tangent($0, $1)
+  EvaluateTangentAtUnit(float, int): Vector3 => U.path_tangent($0, $1)
+  EvaluateLocalPosition(float): Vector3 => $0.to_local(U.path_position($0, $1))
+  EvaluateLocalOrientation(float): Quaternion => U.path_orientation($0, $1)
+  EvaluateLocalTangent(float): Vector3 => U.path_tangent($0, $1)
+  FindClosestPoint(Vector3, int, int, int): float => $0.curve.get_closest_offset($0.to_local($1)) if $0.curve != null else 0.0
+  StandardizePos(float): float => $1
+  StandardizeUnit(float, int): float => $1
+  FromPathNativeUnits(float, int): float => $1
+  ToNativePathUnits(float, int): float => $1
+  DistanceCacheIsValid(): bool => true
+  InvalidateDistanceCache(): void => pass
+  MinUnit(int): float => 0.0
+  MaxUnit(int): float => $0.curve.get_baked_length() if $0.curve != null else 0.0
+
+type CinemachinePath : CinemachinePathBase kind=component gd=Path3D extern=CinemachineCinemachinePath
+  m_Waypoints: Array => []
+  set m_Waypoints: Array => pass
+  m_Looped: bool => false
+  set m_Looped: bool => pass
+
+type CinemachineSmoothPath : CinemachinePathBase kind=component gd=Path3D extern=CinemachineCinemachineSmoothPath
+  m_Waypoints: Array => []
+  set m_Waypoints: Array => pass
+  m_Looped: bool => false
+  set m_Looped: bool => pass
+
+type Cubemap : Texture kind=class gd=Cubemap extern=UnityEngineCubemap
+  ctor(int, TextureFormat, bool) => null
+  format: TextureFormat => 4
+  mipmapCount: int => 1
+  isReadable: bool => false
+  Apply(): void => pass
+  Apply(bool): void => pass
+  Apply(bool, bool): void => pass
+  GetPixel(int, int, int): Color => Color.BLACK
+  GetPixels(int): Color[] => []
+  SetPixel(int, int, int, Color): void => pass
+  SetPixels(Color[], int): void => pass
+  SmoothEdges(): void => pass
+  SmoothEdges(int): void => pass
+
+type Texture3D : Texture kind=class gd=Texture3D extern=UnityEngineTexture3D
+  ctor(int, int, int, TextureFormat, bool) => null
+  depth: int => $0.get_depth() if $0 != null else 0
+  format: TextureFormat => 4
+  isReadable: bool => false
+  Apply(): void => pass
+  Apply(bool): void => pass
+  GetPixel(int, int, int): Color => Color.BLACK
+  GetPixelBilinear(float, float, float): Color => Color.BLACK
+  GetPixels(): Color[] => []
+  SetPixel(int, int, int, Color): void => pass
+  SetPixels(Color[]): void => pass
+
+type CustomRenderTexture : RenderTexture kind=class gd=Texture2D extern=UnityEngineCustomRenderTexture
+  ctor(int, int) => U.new_texture($1, $2)
+  material: Material => U.rt_get($0, "material", null)
+  set material: Material => U.rt_set($0, "material", $v)
+  initializationMaterial: Material => null
+  set initializationMaterial: Material => pass
+  initializationTexture: Texture => null
+  set initializationTexture: Texture => pass
+  initializationColor: Color => Color.BLACK
+  set initializationColor: Color => pass
+  initializationMode: int => 0
+  set initializationMode: int => pass
+  initializationSource: int => 0
+  set initializationSource: int => pass
+  updateMode: int => 0
+  set updateMode: int => pass
+  updatePeriod: float => 0.0
+  set updatePeriod: float => pass
+  updateZoneSpace: int => 0
+  set updateZoneSpace: int => pass
+  doubleBuffered: bool => false
+  set doubleBuffered: bool => pass
+  wrapUpdateZones: bool => false
+  set wrapUpdateZones: bool => pass
+  cubemapFaceMask: uint => 63
+  set cubemapFaceMask: uint => pass
+  shaderPass: int => 0
+  set shaderPass: int => pass
+  Update(): void => pass
+  Update(int): void => pass
+  Initialize(): void => pass
+  ClearUpdateZones(): void => pass
+  GetUpdateZones(Array): void => pass
+  SetUpdateZones(Array): void => pass
+  GetDoubleBufferRenderTexture(): RenderTexture => $0
+  EnsureDoubleBufferConsistency(): void => pass
+
+type BillboardRenderer : Renderer kind=component gd=Sprite3D extern=UnityEngineBillboardRenderer
+  billboard: object => $0.texture
+  set billboard: object => pass
+
+type UIInputFieldExtras kind=static extern=UnityEngineUIInputFieldExtras
+
+type InputField
+  textComponent: Text => $0
+  set textComponent: Text => pass
+  placeholder: Graphic => $0
+  set placeholder: Graphic => pass
+  caretPosition: int => $0.caret_column
+  set caretPosition: int => $0.caret_column = $v
+  selectionAnchorPosition: int => $0.caret_column
+  set selectionAnchorPosition: int => pass
+  selectionFocusPosition: int => $0.caret_column
+  set selectionFocusPosition: int => pass
+  caretBlinkRate: float => 0.85
+  set caretBlinkRate: float => pass
+  caretWidth: int => 1
+  set caretWidth: int => pass
+  caretColor: Color => $0.get_theme_color("caret_color")
+  set caretColor: Color => $0.add_theme_color_override("caret_color", $v)
+  customCaretColor: bool => false
+  set customCaretColor: bool => pass
+  selectionColor: Color => $0.get_theme_color("selection_color")
+  set selectionColor: Color => $0.add_theme_color_override("selection_color", $v)
+  readOnly: bool => not $0.editable
+  set readOnly: bool => $0.editable = not $v
+  multiLine: bool => false
+  contentType: int => 0
+  set contentType: int => pass
+  lineType: int => 0
+  set lineType: int => pass
+  inputType: int => 0
+  set inputType: int => pass
+  keyboardType: int => 0
+  set keyboardType: int => pass
+  characterValidation: int => 0
+  set characterValidation: int => pass
+  asteriskChar: char => "*"
+  set asteriskChar: char => $0.secret_character = $v
+  wasCanceled: bool => false
+  shouldHideMobileInput: bool => false
+  set shouldHideMobileInput: bool => pass
+  shouldActivateOnSelect: bool => true
+  set shouldActivateOnSelect: bool => pass
+  touchScreenKeyboard: object => null
+  onEndEdit: UnityEvent => $0.text_submitted
+  onValueChanged: UnityEvent => $0.text_changed
+  onSubmit: UnityEvent => $0.text_submitted
+  MoveTextEnd(bool): void => $0.caret_column = $0.text.length()
+  MoveTextStart(bool): void => $0.caret_column = 0
+  ForceLabelUpdate(): void => pass
+  ProcessEvent(object): void => pass
+  Rebuild(int): void => pass
+  GraphicUpdateComplete(): void => pass
+  LayoutComplete(): void => pass
+
+type Text
+  font: Font => $0.get_theme_font("font")
+  set font: Font => $0.add_theme_font_override("font", $v)
+  horizontalOverflow: int => 0
+  set horizontalOverflow: int => pass
+  verticalOverflow: int => 0
+  set verticalOverflow: int => pass
+  resizeTextMinSize: int => 10
+  set resizeTextMinSize: int => pass
+  resizeTextMaxSize: int => 40
+  set resizeTextMaxSize: int => pass
+  alignByGeometry: bool => false
+  set alignByGeometry: bool => pass
+  pixelsPerUnit: float => 1.0
+  cachedTextGenerator: object => null
+  cachedTextGeneratorForLayout: object => null
+  mainTexture: Texture => null
+  minWidth: float => $0.get_combined_minimum_size().x
+  minHeight: float => $0.get_combined_minimum_size().y
+  flexibleWidth: float => -1.0
+  flexibleHeight: float => -1.0
+  layoutPriority: int => 0
+  FontTextureChanged(): void => pass
+  GetGenerationSettings(Vector2): object => {}
+  CalculateLayoutInputHorizontal(): void => pass
+  CalculateLayoutInputVertical(): void => pass
+  OnRebuildRequested(): void => pass
+
+type Image
+  fillCenter: bool => true
+  set fillCenter: bool => pass
+  pixelsPerUnitMultiplier: float => 1.0
+  set pixelsPerUnitMultiplier: float => pass
+  useSpriteMesh: bool => false
+  set useSpriteMesh: bool => pass
+  alphaHitTestMinimumThreshold: float => 0.0
+  set alphaHitTestMinimumThreshold: float => pass
+  hasBorder: bool => false
+  pixelsPerUnit: float => 100.0
+  material: Material => $0.material
+  set material: Material => $0.material = $v
+  mainTexture: Texture => U.ui_get_texture($0)
+  minWidth: float => $0.get_combined_minimum_size().x
+  minHeight: float => $0.get_combined_minimum_size().y
+  flexibleWidth: float => -1.0
+  flexibleHeight: float => -1.0
+  layoutPriority: int => 0
+  SetNativeSize(): void => pass
+  IsRaycastLocationValid(Vector2, Camera): bool => true
+  CalculateLayoutInputHorizontal(): void => pass
+  CalculateLayoutInputVertical(): void => pass
+  OnBeforeSerialize(): void => pass
+  OnAfterDeserialize(): void => pass
+  static defaultETC1GraphicMaterial: Material => null
+
+type ScrollRect
+  horizontal: bool => $0.horizontal_scroll_mode != 0
+  set horizontal: bool => $0.horizontal_scroll_mode = (1 if $v else 0)
+  vertical: bool => $0.vertical_scroll_mode != 0
+  set vertical: bool => $0.vertical_scroll_mode = (1 if $v else 0)
+  movementType: int => 1
+  set movementType: int => pass
+  elasticity: float => 0.1
+  set elasticity: float => pass
+  inertia: bool => true
+  set inertia: bool => pass
+  decelerationRate: float => 0.135
+  set decelerationRate: float => pass
+  scrollSensitivity: float => 1.0
+  set scrollSensitivity: float => pass
+  viewport: RectTransform => $0
+  set viewport: RectTransform => pass
+  horizontalScrollbar: Scrollbar => $0.get_h_scroll_bar()
+  set horizontalScrollbar: Scrollbar => pass
+  verticalScrollbar: Scrollbar => $0.get_v_scroll_bar()
+  set verticalScrollbar: Scrollbar => pass
+  horizontalScrollbarVisibility: int => 0
+  set horizontalScrollbarVisibility: int => pass
+  verticalScrollbarVisibility: int => 0
+  set verticalScrollbarVisibility: int => pass
+  horizontalScrollbarSpacing: float => 0.0
+  set horizontalScrollbarSpacing: float => pass
+  verticalScrollbarSpacing: float => 0.0
+  set verticalScrollbarSpacing: float => pass
+  normalizedPosition: Vector2 => Vector2(U.scroll_get_h($0), U.scroll_get_v($0))
+  set normalizedPosition: Vector2 => U.scroll_set_h($0, $v.x) ;; U.scroll_set_v($0, $v.y)
+  onValueChanged: UnityEvent => $0.get_v_scroll_bar().value_changed
+  minWidth: float => $0.get_combined_minimum_size().x
+  minHeight: float => $0.get_combined_minimum_size().y
+  preferredWidth: float => $0.get_combined_minimum_size().x
+  preferredHeight: float => $0.get_combined_minimum_size().y
+  flexibleWidth: float => -1.0
+  flexibleHeight: float => -1.0
+  layoutPriority: int => -1
+  Rebuild(int): void => pass
+  LayoutComplete(): void => pass
+  GraphicUpdateComplete(): void => pass
+  StopMovement(): void => pass
+  SetLayoutHorizontal(): void => pass
+  SetLayoutVertical(): void => pass
+  CalculateLayoutInputHorizontal(): void => pass
+  CalculateLayoutInputVertical(): void => pass
+  IsActive(): bool => $0.visible
+
+type Dropdown
+  options: Array => U.dropdown_options($0)
+  set options: Array => U.dropdown_set_options($0, $v)
+  captionText: Text => $0
+  set captionText: Text => pass
+  captionImage: Image => $0
+  set captionImage: Image => pass
+  itemText: Text => $0
+  set itemText: Text => pass
+  itemImage: Image => $0
+  set itemImage: Image => pass
+  template: RectTransform => $0
+  set template: RectTransform => pass
+  alphaFadeSpeed: float => 0.15
+  set alphaFadeSpeed: float => pass
+  onValueChanged: UnityEvent => $0.item_selected
+  AddOptions(Array): void => U.dropdown_add_options($0, $1)
+  Show(): void => $0.show_popup()
+  Hide(): void => $0.get_popup().hide()
+  OnPointerClick(object): void => pass
+  OnSubmit(object): void => pass
+  OnCancel(object): void => pass
+
+type Scrollbar
+  direction: int => 0
+  set direction: int => pass
+  numberOfSteps: int => 0
+  set numberOfSteps: int => pass
+  handleRect: RectTransform => $0
+  set handleRect: RectTransform => pass
+  onValueChanged: UnityEvent => $0.value_changed
+  SetValueWithoutNotify(float): void => $0.set_value_no_signal($1)
+  Rebuild(int): void => pass
+  LayoutComplete(): void => pass
+  GraphicUpdateComplete(): void => pass
+  OnBeginDrag(object): void => pass
+  OnDrag(object): void => pass
+  OnPointerDown(object): void => pass
+  OnPointerUp(object): void => pass
+  OnMove(object): void => pass
+  OnInitializePotentialDrag(object): void => pass
+  FindSelectableOnLeft(): Selectable => null
+  FindSelectableOnRight(): Selectable => null
+  FindSelectableOnUp(): Selectable => null
+  FindSelectableOnDown(): Selectable => null
+
+type Animator
+  updateMode: int => 0
+  set updateMode: int => pass
+  fireEvents: bool => true
+  set fireEvents: bool => pass
+  keepAnimatorStateOnDisable: bool => false
+  set keepAnimatorStateOnDisable: bool => pass
+  writeDefaultValuesOnDisable: bool => false
+  set writeDefaultValuesOnDisable: bool => pass
+  hasRootMotion: bool => false
+  isHuman: bool => false
+  hasTransformHierarchy: bool => true
+  humanScale: float => 1.0
+  avatar: object => null
+  set avatar: object => pass
+  stabilizeFeet: bool => false
+  set stabilizeFeet: bool => pass
+  feetPivotActive: float => 0.0
+  set feetPivotActive: float => pass
+  pivotWeight: float => 0.5
+  pivotPosition: Vector3 => Vector3.ZERO
+  rootPosition: Vector3 => $0.global_position if $0 is Node3D else Vector3.ZERO
+  set rootPosition: Vector3 => pass
+  rootRotation: Quaternion => U.get_global_rotation($0) if $0 is Node3D else Quaternion()
+  set rootRotation: Quaternion => pass
+  bodyPosition: Vector3 => $0.global_position if $0 is Node3D else Vector3.ZERO
+  set bodyPosition: Vector3 => pass
+  bodyRotation: Quaternion => U.get_global_rotation($0) if $0 is Node3D else Quaternion()
+  set bodyRotation: Quaternion => pass
+  deltaPosition: Vector3 => Vector3.ZERO
+  deltaRotation: Quaternion => Quaternion()
+  velocity: Vector3 => Vector3.ZERO
+  angularVelocity: Vector3 => Vector3.ZERO
+  gravityWeight: float => 1.0
+  leftFeetBottomHeight: float => 0.0
+  rightFeetBottomHeight: float => 0.0
+  isOptimizable: bool => false
+  isMatchingTarget: bool => false
+  playbackTime: float => 0.0
+  set playbackTime: float => pass
+  recorderStartTime: float => 0.0
+  set recorderStartTime: float => pass
+  recorderStopTime: float => 0.0
+  set recorderStopTime: float => pass
+  recorderMode: int => 0
+  playableGraph: object => null
+  parameters: Array => U.anim_parameters($0)
+  logWarnings: bool => false
+  set logWarnings: bool => pass
+  layersAffectMassCenter: bool => false
+  set layersAffectMassCenter: bool => pass
+  GetParameter(int): object => U.anim_parameters($0)[$1]
+  IsParameterControlledByCurve(string): bool => false
+  IsParameterControlledByCurve(int): bool => false
+  GetAnimatorTransitionInfo(int): object => {"normalizedTime": 0.0, "duration": 0.0}
+  GetCurrentAnimatorClipInfo(int, Array): void => pass
+  GetNextAnimatorClipInfo(int): Array => []
+  GetNextAnimatorClipInfo(int, Array): void => pass
+  GetNextAnimatorClipInfoCount(int): int => 0
+  GetIKPosition(int): Vector3 => Vector3.ZERO
+  GetIKRotation(int): Quaternion => Quaternion()
+  GetIKPositionWeight(int): float => 0.0
+  GetIKRotationWeight(int): float => 0.0
+  GetIKHintPosition(int): Vector3 => Vector3.ZERO
+  SetIKHintPosition(int, Vector3): void => pass
+  GetIKHintPositionWeight(int): float => 0.0
+  SetIKHintPositionWeight(int, float): void => pass
+  SetLookAtPosition(Vector3): void => pass
+  SetLookAtWeight(float): void => pass
+  SetLookAtWeight(float, float): void => pass
+  SetLookAtWeight(float, float, float): void => pass
+  SetLookAtWeight(float, float, float, float): void => pass
+  SetLookAtWeight(float, float, float, float, float): void => pass
+  SetBoneLocalRotation(HumanBodyBones, Quaternion): void => pass
+  MatchTarget(Vector3, Quaternion, int, object, float): void => pass
+  MatchTarget(Vector3, Quaternion, int, object, float, float): void => pass
+  InterruptMatchTarget(): void => pass
+  InterruptMatchTarget(bool): void => pass
+  StartPlayback(): void => pass
+  StopPlayback(): void => pass
+  StartRecording(int): void => pass
+  StopRecording(): void => pass
+  ApplyBuiltinRootMotion(): void => pass
+  UpdateWithDelta(float): void => pass
+  GetBehaviour(): object => null
+  GetBehaviours(): Array => []
+  GetBehaviours(int, int): Array => []
+  HasState(int, string): bool => true
+  StringToHash(string): int => U.string_to_hash($1)
+  Play(int, int): void => U.anim_play($0, $1, $2, -INF)
+  PlayInFixedTime(int): void => U.anim_play($0, $1, -1, -INF)
+  PlayInFixedTime(int, int): void => U.anim_play($0, $1, $2, -INF)
+  PlayInFixedTime(int, int, float): void => U.anim_play($0, $1, $2, $3)
+  PlayInFixedTime(string, int): void => U.anim_play($0, $1, $2, -INF)
+  CrossFade(int, float): void => U.anim_cross_fade($0, $1, $2, -1)
+  CrossFade(int, float, int): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFade(int, float, int, float): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFade(string, float, int, float, float): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFade(int, float, int, float, float): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFadeInFixedTime(int, float): void => U.anim_cross_fade($0, $1, $2, -1)
+  CrossFadeInFixedTime(int, float, int): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFadeInFixedTime(string, float, int, float): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFadeInFixedTime(int, float, int, float): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFadeInFixedTime(string, float, int, float, float): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFadeInFixedTime(int, float, int, float, float): void => U.anim_cross_fade($0, $1, $2, $3)
+  SetTarget(int, float): void => pass
+  targetPosition: Vector3 => Vector3.ZERO
+  targetRotation: Quaternion => Quaternion()
+  IsControlled(Transform): bool => false
+  IsBoneTransform(Transform): bool => false
+
+type AnimatorControllerParameter kind=class gd=Dictionary extern=UnityEngineAnimatorControllerParameter
+  name: string => $0.get("name", "")
+  set name: string => $0.name = $v
+  nameHash: int => U.string_to_hash($0.get("name", ""))
+  type: int => $0.get("type", 1)
+  set type: int => $0.type = $v
+  defaultFloat: float => float($0.get("value", 0.0))
+  set defaultFloat: float => $0.value = $v
+  defaultInt: int => int($0.get("value", 0))
+  set defaultInt: int => $0.value = $v
+  defaultBool: bool => bool($0.get("value", false))
+  set defaultBool: bool => $0.value = $v
+
+type AnimatorControllerParameterType kind=enum extern=UnityEngineAnimatorControllerParameterType
+  enum Float = 1
+  enum Int = 3
+  enum Bool = 4
+  enum Trigger = 9
+
+type AnimatorTransitionInfo kind=struct gd=Dictionary extern=UnityEngineAnimatorTransitionInfo
+  normalizedTime: float => $0.get("normalizedTime", 0.0)
+  duration: float => $0.get("duration", 0.0)
+  durationUnit: int => 0
+  anyState: bool => false
+  fullPathHash: int => 0
+  nameHash: int => 0
+  userNameHash: int => 0
+  IsName(string): bool => false
+  IsUserName(string): bool => false
+
+type AnimatorClipInfo kind=struct gd=Dictionary extern=UnityEngineAnimatorClipInfo
+  clip: AnimationClip => $0.get("clip", null)
+  weight: float => $0.get("weight", 1.0)
+
+type AnimationState : Object kind=class gd=Dictionary extern=UnityEngineAnimationState
+  name: string => $0.get("name", "")
+  set name: string => $0.name = $v
+  enabled: bool => $0.get("enabled", true)
+  set enabled: bool => $0.enabled = $v
+  weight: float => $0.get("weight", 1.0)
+  set weight: float => $0.weight = $v
+  wrapMode: int => 0
+  set wrapMode: int => pass
+  time: float => $0.get("time", 0.0)
+  set time: float => $0.time = $v
+  normalizedTime: float => $0.get("normalizedTime", 0.0)
+  set normalizedTime: float => $0.normalizedTime = $v
+  speed: float => $0.get("speed", 1.0)
+  set speed: float => $0.speed = $v
+  normalizedSpeed: float => $0.get("speed", 1.0)
+  set normalizedSpeed: float => $0.speed = $v
+  length: float => $0.get("length", 0.0)
+  layer: int => 0
+  set layer: int => pass
+  clip: AnimationClip => $0.get("clip", null)
+  blendMode: int => 0
+  set blendMode: int => pass
+  AddMixingTransform(Transform): void => pass
+  AddMixingTransform(Transform, bool): void => pass
+  RemoveMixingTransform(Transform): void => pass
+
+type Animation
+  this[string]: AnimationState => U.animation_state($0, $1)
+  playAutomatically: bool => $0.autoplay != ""
+  set playAutomatically: bool => pass
+  wrapMode: int => 0
+  set wrapMode: int => pass
+  animatePhysics: bool => false
+  set animatePhysics: bool => pass
+  cullingType: int => 0
+  set cullingType: int => pass
+  localBounds: Bounds => AABB()
+  set localBounds: Bounds => pass
+  set clip: AnimationClip => pass
+  GetClipCount(): int => $0.get_animation_list().size()
+  Play(int): bool => U.animation_play($0, "")
+  Play(string, int): bool => U.animation_play($0, $1)
+  PlayQueued(string): AnimationState => $0.queue($1) ;; U.animation_state($0, $1)
+  PlayQueued(string, int): AnimationState => $0.queue($1) ;; U.animation_state($0, $1)
+  PlayQueued(string, int, int): AnimationState => $0.queue($1) ;; U.animation_state($0, $1)
+  CrossFade(string, float, int): void => $0.play($1, $2)
+  CrossFadeQueued(string, float): AnimationState => $0.queue($1) ;; U.animation_state($0, $1)
+  Blend(string): void => $0.play($1)
+  Blend(string, float): void => $0.play($1)
+  Blend(string, float, float): void => $0.play($1, $3)
+  AddClip(AnimationClip, string): void => U.animation_add_clip($0, $1, $2)
+  AddClip(AnimationClip, string, int, int): void => U.animation_add_clip($0, $1, $2)
+  AddClip(AnimationClip, string, int, int, bool): void => U.animation_add_clip($0, $1, $2)
+  RemoveClip(AnimationClip): void => pass
+  RemoveClip(string): void => U.animation_remove_clip($0, $1)
+  GetClip(string): AnimationClip => $0.get_animation($1) if $0.has_animation($1) else null
+  GetAnimationState(string): AnimationState => U.animation_state($0, $1)
+  SyncLayer(int): void => pass
+  GetEnumerator(): object => Array($0.get_animation_list())
+
+type AnimationClip
+  wrapMode: int => (0 if $0.loop_mode == 0 else 2)
+  set wrapMode: int => $0.loop_mode = (0 if $v == 0 else 1)
+  set frameRate: float => pass
+  localBounds: Bounds => AABB()
+  set localBounds: Bounds => pass
+  legacy: bool => true
+  set legacy: bool => pass
+  humanMotion: bool => false
+  empty: bool => $0.get_track_count() == 0
+  hasGenericRootTransform: bool => false
+  hasMotionFloatCurves: bool => false
+  hasMotionCurves: bool => false
+  hasRootCurves: bool => false
+  events: Array => []
+  set events: Array => pass
+  ctor() => Animation.new()
+  SampleAnimation(GameObject, float): void => pass
+  AddEvent(object): void => pass
+  ClearCurves(): void => $0.clear()
+  EnsureQuaternionContinuity(): void => pass
+  SetCurve(string, Type, string, AnimationCurve): void => pass
+
+type PlayableDirector : Behaviour kind=component gd=AnimationPlayer extern=UnityEnginePlayablesPlayableDirector
+  state: int => (1 if $0.is_playing() else 0)
+  extrapolationMode: int => 0
+  set extrapolationMode: int => pass
+  playableAsset: object => null
+  set playableAsset: object => pass
+  playableGraph: object => null
+  playOnAwake: bool => $0.autoplay != ""
+  set playOnAwake: bool => pass
+  timeUpdateMode: int => 0
+  set timeUpdateMode: int => pass
+  time: double => $0.current_animation_position if $0.current_animation != "" else 0.0
+  set time: double => $0.seek($v, true)
+  initialTime: double => 0.0
+  set initialTime: double => pass
+  duration: double => $0.current_animation_length if $0.current_animation != "" else 0.0
+  Play(): void => U.animation_play($0, "")
+  Play(object): void => U.animation_play($0, "")
+  Play(object, int): void => U.animation_play($0, "")
+  Stop(): void => $0.stop()
+  Pause(): void => $0.pause()
+  Resume(): void => $0.play()
+  Evaluate(): void => pass
+  RebuildGraph(): void => pass
+  DeferredEvaluate(): void => pass
+  ClearGenericBinding(object): void => pass
+  GetGenericBinding(object): object => null
+  SetGenericBinding(object, object): void => pass
+  GetReferenceValue(string, out bool): object => $2 = false ;; null
+  SetReferenceValue(string, object): void => pass
+  ClearReferenceValue(string): void => pass
+  RebindPlayableGraphOutputs(): void => pass
+  playableGraphIsValid(): bool => false
+
+type LODGroup : Component kind=component gd=Node3D extern=UnityEngineLODGroup
+  localReferencePoint: Vector3 => Vector3.ZERO
+  set localReferencePoint: Vector3 => pass
+  size: float => 1.0
+  set size: float => pass
+  lodCount: int => 1
+  fadeMode: int => 0
+  set fadeMode: int => pass
+  animateCrossFading: bool => false
+  set animateCrossFading: bool => pass
+  enabled: bool => $0.visible
+  set enabled: bool => $0.visible = $v
+  lastLODBillboard: bool => false
+  set lastLODBillboard: bool => pass
+  RecalculateBounds(): void => pass
+  GetLODs(): Array => []
+  SetLODs(Array): void => pass
+  ForceLOD(int): void => pass
+  static crossFadeAnimationDuration: float => 0.0
+  static set crossFadeAnimationDuration: float => pass
+
+type Terrain : Behaviour kind=component gd=Node3D extern=UnityEngineTerrain
+  terrainData: object => null
+  set terrainData: object => pass
+  treeDistance: float => 5000.0
+  set treeDistance: float => pass
+  treeBillboardDistance: float => 50.0
+  set treeBillboardDistance: float => pass
+  treeCrossFadeLength: float => 5.0
+  set treeCrossFadeLength: float => pass
+  treeMaximumFullLODCount: int => 50
+  set treeMaximumFullLODCount: int => pass
+  detailObjectDistance: float => 80.0
+  set detailObjectDistance: float => pass
+  detailObjectDensity: float => 1.0
+  set detailObjectDensity: float => pass
+  heightmapPixelError: float => 5.0
+  set heightmapPixelError: float => pass
+  heightmapMaximumLOD: int => 0
+  set heightmapMaximumLOD: int => pass
+  basemapDistance: float => 1000.0
+  set basemapDistance: float => pass
+  lightmapIndex: int => -1
+  set lightmapIndex: int => pass
+  realtimeLightmapIndex: int => -1
+  set realtimeLightmapIndex: int => pass
+  lightmapScaleOffset: Vector4 => Vector4(1.0, 1.0, 0.0, 0.0)
+  set lightmapScaleOffset: Vector4 => pass
+  realtimeLightmapScaleOffset: Vector4 => Vector4(1.0, 1.0, 0.0, 0.0)
+  set realtimeLightmapScaleOffset: Vector4 => pass
+  materialTemplate: Material => null
+  set materialTemplate: Material => pass
+  drawHeightmap: bool => true
+  set drawHeightmap: bool => pass
+  drawTreesAndFoliage: bool => true
+  set drawTreesAndFoliage: bool => pass
+  drawInstanced: bool => false
+  set drawInstanced: bool => pass
+  allowAutoConnect: bool => true
+  set allowAutoConnect: bool => pass
+  groupingID: int => 0
+  set groupingID: int => pass
+  collectDetailPatches: bool => true
+  set collectDetailPatches: bool => pass
+  patchBoundsMultiplier: Vector3 => Vector3.ONE
+  set patchBoundsMultiplier: Vector3 => pass
+  treeLODBiasMultiplier: float => 1.0
+  set treeLODBiasMultiplier: float => pass
+  shadowCastingMode: int => 1
+  set shadowCastingMode: int => pass
+  reflectionProbeUsage: int => 1
+  set reflectionProbeUsage: int => pass
+  renderingLayerMask: uint => 1
+  set renderingLayerMask: uint => pass
+  preserveTreePrototypeLayers: bool => false
+  set preserveTreePrototypeLayers: bool => pass
+  leftNeighbor: Terrain => null
+  rightNeighbor: Terrain => null
+  topNeighbor: Terrain => null
+  bottomNeighbor: Terrain => null
+  editorRenderFlags: int => 0
+  set editorRenderFlags: int => pass
+  SampleHeight(Vector3): float => U.terrain_sample_height($0, $1)
+  AddTreeInstance(object): void => pass
+  Flush(): void => pass
+  SetNeighbors(Terrain, Terrain, Terrain, Terrain): void => pass
+  GetPosition(): Vector3 => $0.global_position
+  GetSplatMaterialPropertyBlock(MaterialPropertyBlock): void => pass
+  SetSplatMaterialPropertyBlock(MaterialPropertyBlock): void => pass
+  GetClosestReflectionProbes(Array): void => pass
+  GetKeepUnusedCameraRenderingResources(): bool => false
+  SetKeepUnusedCameraRenderingResources(bool): void => pass
+  static activeTerrain: Terrain => U.find_object_of_type("Terrain")
+  static activeTerrains: Terrain[] => U.find_objects_of_type("Terrain")
+  static heightmapRenderTextureFormat: int => 0
+  static normalmapRenderTextureFormat: int => 0
+  static heightmapFormat: int => 0
+  static normalmapFormat: int => 0
+  static holesFormat: int => 0
+  static holesRenderTextureFormat: int => 0
+  static compressedHolesFormat: int => 0
+  static compressedHolesRenderTextureFormat: int => 0
+  static SetConnectivityDirty(): void => pass
+  static GetActiveTerrains(Array): void => $1.assign(U.find_objects_of_type("Terrain"))
+  static CreateTerrainGameObject(object): GameObject => U.new_game_object("Terrain")
+
+type Screen
+  static currentResolution: object => {"width": U.screen_size().x, "height": U.screen_size().y, "refreshRate": 60}
+  static resolutions: Array => [{"width": U.screen_size().x, "height": U.screen_size().y, "refreshRate": 60}]
+  static orientation: int => 1
+  static set orientation: int => pass
+  static sleepTimeout: int => -1
+  static set sleepTimeout: int => pass
+  static autorotateToPortrait: bool => false
+  static set autorotateToPortrait: bool => pass
+  static autorotateToLandscapeLeft: bool => true
+  static set autorotateToLandscapeLeft: bool => pass
+  static safeArea: Rect => Rect2(Vector2.ZERO, Vector2(U.screen_size()))
+  static cutouts: Rect[] => []
+  static brightness: float => 1.0
+  static set brightness: float => pass
+  static width: int => U.screen_size().x
+  static height: int => U.screen_size().y
+  static SetResolution(int, int, bool): void => DisplayServer.window_set_size(Vector2i($1, $2))
+  static SetResolution(int, int, int): void => DisplayServer.window_set_size(Vector2i($1, $2))
+  static SetResolution(int, int, bool, int): void => DisplayServer.window_set_size(Vector2i($1, $2))
+  static set fullScreen: bool => DisplayServer.window_set_mode(3 if $v else 0)
+  static fullScreenMode: int => (1 if DisplayServer.window_get_mode() >= 3 else 3)
+  static set fullScreenMode: int => pass
+  static mainWindowPosition: Vector2Int => DisplayServer.window_get_position()
+  static mainWindowDisplayInfo: object => {}
+  static MoveMainWindowTo(object, Vector2Int): void => DisplayServer.window_set_position($2)
+  static GetDisplayLayout(Array): void => pass

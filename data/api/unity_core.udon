@@ -1,0 +1,280 @@
+# UnityEngine core object model → Godot nodes.
+#
+# A Unity GameObject and every Component on it map to ONE Godot node (Node3D or subclass).
+# `gameObject`, `transform` and any component-typed expression therefore all denote that node.
+
+type Object kind=component gd=Node extern=UnityEngineObject
+  name: string => String($0.name)
+  set name: string => $0.name = $v
+  hideFlags: int => 0
+  GetInstanceID(): int => $0.get_instance_id()
+  ToString(): string => String($0.name)
+  Equals(object): bool => $0 == $1
+  GetHashCode(): int => $0.get_instance_id()
+  static Instantiate(Object): Object => Udon.instantiate($1)
+  static Instantiate(Object, Transform): Object => Udon.instantiate_in($1, $2)
+  static Instantiate(Object, Transform, bool): Object => Udon.instantiate_in($1, $2, $3)
+  static Instantiate(Object, Vector3, Quaternion): Object => Udon.instantiate_at($1, $2, $3)
+  static Instantiate(Object, Vector3, Quaternion, Transform): Object => Udon.instantiate_at($1, $2, $3, $4)
+  static Destroy(Object): void => Udon.destroy($1)
+  static Destroy(Object, float): void => Udon.destroy_delayed($1, $2)
+  static DestroyImmediate(Object): void => Udon.destroy($1)
+  static DontDestroyOnLoad(Object): void => pass
+  static FindObjectOfType(Type): Object => U.find_object_of_type($1)
+  static FindObjectsOfType(Type): Object[] => U.find_objects_of_type($1)
+  op ==(Object, Object): bool => U.obj_eq($1, $2)
+  op !=(Object, Object): bool => not U.obj_eq($1, $2)
+  op implicit_bool(Object): bool => is_instance_valid($1)
+
+type Component : Object kind=component gd=Node extern=UnityEngineComponent
+  gameObject: GameObject => $0
+  transform: Transform => $0
+  tag: string => U.get_tag($0)
+  set tag: string => U.set_tag($0, $v)
+  CompareTag(string): bool => U.compare_tag($0, $1)
+  GetComponent(): T => U.get_component($0, $T1)
+  GetComponent(Type): Component => U.get_component($0, $1)
+  GetComponent(string): Component => U.get_component($0, $1)
+  GetComponentInChildren(): T => U.get_component_in_children($0, $T1, false)
+  GetComponentInChildren(bool): T => U.get_component_in_children($0, $T1, $1)
+  GetComponentInChildren(Type): Component => U.get_component_in_children($0, $1, false)
+  GetComponentInChildren(Type, bool): Component => U.get_component_in_children($0, $1, $2)
+  GetComponentInParent(): T => U.get_component_in_parent($0, $T1, false)
+  GetComponentInParent(bool): T => U.get_component_in_parent($0, $T1, $1)
+  GetComponentInParent(Type): Component => U.get_component_in_parent($0, $1, false)
+  GetComponents(): T[] => U.get_components($0, $T1)
+  GetComponents(Type): Component[] => U.get_components($0, $1)
+  GetComponentsInChildren(): T[] => U.get_components_in_children($0, $T1, false)
+  GetComponentsInChildren(bool): T[] => U.get_components_in_children($0, $T1, $1)
+  GetComponentsInChildren(Type): Component[] => U.get_components_in_children($0, $1, false)
+  GetComponentsInChildren(Type, bool): Component[] => U.get_components_in_children($0, $1, $2)
+  GetComponentsInParent(): T[] => U.get_components_in_parent($0, $T1, false)
+  GetComponentsInParent(bool): T[] => U.get_components_in_parent($0, $T1, $1)
+  GetComponentsInParent(Type): Component[] => U.get_components_in_parent($0, $1, false)
+  GetComponentsInParent(Type, bool): Component[] => U.get_components_in_parent($0, $1, $2)
+  TryGetComponent(out T): bool => $1 = U.get_component($0, $T1) ;; $1 != null
+  SendMessage(string): void => U.send_message($0, $1, null)
+  SendMessage(string, object): void => U.send_message($0, $1, $2)
+  BroadcastMessage(string): void => U.broadcast_message($0, $1, null)
+
+type Behaviour : Component kind=component gd=Node extern=UnityEngineBehaviour
+  enabled: bool => U.get_enabled($0)
+  set enabled: bool => U.set_enabled($0, $v)
+  isActiveAndEnabled: bool => (U.is_active_in_hierarchy($0) and U.get_enabled($0))
+
+type MonoBehaviour : Behaviour kind=component gd=Node extern=UnityEngineMonoBehaviour
+
+type GameObject : Object kind=component gd=Node3D extern=UnityEngineGameObject
+  transform: Transform => $0
+  gameObject: GameObject => $0
+  activeSelf: bool => U.is_active($0)
+  activeInHierarchy: bool => U.is_active_in_hierarchy($0)
+  layer: int => U.get_layer($0)
+  set layer: int => U.set_layer($0, $v)
+  tag: string => U.get_tag($0)
+  set tag: string => U.set_tag($0, $v)
+  isStatic: bool => false
+  scene: Scene => null
+  ctor() => U.new_game_object("GameObject")
+  ctor(string) => U.new_game_object($1)
+  SetActive(bool): void => U.set_active($0, $1)
+  CompareTag(string): bool => U.compare_tag($0, $1)
+  GetComponent(): T => U.get_component($0, $T1)
+  GetComponent(Type): Component => U.get_component($0, $1)
+  GetComponent(string): Component => U.get_component($0, $1)
+  GetComponentInChildren(): T => U.get_component_in_children($0, $T1, false)
+  GetComponentInChildren(bool): T => U.get_component_in_children($0, $T1, $1)
+  GetComponentInChildren(Type): Component => U.get_component_in_children($0, $1, false)
+  GetComponentInChildren(Type, bool): Component => U.get_component_in_children($0, $1, $2)
+  GetComponentInParent(): T => U.get_component_in_parent($0, $T1, false)
+  GetComponentInParent(bool): T => U.get_component_in_parent($0, $T1, $1)
+  GetComponentInParent(Type): Component => U.get_component_in_parent($0, $1, false)
+  GetComponents(): T[] => U.get_components($0, $T1)
+  GetComponents(Type): Component[] => U.get_components($0, $1)
+  GetComponentsInChildren(): T[] => U.get_components_in_children($0, $T1, false)
+  GetComponentsInChildren(bool): T[] => U.get_components_in_children($0, $T1, $1)
+  GetComponentsInChildren(Type): Component[] => U.get_components_in_children($0, $1, false)
+  GetComponentsInChildren(Type, bool): Component[] => U.get_components_in_children($0, $1, $2)
+  GetComponentsInParent(): T[] => U.get_components_in_parent($0, $T1, false)
+  GetComponentsInParent(bool): T[] => U.get_components_in_parent($0, $T1, $1)
+  TryGetComponent(out T): bool => $1 = U.get_component($0, $T1) ;; $1 != null
+  AddComponent(): T => U.add_component($0, $T1)
+  AddComponent(Type): Component => U.add_component($0, $1)
+  SendMessage(string): void => U.send_message($0, $1, null)
+  SendMessage(string, object): void => U.send_message($0, $1, $2)
+  BroadcastMessage(string): void => U.broadcast_message($0, $1, null)
+  static Find(string): GameObject => U.find_object($1)
+  static FindGameObjectWithTag(string): GameObject => U.find_with_tag($1)
+  static FindWithTag(string): GameObject => U.find_with_tag($1)
+  static FindGameObjectsWithTag(string): GameObject[] => U.find_all_with_tag($1)
+
+type Scene kind=struct gd=Variant extern=UnityEngineSceneManagementScene
+  name: string => "main"
+
+type Transform : Component kind=component gd=Node3D extern=UnityEngineTransform
+  position: Vector3 => $0.global_position
+  set position: Vector3 => $0.global_position = $v
+  localPosition: Vector3 => $0.position
+  set localPosition: Vector3 => $0.position = $v
+  rotation: Quaternion => U.get_global_rotation($0)
+  set rotation: Quaternion => U.set_global_rotation($0, $v)
+  localRotation: Quaternion => $0.quaternion
+  set localRotation: Quaternion => $0.quaternion = $v
+  eulerAngles: Vector3 => U.quat_to_euler(U.get_global_rotation($0))
+  set eulerAngles: Vector3 => U.set_global_rotation($0, U.euler_v($v))
+  localEulerAngles: Vector3 => U.quat_to_euler($0.quaternion)
+  set localEulerAngles: Vector3 => $0.quaternion = U.euler_v($v)
+  localScale: Vector3 => $0.scale
+  set localScale: Vector3 => $0.scale = $v
+  lossyScale: Vector3 => $0.global_transform.basis.get_scale()
+  forward: Vector3 => U.forward($0)
+  set forward: Vector3 => U.set_global_rotation($0, U.look_rotation($v, Vector3.UP))
+  right: Vector3 => U.right($0)
+  set right: Vector3 => U.set_right($0, $v)
+  up: Vector3 => U.up($0)
+  set up: Vector3 => U.set_up($0, $v)
+  parent: Transform => $0.get_parent()
+  set parent: Transform => U.set_parent($0, $v, true)
+  root: Transform => U.root_of($0)
+  childCount: int => $0.get_child_count()
+  localToWorldMatrix: Matrix4x4 => $0.global_transform
+  worldToLocalMatrix: Matrix4x4 => $0.global_transform.affine_inverse()
+  hasChanged: bool => true
+  set hasChanged: bool => pass
+  hierarchyCapacity: int => 0
+  GetChild(int): Transform => $0.get_child($1)
+  Find(string): Transform => $0.get_node_or_null($1)
+  IsChildOf(Transform): bool => U.is_child_of($0, $1)
+  SetParent(Transform): void => U.set_parent($0, $1, true)
+  SetParent(Transform, bool): void => U.set_parent($0, $1, $2)
+  DetachChildren(): void => U.detach_children($0)
+  SetAsFirstSibling(): void => U.set_sibling_index($0, 0)
+  SetAsLastSibling(): void => U.set_sibling_index($0, -1)
+  SetSiblingIndex(int): void => U.set_sibling_index($0, $1)
+  GetSiblingIndex(): int => $0.get_index()
+  TransformPoint(Vector3): Vector3 => $0.to_global($1)
+  TransformPoint(float, float, float): Vector3 => $0.to_global(Vector3($1, $2, $3))
+  InverseTransformPoint(Vector3): Vector3 => $0.to_local($1)
+  InverseTransformPoint(float, float, float): Vector3 => $0.to_local(Vector3($1, $2, $3))
+  TransformDirection(Vector3): Vector3 => U.transform_direction($0, $1)
+  TransformDirection(float, float, float): Vector3 => U.transform_direction($0, Vector3($1, $2, $3))
+  InverseTransformDirection(Vector3): Vector3 => U.inverse_transform_direction($0, $1)
+  InverseTransformDirection(float, float, float): Vector3 => U.inverse_transform_direction($0, Vector3($1, $2, $3))
+  TransformVector(Vector3): Vector3 => ($0.global_transform.basis * $1)
+  InverseTransformVector(Vector3): Vector3 => ($0.global_transform.basis.inverse() * $1)
+  LookAt(Transform): void => U.look_at($0, $1.global_position, Vector3.UP)
+  LookAt(Transform, Vector3): void => U.look_at($0, $1.global_position, $2)
+  LookAt(Vector3): void => U.look_at($0, $1, Vector3.UP)
+  LookAt(Vector3, Vector3): void => U.look_at($0, $1, $2)
+  Rotate(Vector3): void => U.rotate_euler($0, $1, 0)
+  Rotate(Vector3, Space): void => U.rotate_euler($0, $1, $2)
+  Rotate(float, float, float): void => U.rotate_euler($0, Vector3($1, $2, $3), 0)
+  Rotate(float, float, float, Space): void => U.rotate_euler($0, Vector3($1, $2, $3), $4)
+  Rotate(Vector3, float): void => U.rotate_axis($0, $1, $2, 0)
+  Rotate(Vector3, float, Space): void => U.rotate_axis($0, $1, $2, $3)
+  RotateAround(Vector3, Vector3, float): void => U.rotate_around($0, $1, $2, $3)
+  Translate(Vector3): void => U.translate($0, $1, 0)
+  Translate(Vector3, Space): void => U.translate($0, $1, $2)
+  Translate(float, float, float): void => U.translate($0, Vector3($1, $2, $3), 0)
+  Translate(float, float, float, Space): void => U.translate($0, Vector3($1, $2, $3), $4)
+  Translate(Vector3, Transform): void => U.translate_relative($0, $1, $2)
+  SetPositionAndRotation(Vector3, Quaternion): void => U.set_position_and_rotation($0, $1, $2)
+  SetLocalPositionAndRotation(Vector3, Quaternion): void => U.set_local_position_and_rotation($0, $1, $2)
+  GetPositionAndRotation(out Vector3, out Quaternion): void => $1 = $0.global_position ;; $2 = U.get_global_rotation($0)
+  GetLocalPositionAndRotation(out Vector3, out Quaternion): void => $1 = $0.position ;; $2 = $0.quaternion
+  GetEnumerator(): object => $0.get_children()
+
+type RectTransform : Transform kind=component gd=Control extern=UnityEngineRectTransform
+  anchoredPosition: Vector2 => $0.position
+  set anchoredPosition: Vector2 => $0.position = $v
+  anchoredPosition3D: Vector3 => Vector3($0.position.x, $0.position.y, 0.0)
+  sizeDelta: Vector2 => $0.size
+  set sizeDelta: Vector2 => $0.size = $v
+  rect: Rect => $0.get_rect()
+  pivot: Vector2 => U.rect_get_pivot($0)
+  set pivot: Vector2 => U.rect_set_pivot($0, $v)
+  anchorMin: Vector2 => Vector2($0.anchor_left, $0.anchor_top)
+  set anchorMin: Vector2 => U.rect_set_anchor_min($0, $v)
+  anchorMax: Vector2 => Vector2($0.anchor_right, $0.anchor_bottom)
+  set anchorMax: Vector2 => U.rect_set_anchor_max($0, $v)
+  offsetMin: Vector2 => Vector2($0.offset_left, $0.offset_top)
+  set offsetMin: Vector2 => U.rect_set_offset_min($0, $v)
+  offsetMax: Vector2 => Vector2($0.offset_right, $0.offset_bottom)
+  set offsetMax: Vector2 => U.rect_set_offset_max($0, $v)
+  SetSizeWithCurrentAnchors(int, float): void => U.rect_set_size_axis($0, $1, $2)
+  GetWorldCorners(Vector3[]): void => U.rect_world_corners($0, $1)
+
+type Space kind=enum extern=UnityEngineSpace
+  enum World = 0
+  enum Self = 1
+
+type Application kind=static extern=UnityEngineApplication
+  static isPlaying: bool => true
+  static isEditor: bool => false
+  static isFocused: bool => U.app_is_focused()
+  static platform: RuntimePlatform => U.app_platform()
+  static targetFrameRate: int => Engine.max_fps
+  static set targetFrameRate: int => Engine.max_fps = $v
+  static version: string => U.app_version()
+  static unityVersion: string => Engine.get_version_info().string
+  static isMobilePlatform: bool => OS.has_feature("mobile")
+  static runInBackground: bool => true
+  static dataPath: string => OS.get_user_data_dir()
+  static persistentDataPath: string => OS.get_user_data_dir()
+  static OpenURL(string): void => OS.shell_open($1)
+  static Quit(): void => pass
+
+type RuntimePlatform kind=enum extern=UnityEngineRuntimePlatform
+  enum OSXEditor = 0
+  enum OSXPlayer = 1
+  enum WindowsPlayer = 2
+  enum WindowsEditor = 7
+  enum IPhonePlayer = 8
+  enum Android = 11
+  enum LinuxPlayer = 13
+  enum LinuxEditor = 16
+  enum WebGLPlayer = 17
+
+type Screen kind=static extern=UnityEngineScreen
+  static width: int => U.screen_size().x
+  static height: int => U.screen_size().y
+  static dpi: float => DisplayServer.screen_get_dpi()
+  static fullScreen: bool => (DisplayServer.window_get_mode() >= 3)
+
+type SystemInfo kind=static extern=UnityEngineSystemInfo
+  static deviceName: string => OS.get_model_name()
+  static deviceModel: string => OS.get_model_name()
+  static operatingSystem: string => OS.get_name()
+  static processorCount: int => OS.get_processor_count()
+  static systemMemorySize: int => int(OS.get_memory_info().physical / 1048576.0)
+  static graphicsDeviceName: string => RenderingServer.get_video_adapter_name()
+  static graphicsMemorySize: int => 0
+  static supportsInstancing: bool => true
+  static deviceUniqueIdentifier: string => OS.get_unique_id()
+  static deviceType: int => 0
+
+type Debug kind=static extern=UnityEngineDebug
+  static Log(object): void => print($1)
+  static Log(object, Object): void => print($1)
+  static LogWarning(object): void => push_warning(str($1))
+  static LogWarning(object, Object): void => push_warning(str($1))
+  static LogError(object): void => push_error(str($1))
+  static LogError(object, Object): void => push_error(str($1))
+  static LogException(object): void => push_error(str($1))
+  static LogFormat(string, params object[]): void => print(U.format($1, $params))
+  static LogWarningFormat(string, params object[]): void => push_warning(U.format($1, $params))
+  static LogErrorFormat(string, params object[]): void => push_error(U.format($1, $params))
+  static Assert(bool): void => assert($1)
+  static Assert(bool, object): void => assert($1, str($2))
+  static Assert(bool, string): void => assert($1, $2)
+  static DrawLine(Vector3, Vector3): void => U.debug_draw_line($1, $2, Color.WHITE, 0.0)
+  static DrawLine(Vector3, Vector3, Color): void => U.debug_draw_line($1, $2, $3, 0.0)
+  static DrawLine(Vector3, Vector3, Color, float): void => U.debug_draw_line($1, $2, $3, $4)
+  static DrawLine(Vector3, Vector3, Color, float, bool): void => U.debug_draw_line($1, $2, $3, $4)
+  static DrawRay(Vector3, Vector3): void => U.debug_draw_line($1, $1 + $2, Color.WHITE, 0.0)
+  static DrawRay(Vector3, Vector3, Color): void => U.debug_draw_line($1, $1 + $2, $3, 0.0)
+  static DrawRay(Vector3, Vector3, Color, float): void => U.debug_draw_line($1, $1 + $2, $3, $4)
+  static DrawRay(Vector3, Vector3, Color, float, bool): void => U.debug_draw_line($1, $1 + $2, $3, $4)
+  static Break(): void => breakpoint
+  static isDebugBuild: bool => OS.is_debug_build()
+  static developerConsoleVisible: bool => false

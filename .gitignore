@@ -1,0 +1,9 @@
+/target
+/out
+/refs
+/tools
+/godot_project/.godot
+/godot_project/addons/godot_sandbox
+/godot_project/converted_corpus
+/godot_project/converted
+/godot_project/converted_coverage

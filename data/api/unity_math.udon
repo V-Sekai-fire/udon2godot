@@ -1,0 +1,454 @@
+# UnityEngine math types → Godot built-in value types.
+#
+# Direction/rotation conventions go through the `U` shim so a world can pick Unity axes
+# (+Z forward, default) or Godot axes (-Z forward) with `U.coord_mode`.
+
+type Mathf kind=static extern=UnityEngineMathf
+  static PI: float => PI
+  static Infinity: float => INF
+  static NegativeInfinity: float => -INF
+  static Epsilon: float => 1.401298464324817e-45
+  static Deg2Rad: float => (PI / 180.0)
+  static Rad2Deg: float => (180.0 / PI)
+  static Abs(float): float => absf($1)
+  static Abs(int): int => absi($1)
+  static Min(float, float): float => minf($1, $2)
+  static Min(int, int): int => mini($1, $2)
+  static Min(params float[]): float => U.min_all($params)
+  static Min(params int[]): int => U.min_all($params)
+  static Max(float, float): float => maxf($1, $2)
+  static Max(int, int): int => maxi($1, $2)
+  static Max(params float[]): float => U.max_all($params)
+  static Max(params int[]): int => U.max_all($params)
+  static Clamp(float, float, float): float => clampf($1, $2, $3)
+  static Clamp(int, int, int): int => clampi($1, $2, $3)
+  static Clamp01(float): float => clampf($1, 0.0, 1.0)
+  static Lerp(float, float, float): float => lerpf($1, $2, clampf($3, 0.0, 1.0))
+  static LerpUnclamped(float, float, float): float => lerpf($1, $2, $3)
+  static LerpAngle(float, float, float): float => U.lerp_angle_deg($1, $2, clampf($3, 0.0, 1.0))
+  static InverseLerp(float, float, float): float => U.inverse_lerp($1, $2, $3)
+  static Pow(float, float): float => pow($1, $2)
+  static Sqrt(float): float => sqrt($1)
+  static Exp(float): float => exp($1)
+  static Log(float): float => log($1)
+  static Log(float, float): float => (log($1) / log($2))
+  static Log10(float): float => (log($1) / log(10.0))
+  static Sin(float): float => sin($1)
+  static Cos(float): float => cos($1)
+  static Tan(float): float => tan($1)
+  static Asin(float): float => asin($1)
+  static Acos(float): float => acos($1)
+  static Atan(float): float => atan($1)
+  static Atan2(float, float): float => atan2($1, $2)
+  static Floor(float): float => floorf($1)
+  static Ceil(float): float => ceilf($1)
+  static Round(float): float => U.round_even($1)
+  static FloorToInt(float): int => floori($1)
+  static CeilToInt(float): int => ceili($1)
+  static RoundToInt(float): int => int(U.round_even($1))
+  static Sign(float): float => U.sign($1)
+  static Repeat(float, float): float => fposmod($1, $2)
+  static PingPong(float, float): float => pingpong($1, $2)
+  static MoveTowards(float, float, float): float => move_toward($1, $2, $3)
+  static MoveTowardsAngle(float, float, float): float => U.move_towards_angle($1, $2, $3)
+  static DeltaAngle(float, float): float => U.delta_angle($1, $2)
+  static SmoothStep(float, float, float): float => U.smooth_step($1, $2, $3)
+  static SmoothDamp(float, float, ref float, float): float => var $tmp = U.smooth_damp($1, $2, $3, $4, INF, U.delta_time()) ;; $3 = $tmp[1] ;; $tmp[0]
+  static SmoothDamp(float, float, ref float, float, float): float => var $tmp = U.smooth_damp($1, $2, $3, $4, $5, U.delta_time()) ;; $3 = $tmp[1] ;; $tmp[0]
+  static SmoothDamp(float, float, ref float, float, float, float): float => var $tmp = U.smooth_damp($1, $2, $3, $4, $5, $6) ;; $3 = $tmp[1] ;; $tmp[0]
+  static SmoothDampAngle(float, float, ref float, float): float => var $tmp = U.smooth_damp_angle($1, $2, $3, $4, INF, U.delta_time()) ;; $3 = $tmp[1] ;; $tmp[0]
+  static SmoothDampAngle(float, float, ref float, float, float, float): float => var $tmp = U.smooth_damp_angle($1, $2, $3, $4, $5, $6) ;; $3 = $tmp[1] ;; $tmp[0]
+  static Approximately(float, float): bool => is_equal_approx($1, $2)
+  static PerlinNoise(float, float): float => U.perlin_noise($1, $2)
+  static PerlinNoise1D(float): float => U.perlin_noise($1, 0.0)
+  static IsPowerOfTwo(int): bool => (($1 & ($1 - 1)) == 0 and $1 > 0)
+  static NextPowerOfTwo(int): int => nearest_po2($1)
+  static ClosestPowerOfTwo(int): int => U.closest_po2($1)
+  static GammaToLinearSpace(float): float => pow($1, 2.2)
+  static LinearToGammaSpace(float): float => pow($1, 1.0 / 2.2)
+  static Gamma(float, float, float): float => U.gamma($1, $2, $3)
+
+type Vector3 kind=struct gd=Vector3 extern=UnityEngineVector3
+  x: float
+  y: float
+  z: float
+  magnitude: float => $0.length()
+  sqrMagnitude: float => $0.length_squared()
+  normalized: Vector3 => $0.normalized()
+  this[int]: float => $0[$1]
+  static zero: Vector3 => Vector3.ZERO
+  static one: Vector3 => Vector3.ONE
+  static up: Vector3 => Vector3.UP
+  static down: Vector3 => Vector3.DOWN
+  static left: Vector3 => Vector3.LEFT
+  static right: Vector3 => Vector3.RIGHT
+  static forward: Vector3 => U.vec_forward()
+  static back: Vector3 => U.vec_back()
+  static positiveInfinity: Vector3 => Vector3(INF, INF, INF)
+  static negativeInfinity: Vector3 => Vector3(-INF, -INF, -INF)
+  ctor() => Vector3.ZERO
+  ctor(float, float) => Vector3($1, $2, 0.0)
+  ctor(float, float, float) => Vector3($1, $2, $3)
+  Set(float, float, float): void => $0 = Vector3($1, $2, $3)
+  Normalize(): void => $0 = $0.normalized()
+  Scale(Vector3): void => $0 = $0 * $1
+  Equals(Vector3): bool => $0 == $1
+  Equals(object): bool => $0 == $1
+  ToString(): string => U.vec3_str($0)
+  ToString(string): string => U.vec3_str($0, $1)
+  GetHashCode(): int => hash($0)
+  static Dot(Vector3, Vector3): float => $1.dot($2)
+  static Cross(Vector3, Vector3): Vector3 => $1.cross($2)
+  static Distance(Vector3, Vector3): float => $1.distance_to($2)
+  static Lerp(Vector3, Vector3, float): Vector3 => $1.lerp($2, clampf($3, 0.0, 1.0))
+  static LerpUnclamped(Vector3, Vector3, float): Vector3 => $1.lerp($2, $3)
+  static Slerp(Vector3, Vector3, float): Vector3 => U.vec3_slerp($1, $2, clampf($3, 0.0, 1.0))
+  static SlerpUnclamped(Vector3, Vector3, float): Vector3 => U.vec3_slerp($1, $2, $3)
+  static MoveTowards(Vector3, Vector3, float): Vector3 => $1.move_toward($2, $3)
+  static RotateTowards(Vector3, Vector3, float, float): Vector3 => U.vec3_rotate_towards($1, $2, $3, $4)
+  static Angle(Vector3, Vector3): float => rad_to_deg($1.angle_to($2))
+  static SignedAngle(Vector3, Vector3, Vector3): float => rad_to_deg($1.signed_angle_to($2, $3))
+  static Scale(Vector3, Vector3): Vector3 => $1 * $2
+  static Normalize(Vector3): Vector3 => $1.normalized()
+  static Project(Vector3, Vector3): Vector3 => $1.project($2)
+  static ProjectOnPlane(Vector3, Vector3): Vector3 => U.project_on_plane($1, $2)
+  static Reflect(Vector3, Vector3): Vector3 => U.reflect($1, $2)
+  static ClampMagnitude(Vector3, float): Vector3 => $1.limit_length($2)
+  static Min(Vector3, Vector3): Vector3 => $1.min($2)
+  static Max(Vector3, Vector3): Vector3 => $1.max($2)
+  static Magnitude(Vector3): float => $1.length()
+  static SqrMagnitude(Vector3): float => $1.length_squared()
+  static SmoothDamp(Vector3, Vector3, ref Vector3, float): Vector3 => var $tmp = U.vec3_smooth_damp($1, $2, $3, $4, INF, U.delta_time()) ;; $3 = $tmp[1] ;; $tmp[0]
+  static SmoothDamp(Vector3, Vector3, ref Vector3, float, float): Vector3 => var $tmp = U.vec3_smooth_damp($1, $2, $3, $4, $5, U.delta_time()) ;; $3 = $tmp[1] ;; $tmp[0]
+  static SmoothDamp(Vector3, Vector3, ref Vector3, float, float, float): Vector3 => var $tmp = U.vec3_smooth_damp($1, $2, $3, $4, $5, $6) ;; $3 = $tmp[1] ;; $tmp[0]
+  static OrthoNormalize(ref Vector3, ref Vector3): void => var $tmp = U.ortho_normalize($1, $2) ;; $1 = $tmp[0] ;; $2 = $tmp[1]
+  op +(Vector3, Vector3): Vector3 => $1 + $2
+  op -(Vector3, Vector3): Vector3 => $1 - $2
+  op -(Vector3): Vector3 => -$1
+  op *(Vector3, float): Vector3 => $1 * $2
+  op *(float, Vector3): Vector3 => $1 * $2
+  op /(Vector3, float): Vector3 => $1 / $2
+  op ==(Vector3, Vector3): bool => $1.is_equal_approx($2)
+  op !=(Vector3, Vector3): bool => not $1.is_equal_approx($2)
+  cast Vector2 => Vector2($0.x, $0.y)
+
+type Vector2 kind=struct gd=Vector2 extern=UnityEngineVector2
+  x: float
+  y: float
+  magnitude: float => $0.length()
+  sqrMagnitude: float => $0.length_squared()
+  normalized: Vector2 => $0.normalized()
+  this[int]: float => $0[$1]
+  static zero: Vector2 => Vector2.ZERO
+  static one: Vector2 => Vector2.ONE
+  static up: Vector2 => Vector2(0.0, 1.0)
+  static down: Vector2 => Vector2(0.0, -1.0)
+  static left: Vector2 => Vector2.LEFT
+  static right: Vector2 => Vector2.RIGHT
+  ctor() => Vector2.ZERO
+  ctor(float, float) => Vector2($1, $2)
+  Set(float, float): void => $0 = Vector2($1, $2)
+  Normalize(): void => $0 = $0.normalized()
+  Scale(Vector2): void => $0 = $0 * $1
+  Equals(Vector2): bool => $0 == $1
+  ToString(): string => U.vec2_str($0)
+  ToString(string): string => U.vec2_str($0, $1)
+  static Dot(Vector2, Vector2): float => $1.dot($2)
+  static Distance(Vector2, Vector2): float => $1.distance_to($2)
+  static Lerp(Vector2, Vector2, float): Vector2 => $1.lerp($2, clampf($3, 0.0, 1.0))
+  static LerpUnclamped(Vector2, Vector2, float): Vector2 => $1.lerp($2, $3)
+  static MoveTowards(Vector2, Vector2, float): Vector2 => $1.move_toward($2, $3)
+  static Angle(Vector2, Vector2): float => rad_to_deg(absf($1.angle_to($2)))
+  static SignedAngle(Vector2, Vector2): float => rad_to_deg($1.angle_to($2))
+  static Scale(Vector2, Vector2): Vector2 => $1 * $2
+  static ClampMagnitude(Vector2, float): Vector2 => $1.limit_length($2)
+  static Reflect(Vector2, Vector2): Vector2 => $1.reflect($2)
+  static Perpendicular(Vector2): Vector2 => $1.orthogonal()
+  static Min(Vector2, Vector2): Vector2 => $1.min($2)
+  static Max(Vector2, Vector2): Vector2 => $1.max($2)
+  static SmoothDamp(Vector2, Vector2, ref Vector2, float): Vector2 => var $tmp = U.vec2_smooth_damp($1, $2, $3, $4, INF, U.delta_time()) ;; $3 = $tmp[1] ;; $tmp[0]
+  op +(Vector2, Vector2): Vector2 => $1 + $2
+  op -(Vector2, Vector2): Vector2 => $1 - $2
+  op -(Vector2): Vector2 => -$1
+  op *(Vector2, float): Vector2 => $1 * $2
+  op *(float, Vector2): Vector2 => $1 * $2
+  op /(Vector2, float): Vector2 => $1 / $2
+  op ==(Vector2, Vector2): bool => $1.is_equal_approx($2)
+  op !=(Vector2, Vector2): bool => not $1.is_equal_approx($2)
+  cast Vector3 => Vector3($0.x, $0.y, 0.0)
+
+type Vector4 kind=struct gd=Vector4 extern=UnityEngineVector4
+  x: float
+  y: float
+  z: float
+  w: float
+  magnitude: float => $0.length()
+  sqrMagnitude: float => $0.length_squared()
+  normalized: Vector4 => $0.normalized()
+  static zero: Vector4 => Vector4.ZERO
+  static one: Vector4 => Vector4.ONE
+  ctor(float, float, float, float) => Vector4($1, $2, $3, $4)
+  ctor(float, float, float) => Vector4($1, $2, $3, 0.0)
+  static Dot(Vector4, Vector4): float => $1.dot($2)
+  static Lerp(Vector4, Vector4, float): Vector4 => $1.lerp($2, clampf($3, 0.0, 1.0))
+  op +(Vector4, Vector4): Vector4 => $1 + $2
+  op -(Vector4, Vector4): Vector4 => $1 - $2
+  op *(Vector4, float): Vector4 => $1 * $2
+  op *(float, Vector4): Vector4 => $1 * $2
+  op /(Vector4, float): Vector4 => $1 / $2
+  cast Vector3 => Vector3($0.x, $0.y, $0.z)
+  cast Vector2 => Vector2($0.x, $0.y)
+
+type Vector3Int kind=struct gd=Vector3i extern=UnityEngineVector3Int
+  x: int
+  y: int
+  z: int
+  static zero: Vector3Int => Vector3i.ZERO
+  static one: Vector3Int => Vector3i.ONE
+  ctor(int, int, int) => Vector3i($1, $2, $3)
+  op +(Vector3Int, Vector3Int): Vector3Int => $1 + $2
+  op -(Vector3Int, Vector3Int): Vector3Int => $1 - $2
+  op *(Vector3Int, int): Vector3Int => $1 * $2
+  cast Vector3 => Vector3($0)
+
+type Vector2Int kind=struct gd=Vector2i extern=UnityEngineVector2Int
+  x: int
+  y: int
+  static zero: Vector2Int => Vector2i.ZERO
+  static one: Vector2Int => Vector2i.ONE
+  ctor(int, int) => Vector2i($1, $2)
+  op +(Vector2Int, Vector2Int): Vector2Int => $1 + $2
+  op -(Vector2Int, Vector2Int): Vector2Int => $1 - $2
+  op *(Vector2Int, int): Vector2Int => $1 * $2
+  cast Vector2 => Vector2($0)
+
+type Quaternion kind=struct gd=Quaternion extern=UnityEngineQuaternion
+  x: float
+  y: float
+  z: float
+  w: float
+  eulerAngles: Vector3 => U.quat_to_euler($0)
+  set eulerAngles: Vector3 => $0 = U.euler_v($v)
+  normalized: Quaternion => $0.normalized()
+  static identity: Quaternion => Quaternion()
+  ctor() => Quaternion()
+  ctor(float, float, float, float) => Quaternion($1, $2, $3, $4)
+  Set(float, float, float, float): void => $0 = Quaternion($1, $2, $3, $4)
+  Normalize(): void => $0 = $0.normalized()
+  SetLookRotation(Vector3): void => $0 = U.look_rotation($1, Vector3.UP)
+  SetLookRotation(Vector3, Vector3): void => $0 = U.look_rotation($1, $2)
+  SetFromToRotation(Vector3, Vector3): void => $0 = U.from_to_rotation($1, $2)
+  ToAngleAxis(out float, out Vector3): void => $1 = rad_to_deg($0.get_angle()) ;; $2 = U.quat_axis($0)
+  Equals(Quaternion): bool => $0 == $1
+  ToString(): string => str($0)
+  static Euler(float, float, float): Quaternion => U.euler($1, $2, $3)
+  static Euler(Vector3): Quaternion => U.euler_v($1)
+  static AngleAxis(float, Vector3): Quaternion => U.angle_axis($1, $2)
+  static LookRotation(Vector3): Quaternion => U.look_rotation($1, Vector3.UP)
+  static LookRotation(Vector3, Vector3): Quaternion => U.look_rotation($1, $2)
+  static FromToRotation(Vector3, Vector3): Quaternion => U.from_to_rotation($1, $2)
+  static Slerp(Quaternion, Quaternion, float): Quaternion => $1.slerp($2, clampf($3, 0.0, 1.0))
+  static SlerpUnclamped(Quaternion, Quaternion, float): Quaternion => $1.slerp($2, $3)
+  static Lerp(Quaternion, Quaternion, float): Quaternion => U.quat_lerp($1, $2, clampf($3, 0.0, 1.0))
+  static LerpUnclamped(Quaternion, Quaternion, float): Quaternion => U.quat_lerp($1, $2, $3)
+  static RotateTowards(Quaternion, Quaternion, float): Quaternion => U.quat_rotate_towards($1, $2, $3)
+  static Inverse(Quaternion): Quaternion => $1.inverse()
+  static Dot(Quaternion, Quaternion): float => $1.dot($2)
+  static Angle(Quaternion, Quaternion): float => rad_to_deg($1.angle_to($2))
+  static Normalize(Quaternion): Quaternion => $1.normalized()
+  op *(Quaternion, Quaternion): Quaternion => $1 * $2
+  op *(Quaternion, Vector3): Vector3 => $1 * $2
+  op ==(Quaternion, Quaternion): bool => $1.is_equal_approx($2)
+  op !=(Quaternion, Quaternion): bool => not $1.is_equal_approx($2)
+
+type Matrix4x4 kind=struct gd=Transform3D extern=UnityEngineMatrix4x4
+  static identity: Matrix4x4 => Transform3D()
+  static zero: Matrix4x4 => Transform3D(Basis(Vector3.ZERO, Vector3.ZERO, Vector3.ZERO), Vector3.ZERO)
+  inverse: Matrix4x4 => $0.affine_inverse()
+  transpose: Matrix4x4 => Transform3D($0.basis.transposed(), Vector3.ZERO)
+  lossyScale: Vector3 => $0.basis.get_scale()
+  rotation: Quaternion => $0.basis.get_rotation_quaternion()
+  isIdentity: bool => $0.is_equal_approx(Transform3D())
+  MultiplyPoint(Vector3): Vector3 => $0 * $1
+  MultiplyPoint3x4(Vector3): Vector3 => $0 * $1
+  MultiplyVector(Vector3): Vector3 => $0.basis * $1
+  GetColumn(int): Vector4 => U.matrix_column($0, $1)
+  GetRow(int): Vector4 => U.matrix_row($0, $1)
+  GetPosition(): Vector3 => $0.origin
+  static TRS(Vector3, Quaternion, Vector3): Matrix4x4 => Transform3D(Basis($2).scaled($3), $1)
+  static Translate(Vector3): Matrix4x4 => Transform3D(Basis(), $1)
+  static Rotate(Quaternion): Matrix4x4 => Transform3D(Basis($1), Vector3.ZERO)
+  static Scale(Vector3): Matrix4x4 => Transform3D(Basis().scaled($1), Vector3.ZERO)
+  static Inverse(Matrix4x4): Matrix4x4 => $1.affine_inverse()
+  op *(Matrix4x4, Matrix4x4): Matrix4x4 => $1 * $2
+
+type Color kind=struct gd=Color extern=UnityEngineColor
+  r: float
+  g: float
+  b: float
+  a: float
+  grayscale: float => $0.get_luminance()
+  linear: Color => $0.srgb_to_linear()
+  gamma: Color => $0.linear_to_srgb()
+  maxColorComponent: float => maxf($0.r, maxf($0.g, $0.b))
+  this[int]: float => $0[$1]
+  static red: Color => Color.RED
+  static green: Color => Color.GREEN
+  static blue: Color => Color.BLUE
+  static white: Color => Color.WHITE
+  static black: Color => Color.BLACK
+  static yellow: Color => Color(1.0, 0.9215686, 0.01568628, 1.0)
+  static cyan: Color => Color.CYAN
+  static magenta: Color => Color.MAGENTA
+  static gray: Color => Color(0.5, 0.5, 0.5, 1.0)
+  static grey: Color => Color(0.5, 0.5, 0.5, 1.0)
+  static clear: Color => Color(0.0, 0.0, 0.0, 0.0)
+  ctor() => Color(0.0, 0.0, 0.0, 0.0)
+  ctor(float, float, float) => Color($1, $2, $3, 1.0)
+  ctor(float, float, float, float) => Color($1, $2, $3, $4)
+  ToString(): string => str($0)
+  Equals(Color): bool => $0 == $1
+  static Lerp(Color, Color, float): Color => $1.lerp($2, clampf($3, 0.0, 1.0))
+  static LerpUnclamped(Color, Color, float): Color => $1.lerp($2, $3)
+  static HSVToRGB(float, float, float): Color => Color.from_hsv($1, $2, $3)
+  static HSVToRGB(float, float, float, bool): Color => Color.from_hsv($1, $2, $3)
+  static RGBToHSV(Color, out float, out float, out float): void => var $tmp = U.color_hsv($1) ;; $2 = $tmp[0] ;; $3 = $tmp[1] ;; $4 = $tmp[2]
+  op +(Color, Color): Color => $1 + $2
+  op -(Color, Color): Color => $1 - $2
+  op *(Color, Color): Color => $1 * $2
+  op *(Color, float): Color => $1 * $2
+  op *(float, Color): Color => $1 * $2
+  op /(Color, float): Color => $1 / $2
+  op ==(Color, Color): bool => $1.is_equal_approx($2)
+  op !=(Color, Color): bool => not $1.is_equal_approx($2)
+  cast Vector4 => Vector4($0.r, $0.g, $0.b, $0.a)
+  cast Color32 => $0
+
+type Color32 kind=struct gd=Color extern=UnityEngineColor32
+  r: byte => roundi($0.r * 255.0)
+  g: byte => roundi($0.g * 255.0)
+  b: byte => roundi($0.b * 255.0)
+  a: byte => roundi($0.a * 255.0)
+  set r: byte => $0.r = $v / 255.0
+  set g: byte => $0.g = $v / 255.0
+  set b: byte => $0.b = $v / 255.0
+  set a: byte => $0.a = $v / 255.0
+  ctor(byte, byte, byte, byte) => Color8($1, $2, $3, $4)
+  static Lerp(Color32, Color32, float): Color32 => $1.lerp($2, clampf($3, 0.0, 1.0))
+  cast Color => $0
+
+type ColorUtility kind=static extern=UnityEngineColorUtility
+  static TryParseHtmlString(string, out Color): bool => $2 = Color.html($1) if Color.html_is_valid($1) else Color.BLACK ;; Color.html_is_valid($1)
+  static ToHtmlStringRGB(Color): string => $1.to_html(false).to_upper()
+  static ToHtmlStringRGBA(Color): string => $1.to_html(true).to_upper()
+
+type Bounds kind=struct gd=AABB extern=UnityEngineBounds
+  center: Vector3 => $0.get_center()
+  set center: Vector3 => $0 = AABB($v - $0.size / 2.0, $0.size)
+  size: Vector3 => $0.size
+  set size: Vector3 => $0 = AABB($0.get_center() - $v / 2.0, $v)
+  extents: Vector3 => ($0.size / 2.0)
+  min: Vector3 => $0.position
+  max: Vector3 => ($0.position + $0.size)
+  ctor(Vector3, Vector3) => AABB($1 - $2 / 2.0, $2)
+  Contains(Vector3): bool => $0.has_point($1)
+  ClosestPoint(Vector3): Vector3 => U.aabb_closest_point($0, $1)
+  Encapsulate(Vector3): void => $0 = $0.expand($1)
+  Encapsulate(Bounds): void => $0 = $0.merge($1)
+  Expand(float): void => $0 = $0.grow($1 / 2.0)
+  Intersects(Bounds): bool => $0.intersects($1)
+  SetMinMax(Vector3, Vector3): void => $0 = AABB($1, $2 - $1)
+  SqrDistance(Vector3): float => U.aabb_closest_point($0, $1).distance_squared_to($1)
+  ToString(): string => str($0)
+
+type Rect kind=struct gd=Rect2 extern=UnityEngineRect
+  x: float => $0.position.x
+  y: float => $0.position.y
+  width: float => $0.size.x
+  height: float => $0.size.y
+  set x: float => $0.position.x = $v
+  set y: float => $0.position.y = $v
+  set width: float => $0.size.x = $v
+  set height: float => $0.size.y = $v
+  xMin: float => $0.position.x
+  yMin: float => $0.position.y
+  xMax: float => ($0.position + $0.size).x
+  yMax: float => ($0.position + $0.size).y
+  center: Vector2 => $0.get_center()
+  position: Vector2 => $0.position
+  size: Vector2 => $0.size
+  set position: Vector2 => $0.position = $v
+  set size: Vector2 => $0.size = $v
+  min: Vector2 => $0.position
+  max: Vector2 => ($0.position + $0.size)
+  ctor(float, float, float, float) => Rect2($1, $2, $3, $4)
+  ctor(Vector2, Vector2) => Rect2($1, $2)
+  Contains(Vector2): bool => $0.has_point($1)
+  Contains(Vector3): bool => $0.has_point(Vector2($1.x, $1.y))
+  Overlaps(Rect): bool => $0.intersects($1)
+  static zero: Rect => Rect2()
+
+type Plane kind=struct gd=Plane extern=UnityEnginePlane
+  normal: Vector3 => $0.normal
+  distance: float => -$0.d
+  ctor(Vector3, Vector3) => Plane($1.normalized(), $2)
+  ctor(Vector3, float) => Plane($1.normalized(), -$2)
+  ctor(Vector3, Vector3, Vector3) => Plane($1, $2, $3)
+  GetDistanceToPoint(Vector3): float => $0.distance_to($1)
+  GetSide(Vector3): bool => $0.is_point_over($1)
+  ClosestPointOnPlane(Vector3): Vector3 => $0.project($1)
+  Raycast(Ray, out float): bool => var $tmp = $0.intersects_ray($1.origin, $1.direction) ;; $2 = (0.0 if $tmp == null else $1.origin.distance_to($tmp)) ;; $tmp != null
+  Flip(): void => $0 = Plane(-$0.normal, -$0.d)
+  SetNormalAndPosition(Vector3, Vector3): void => $0 = Plane($1.normalized(), $2)
+
+type Ray kind=struct gd=Dictionary extern=UnityEngineRay
+  origin: Vector3 => $0.origin
+  direction: Vector3 => $0.direction
+  set origin: Vector3 => $0.origin = $v
+  set direction: Vector3 => $0.direction = $v.normalized()
+  ctor(Vector3, Vector3) => {"origin": $1, "direction": $2.normalized()}
+  GetPoint(float): Vector3 => ($0.origin + $0.direction * $1)
+  ToString(): string => str($0)
+
+type Random kind=static extern=UnityEngineRandom
+  static Range(int, int): int => randi_range($1, $2 - 1)
+  static Range(float, float): float => randf_range($1, $2)
+  static value: float => randf()
+  static insideUnitSphere: Vector3 => U.inside_unit_sphere()
+  static onUnitSphere: Vector3 => U.on_unit_sphere()
+  static insideUnitCircle: Vector2 => U.inside_unit_circle()
+  static rotation: Quaternion => U.random_rotation()
+  static rotationUniform: Quaternion => U.random_rotation()
+  static InitState(int): void => seed($1)
+  static ColorHSV(): Color => Color.from_hsv(randf(), randf(), randf())
+  static ColorHSV(float, float): Color => Color.from_hsv(randf_range($1, $2), randf(), randf())
+  static ColorHSV(float, float, float, float): Color => Color.from_hsv(randf_range($1, $2), randf_range($3, $4), randf())
+  static ColorHSV(float, float, float, float, float, float): Color => Color.from_hsv(randf_range($1, $2), randf_range($3, $4), randf_range($5, $6))
+  static seed: int => !unsupported Random.seed is write-only in Godot; use Random.InitState
+  static set seed: int => seed($v)
+
+type Time kind=static extern=UnityEngineTime
+  static deltaTime: float => U.delta_time()
+  static smoothDeltaTime: float => U.delta_time()
+  static unscaledDeltaTime: float => U.unscaled_delta_time()
+  static fixedDeltaTime: float => U.fixed_delta_time()
+  static fixedUnscaledDeltaTime: float => U.fixed_delta_time()
+  static set fixedDeltaTime: float => Engine.physics_ticks_per_second = int(1.0 / $v)
+  static time: float => U.time()
+  static timeAsDouble: double => U.time()
+  static timeSinceLevelLoad: float => U.time()
+  static timeSinceLevelLoadAsDouble: double => U.time()
+  static unscaledTime: float => U.realtime()
+  static unscaledTimeAsDouble: double => U.realtime()
+  static realtimeSinceStartup: float => U.realtime()
+  static realtimeSinceStartupAsDouble: double => U.realtime()
+  static fixedTime: float => U.fixed_time()
+  static fixedTimeAsDouble: double => U.fixed_time()
+  static fixedUnscaledTime: float => U.fixed_time()
+  static frameCount: int => Engine.get_process_frames()
+  static renderedFrameCount: int => Engine.get_process_frames()
+  static timeScale: float => Engine.time_scale
+  static set timeScale: float => Engine.time_scale = $v
+  static inFixedTimeStep: bool => Engine.is_in_physics_frame()
+  static captureFramerate: int => 0
+  static maximumDeltaTime: float => 0.3333333

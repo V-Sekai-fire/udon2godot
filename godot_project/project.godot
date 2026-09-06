@@ -1,0 +1,16 @@
+; Engine configuration file.
+config_version=5
+
+[application]
+
+config/name="udon2godot"
+config/features=PackedStringArray("4.6")
+
+[autoload]
+
+Udon="*res://addons/udon_runtime/udon.gd"
+U="*res://addons/udon_runtime/u.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_sandbox/plugin.cfg")

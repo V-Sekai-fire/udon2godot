@@ -1,0 +1,474 @@
+# .NET extras: StringBuilder, Regex, Encoding, DateTimeOffset, TimeZoneInfo, Stopwatch, Type, exceptions.
+
+type StringBuilder kind=class gd=Object extern=SystemTextStringBuilder
+  ctor() => U.new_string_builder("")
+  ctor(string) => U.new_string_builder($1)
+  ctor(int) => U.new_string_builder("")
+  ctor(string, int) => U.new_string_builder($1)
+  ctor(int, int) => U.new_string_builder("")
+  Length: int => $0.length()
+  set Length: int => $0.set_length($v)
+  Capacity: int => $0.length()
+  set Capacity: int => pass
+  MaxCapacity: int => 2147483647
+  this[int]: char => $0.char_at($1)
+  Append(string): StringBuilder => $0.append($1)
+  Append(char): StringBuilder => $0.append($1)
+  Append(int): StringBuilder => $0.append(str($1))
+  Append(uint): StringBuilder => $0.append(str($1))
+  Append(long): StringBuilder => $0.append(str($1))
+  Append(short): StringBuilder => $0.append(str($1))
+  Append(byte): StringBuilder => $0.append(str($1))
+  Append(float): StringBuilder => $0.append(U.float_str($1))
+  Append(double): StringBuilder => $0.append(U.float_str($1))
+  Append(bool): StringBuilder => $0.append(U.bool_str($1))
+  Append(object): StringBuilder => $0.append(U._to_str($1))
+  Append(char, int): StringBuilder => $0.append($1.repeat($2))
+  Append(string, int, int): StringBuilder => $0.append($1.substr($2, $3))
+  Append(char[]): StringBuilder => $0.append("".join($1))
+  Append(char[], int, int): StringBuilder => $0.append("".join($1.slice($2, $2 + $3)))
+  Append(StringBuilder): StringBuilder => $0.append($1.to_string())
+  AppendLine(): StringBuilder => $0.append("\n")
+  AppendLine(string): StringBuilder => $0.append($1 + "\n")
+  AppendFormat(string, object): StringBuilder => $0.append(U.format($1, [$2]))
+  AppendFormat(string, object, object): StringBuilder => $0.append(U.format($1, [$2, $3]))
+  AppendFormat(string, object, object, object): StringBuilder => $0.append(U.format($1, [$2, $3, $4]))
+  AppendFormat(string, params object[]): StringBuilder => $0.append(U.format($1, $params))
+  AppendJoin(string, params object[]): StringBuilder => $0.append(U.join($1, $params))
+  AppendJoin(string, params string[]): StringBuilder => $0.append($1.join($params))
+  AppendJoin(char, params string[]): StringBuilder => $0.append($1.join($params))
+  Insert(int, string): StringBuilder => $0.insert($1, $2)
+  Insert(int, char): StringBuilder => $0.insert($1, $2)
+  Insert(int, int): StringBuilder => $0.insert($1, str($2))
+  Insert(int, float): StringBuilder => $0.insert($1, U.float_str($2))
+  Insert(int, bool): StringBuilder => $0.insert($1, U.bool_str($2))
+  Insert(int, object): StringBuilder => $0.insert($1, U._to_str($2))
+  Remove(int, int): StringBuilder => $0.remove($1, $2)
+  Replace(string, string): StringBuilder => $0.replace($1, $2)
+  Replace(char, char): StringBuilder => $0.replace($1, $2)
+  Replace(string, string, int, int): StringBuilder => $0.replace_range($1, $2, $3, $4)
+  Replace(char, char, int, int): StringBuilder => $0.replace_range($1, $2, $3, $4)
+  Clear(): StringBuilder => $0.clear()
+  ToString(): string => $0.to_string()
+  ToString(int, int): string => $0.to_string().substr($1, $2)
+  Equals(StringBuilder): bool => $0.to_string() == $1.to_string()
+  EnsureCapacity(int): int => $1
+  CopyTo(int, char[], int, int): void => U.array_copy(U.to_char_array($0.to_string()), $1, $2, $3, $4)
+  GetChunks(): object => [$0.to_string()]
+
+type Regex kind=class gd=RegEx extern=SystemTextRegularExpressionsRegex
+  ctor(string) => U.new_regex($1, 0)
+  ctor(string, RegexOptions) => U.new_regex($1, $2)
+  ctor(string, RegexOptions, TimeSpan) => U.new_regex($1, $2)
+  Options: RegexOptions => $0.get_meta("udon_options", 0)
+  RightToLeft: bool => false
+  IsMatch(string): bool => $0.search($1) != null
+  IsMatch(string, int): bool => $0.search($1, $2) != null
+  Match(string): Match => U.regex_match($0, $1, 0)
+  Match(string, int): Match => U.regex_match($0, $1, $2)
+  Match(string, int, int): Match => U.regex_match($0, $1, $2, $2 + $3)
+  Matches(string): MatchCollection => U.regex_matches($0, $1, 0)
+  Matches(string, int): MatchCollection => U.regex_matches($0, $1, $2)
+  Replace(string, string): string => $0.sub($1, U.regex_replacement($2), true)
+  Replace(string, string, int): string => U.regex_replace_n($0, $1, $2, $3)
+  Replace(string, string, int, int): string => U.regex_replace_n($0, $1, $2, $3, $4)
+  Split(string): string[] => U.regex_split($0, $1)
+  Split(string, int): string[] => U.regex_split($0, $1, $2)
+  GetGroupNames(): string[] => Array($0.get_names())
+  GetGroupNumbers(): int[] => range($0.get_group_count() + 1)
+  GroupNameFromNumber(int): string => U.regex_group_name($0, $1)
+  GroupNumberFromName(string): int => U.regex_group_number($0, $1)
+  ToString(): string => $0.get_pattern()
+  static IsMatch(string, string): bool => U.regex_static($2, 0).search($1) != null
+  static IsMatch(string, string, RegexOptions): bool => U.regex_static($2, $3).search($1) != null
+  static Match(string, string): Match => U.regex_match(U.regex_static($2, 0), $1, 0)
+  static Match(string, string, RegexOptions): Match => U.regex_match(U.regex_static($2, $3), $1, 0)
+  static Matches(string, string): MatchCollection => U.regex_matches(U.regex_static($2, 0), $1, 0)
+  static Matches(string, string, RegexOptions): MatchCollection => U.regex_matches(U.regex_static($2, $3), $1, 0)
+  static Replace(string, string, string): string => U.regex_static($2, 0).sub($1, U.regex_replacement($3), true)
+  static Replace(string, string, string, RegexOptions): string => U.regex_static($2, $4).sub($1, U.regex_replacement($3), true)
+  static Split(string, string): string[] => U.regex_split(U.regex_static($2, 0), $1)
+  static Split(string, string, RegexOptions): string[] => U.regex_split(U.regex_static($2, $3), $1)
+  static Escape(string): string => U.regex_escape($1)
+  static Unescape(string): string => U.regex_unescape($1)
+
+type RegexOptions kind=enum extern=SystemTextRegularExpressionsRegexOptions
+  enum None = 0
+  enum IgnoreCase = 1
+  enum Multiline = 2
+  enum ExplicitCapture = 4
+  enum Compiled = 8
+  enum Singleline = 16
+  enum IgnorePatternWhitespace = 32
+  enum RightToLeft = 64
+  enum ECMAScript = 256
+  enum CultureInvariant = 512
+  enum NonBacktracking = 1024
+
+type Capture kind=class gd=Dictionary extern=SystemTextRegularExpressionsCapture
+  Value: string => $0.get("value", "")
+  Index: int => $0.get("index", 0)
+  Length: int => $0.get("length", 0)
+  ToString(): string => $0.get("value", "")
+
+type Group : Capture kind=class gd=Dictionary extern=SystemTextRegularExpressionsGroup
+  Success: bool => $0.get("success", false)
+  Name: string => $0.get("name", "0")
+  Captures: CaptureCollection => [$0]
+
+type Match : Group kind=class gd=Dictionary extern=SystemTextRegularExpressionsMatch
+  Groups: GroupCollection => $0.get("groups", [])
+  NextMatch(): Match => U.regex_next_match($0)
+  Result(string): string => U.regex_expand($0, $1)
+  static Empty: Match => {"success": false, "value": "", "index": 0, "length": 0, "groups": []}
+
+type MatchCollection kind=class gd=Array extern=SystemTextRegularExpressionsMatchCollection
+  Count: int => $0.size()
+  this[int]: Match => $0[$1]
+  GetEnumerator(): object => $0
+  CopyTo(Array, int): void => U.array_copy($0, 0, $1, $2, $0.size())
+
+type GroupCollection kind=class gd=Array extern=SystemTextRegularExpressionsGroupCollection
+  Count: int => $0.size()
+  this[int]: Group => $0[$1]
+  this[string]: Group => U.regex_group_by_name($0, $1)
+  Keys: string[] => U.regex_group_names($0)
+  Values: Group[] => $0
+  ContainsKey(string): bool => U.regex_group_by_name($0, $1).get("name", "") != ""
+
+type CaptureCollection kind=class gd=Array extern=SystemTextRegularExpressionsCaptureCollection
+  Count: int => $0.size()
+  this[int]: Capture => $0[$1]
+
+type Encoding kind=class gd=String extern=SystemTextEncoding
+  static UTF8: Encoding => "utf8"
+  static ASCII: Encoding => "ascii"
+  static Unicode: Encoding => "utf16"
+  static UTF32: Encoding => "utf32"
+  static Default: Encoding => "utf8"
+  static Latin1: Encoding => "latin1"
+  GetBytes(string): byte[] => U.encoding_get_bytes($0, $1)
+  GetBytes(char[]): byte[] => U.encoding_get_bytes($0, "".join($1))
+  GetString(byte[]): string => U.encoding_get_string($0, $1)
+  GetString(byte[], int, int): string => U.encoding_get_string($0, $1.slice($2, $2 + $3))
+  GetByteCount(string): int => U.encoding_get_bytes($0, $1).size()
+  GetCharCount(byte[]): int => U.encoding_get_string($0, $1).length()
+  GetChars(byte[]): char[] => U.to_char_array(U.encoding_get_string($0, $1))
+  EncodingName: string => $0
+  WebName: string => $0
+  BodyName: string => $0
+  CodePage: int => (65001 if $0 == "utf8" else 20127)
+  GetPreamble(): byte[] => []
+  static Convert(Encoding, Encoding, byte[]): byte[] => U.encoding_get_bytes($2, U.encoding_get_string($1, $3))
+  static GetEncoding(string): Encoding => $1.to_lower().replace("-", "")
+  static GetEncoding(int): Encoding => ("utf8" if $1 == 65001 else "ascii")
+
+type UTF8Encoding : Encoding kind=class gd=String extern=SystemTextUTF8Encoding
+  ctor() => "utf8"
+  ctor(bool) => "utf8"
+
+type DateTimeOffset kind=struct gd=Dictionary extern=SystemDateTimeOffset
+  static Now: DateTimeOffset => U.datetime_now(false)
+  static UtcNow: DateTimeOffset => U.datetime_now(true)
+  static MinValue: DateTimeOffset => U.datetime_from_unix(0)
+  static MaxValue: DateTimeOffset => U.datetime_from_unix(253402300799)
+  ctor(DateTime) => $1
+  ctor(DateTime, TimeSpan) => U.datetime_add_seconds($1, -$2.total_seconds)
+  ctor(long, TimeSpan) => U.datetime_from_unix(($1 - 621355968000000000) / 10000000.0)
+  DateTime: DateTime => $0
+  UtcDateTime: DateTime => $0
+  LocalDateTime: DateTime => $0
+  Date: DateTime => U.datetime_date($0)
+  Offset: TimeSpan => U.timespan_from_seconds(0.0)
+  Ticks: long => $0.ticks
+  UtcTicks: long => $0.ticks
+  Year: int => $0.year
+  Month: int => $0.month
+  Day: int => $0.day
+  Hour: int => $0.hour
+  Minute: int => $0.minute
+  Second: int => $0.second
+  Millisecond: int => $0.millisecond
+  DayOfWeek: DayOfWeek => $0.weekday
+  DayOfYear: int => $0.get("dayofyear", 1)
+  TimeOfDay: TimeSpan => U.timespan_from_seconds($0.hour * 3600 + $0.minute * 60 + $0.second)
+  ToUnixTimeSeconds(): long => int($0.unix)
+  ToUnixTimeMilliseconds(): long => int($0.unix * 1000.0)
+  ToString(): string => U.datetime_format($0, "")
+  ToString(string): string => U.datetime_format($0, $1)
+  ToString(string, IFormatProvider): string => U.datetime_format($0, $1)
+  ToUniversalTime(): DateTimeOffset => $0
+  ToLocalTime(): DateTimeOffset => $0
+  ToOffset(TimeSpan): DateTimeOffset => $0
+  AddSeconds(double): DateTimeOffset => U.datetime_add_seconds($0, $1)
+  AddMilliseconds(double): DateTimeOffset => U.datetime_add_seconds($0, $1 / 1000.0)
+  AddMinutes(double): DateTimeOffset => U.datetime_add_seconds($0, $1 * 60.0)
+  AddHours(double): DateTimeOffset => U.datetime_add_seconds($0, $1 * 3600.0)
+  AddDays(double): DateTimeOffset => U.datetime_add_seconds($0, $1 * 86400.0)
+  AddTicks(long): DateTimeOffset => U.datetime_add_seconds($0, $1 / 10000000.0)
+  Add(TimeSpan): DateTimeOffset => U.datetime_add_seconds($0, $1.total_seconds)
+  Subtract(DateTimeOffset): TimeSpan => U.datetime_diff($0, $1)
+  Subtract(TimeSpan): DateTimeOffset => U.datetime_add_seconds($0, -$1.total_seconds)
+  CompareTo(DateTimeOffset): int => U.compare($0.unix, $1.unix)
+  Equals(DateTimeOffset): bool => $0.unix == $1.unix
+  EqualsExact(DateTimeOffset): bool => $0.unix == $1.unix
+  static FromUnixTimeSeconds(long): DateTimeOffset => U.datetime_from_unix($1)
+  static FromUnixTimeMilliseconds(long): DateTimeOffset => U.datetime_from_unix($1 / 1000.0)
+  static Compare(DateTimeOffset, DateTimeOffset): int => U.compare($1.unix, $2.unix)
+  static Equals(DateTimeOffset, DateTimeOffset): bool => $1.unix == $2.unix
+  op -(DateTimeOffset, DateTimeOffset): TimeSpan => U.datetime_diff($1, $2)
+  op -(DateTimeOffset, TimeSpan): DateTimeOffset => U.datetime_add_seconds($1, -$2.total_seconds)
+  op +(DateTimeOffset, TimeSpan): DateTimeOffset => U.datetime_add_seconds($1, $2.total_seconds)
+  op <(DateTimeOffset, DateTimeOffset): bool => $1.unix < $2.unix
+  op >(DateTimeOffset, DateTimeOffset): bool => $1.unix > $2.unix
+  op <=(DateTimeOffset, DateTimeOffset): bool => $1.unix <= $2.unix
+  op >=(DateTimeOffset, DateTimeOffset): bool => $1.unix >= $2.unix
+  op ==(DateTimeOffset, DateTimeOffset): bool => $1.unix == $2.unix
+  op !=(DateTimeOffset, DateTimeOffset): bool => $1.unix != $2.unix
+  op implicit_DateTimeOffset(DateTime): DateTimeOffset => $1
+
+type DateTime
+  static Parse(string): DateTime => U.datetime_parse($1)
+  static TryParse(string, out DateTime): bool => $2 = U.datetime_parse($1) ;; ($2.get("unix", -1.0) >= 0.0)
+  static UnixEpoch: DateTime => U.datetime_from_unix(0)
+  static MaxValue: DateTime => U.datetime_from_unix(253402300799)
+  static IsLeapYear(int): bool => (($1 % 4 == 0 and $1 % 100 != 0) or $1 % 400 == 0)
+  static DaysInMonth(int, int): int => U.days_in_month($1, $2)
+  ctor(long) => U.datetime_from_unix(($1 - 621355968000000000) / 10000000.0)
+  ctor(int, int, int) => U.datetime_from_parts($1, $2, $3, 0, 0, 0)
+  ctor(int, int, int, int, int, int) => U.datetime_from_parts($1, $2, $3, $4, $5, $6)
+  ctor(int, int, int, int, int, int, int) => U.datetime_from_parts($1, $2, $3, $4, $5, $6)
+  Kind: DateTimeKind => 1
+  AddTicks(long): DateTime => U.datetime_add_seconds($0, $1 / 10000000.0)
+  AddYears(int): DateTime => U.datetime_add_seconds($0, $1 * 31536000.0)
+  AddMonths(int): DateTime => U.datetime_add_seconds($0, $1 * 2592000.0)
+  ToFileTime(): long => $0.ticks
+  ToOADate(): double => ($0.unix / 86400.0 + 25569.0)
+  ToLongDateString(): string => U.datetime_format($0, "yyyy-MM-dd")
+  ToShortTimeString(): string => U.datetime_format($0, "HH:mm")
+  GetDateTimeFormats(): string[] => [U.datetime_format($0, "")]
+
+type DateTimeKind kind=enum extern=SystemDateTimeKind
+  enum Unspecified = 0
+  enum Utc = 1
+  enum Local = 2
+
+type TimeZoneInfo kind=class gd=Dictionary extern=SystemTimeZoneInfo
+  static Local: TimeZoneInfo => {"id": "Local", "offset": 0.0}
+  static Utc: TimeZoneInfo => {"id": "UTC", "offset": 0.0}
+  Id: string => $0.get("id", "UTC")
+  DisplayName: string => $0.get("id", "UTC")
+  StandardName: string => $0.get("id", "UTC")
+  BaseUtcOffset: TimeSpan => U.timespan_from_seconds($0.get("offset", 0.0))
+  SupportsDaylightSavingTime: bool => false
+  GetUtcOffset(DateTime): TimeSpan => U.timespan_from_seconds($0.get("offset", 0.0))
+  IsDaylightSavingTime(DateTime): bool => false
+  static ConvertTime(DateTime, TimeZoneInfo): DateTime => $1
+  static ConvertTimeToUtc(DateTime): DateTime => $1
+  static ConvertTimeFromUtc(DateTime, TimeZoneInfo): DateTime => $1
+  static FindSystemTimeZoneById(string): TimeZoneInfo => {"id": $1, "offset": 0.0}
+
+type Stopwatch kind=class gd=Dictionary extern=SystemDiagnosticsStopwatch
+  ctor() => {"start": 0, "acc": 0, "running": false}
+  Start(): void => U.stopwatch_start($0)
+  Stop(): void => U.stopwatch_stop($0)
+  Reset(): void => $0.start = 0 ;; $0.acc = 0 ;; $0.running = false
+  Restart(): void => $0.acc = 0 ;; $0.start = Time.get_ticks_usec() ;; $0.running = true
+  IsRunning: bool => $0.get("running", false)
+  ElapsedMilliseconds: long => (U.stopwatch_usec($0) / 1000)
+  ElapsedTicks: long => (U.stopwatch_usec($0) * 10)
+  Elapsed: TimeSpan => U.timespan_from_seconds(U.stopwatch_usec($0) / 1000000.0)
+  static StartNew(): Stopwatch => {"start": Time.get_ticks_usec(), "acc": 0, "running": true}
+  static GetTimestamp(): long => Time.get_ticks_usec() * 10
+  static Frequency: long => 10000000
+  static IsHighResolution: bool => true
+
+type Type
+  IsArray: bool => $0.ends_with("[]")
+  IsEnum: bool => false
+  IsValueType: bool => U.type_is_value($0)
+  IsPrimitive: bool => U.type_is_value($0)
+  IsClass: bool => not U.type_is_value($0)
+  IsAbstract: bool => false
+  IsInterface: bool => false
+  Namespace: string => ""
+  BaseType: Type => U.type_base($0)
+  AssemblyQualifiedName: string => $0
+  GetElementType(): Type => $0.trim_suffix("[]")
+  IsInstanceOfType(object): bool => U.is_type($1, $0)
+  static GetType(string): Type => $1
+  static GetTypeCode(Type): int => U.type_code($1)
+  static EmptyTypes: Type[] => []
+
+type TypeCode kind=enum extern=SystemTypeCode
+  enum Empty = 0
+  enum Object = 1
+  enum DBNull = 2
+  enum Boolean = 3
+  enum Char = 4
+  enum SByte = 5
+  enum Byte = 6
+  enum Int16 = 7
+  enum UInt16 = 8
+  enum Int32 = 9
+  enum UInt32 = 10
+  enum Int64 = 11
+  enum UInt64 = 12
+  enum Single = 13
+  enum Double = 14
+  enum Decimal = 15
+  enum DateTime = 16
+  enum String = 18
+
+type ArgumentException : Exception kind=class gd=String extern=SystemArgumentException
+  ctor() => "ArgumentException"
+  ctor(string) => $1
+  ctor(string, string) => $1
+  ParamName: string => ""
+
+type ArgumentNullException : ArgumentException kind=class gd=String extern=SystemArgumentNullException
+  ctor() => "ArgumentNullException"
+  ctor(string) => $1
+
+type ArgumentOutOfRangeException : ArgumentException kind=class gd=String extern=SystemArgumentOutOfRangeException
+  ctor() => "ArgumentOutOfRangeException"
+  ctor(string) => $1
+
+type InvalidOperationException : Exception kind=class gd=String extern=SystemInvalidOperationException
+  ctor() => "InvalidOperationException"
+  ctor(string) => $1
+
+type NotImplementedException : Exception kind=class gd=String extern=SystemNotImplementedException
+  ctor() => "NotImplementedException"
+  ctor(string) => $1
+
+type NotSupportedException : Exception kind=class gd=String extern=SystemNotSupportedException
+  ctor() => "NotSupportedException"
+  ctor(string) => $1
+
+type NullReferenceException : Exception kind=class gd=String extern=SystemNullReferenceException
+  ctor() => "NullReferenceException"
+  ctor(string) => $1
+
+type IndexOutOfRangeException : Exception kind=class gd=String extern=SystemIndexOutOfRangeException
+  ctor() => "IndexOutOfRangeException"
+  ctor(string) => $1
+
+type FormatException : Exception kind=class gd=String extern=SystemFormatException
+  ctor() => "FormatException"
+  ctor(string) => $1
+
+type OverflowException : Exception kind=class gd=String extern=SystemOverflowException
+  ctor() => "OverflowException"
+  ctor(string) => $1
+
+type Exception
+  StackTrace: string => ""
+  InnerException: Exception => null
+  Source: string => ""
+  HResult: int => 0
+  GetBaseException(): Exception => $0
+
+type Math
+  static Round(float): float => U.round_even($1)
+  static Round(float, int): float => snappedf($1, pow(10.0, -$2))
+  static Round(double, MidpointRounding): double => (roundf($1) if $2 == 1 else U.round_even($1))
+  static Round(double, int, MidpointRounding): double => snappedf($1, pow(10.0, -$2))
+  static Truncate(float): float => U.trunc($1)
+  static Floor(float): float => floorf($1)
+  static Ceiling(float): float => ceilf($1)
+  static BigMul(int, int): long => $1 * $2
+  static DivRem(int, int, out int): int => $3 = $1 % $2 ;; $1 / $2
+  static IEEERemainder(double, double): double => ($1 - $2 * U.round_even($1 / $2))
+  static Cbrt(double): double => pow($1, 1.0 / 3.0)
+  static Log2(double): double => (log($1) / log(2.0))
+  static Asinh(double): double => log($1 + sqrt($1 * $1 + 1.0))
+  static Acosh(double): double => log($1 + sqrt($1 * $1 - 1.0))
+  static Atanh(double): double => (0.5 * log((1.0 + $1) / (1.0 - $1)))
+  static Tau: double => TAU
+
+type MidpointRounding kind=enum extern=SystemMidpointRounding
+  enum ToEven = 0
+  enum AwayFromZero = 1
+  enum ToZero = 2
+  enum ToNegativeInfinity = 3
+  enum ToPositiveInfinity = 4
+
+type Convert
+  static ToInt32(char): int => $1.unicode_at(0)
+  static ToInt32(long): int => U.wrap_i32($1)
+  static ToInt32(uint): int => U.wrap_i32($1)
+  static ToInt32(short): int => $1
+  static ToInt32(byte): int => $1
+  static ToInt64(string): long => $1.to_int()
+  static ToInt64(double): long => U.round_even($1)
+  static ToInt16(string): short => U.wrap_i16($1.to_int())
+  static ToUInt32(string): uint => $1.to_int()
+  static ToUInt16(object): ushort => (int($1) & 65535)
+  static ToUInt64(object): ulong => int($1)
+  static ToSByte(object): sbyte => U.wrap_i8(int($1))
+  static ToDecimal(object): decimal => float($1)
+  static ToString(char): string => $1
+  static ToString(double): string => U.float_str($1)
+  static ToString(long): string => str($1)
+  static ToString(byte, int): string => U.to_base($1, $2)
+  static ToString(long, int): string => U.to_base($1, $2)
+  static ToString(object, IFormatProvider): string => str($1)
+  static ToChar(string): char => $1.substr(0, 1)
+  static ToBoolean(string): bool => ($1.to_lower() == "true")
+  static ToBoolean(int): bool => ($1 != 0)
+  static ToBoolean(float): bool => ($1 != 0.0)
+  static IsDBNull(object): bool => ($1 == null)
+  static ChangeType(object, Type): object => U.change_type($1, $2)
+  static ToBase64String(byte[], int, int): string => Marshalls.raw_to_base64(PackedByteArray($1.slice($2, $2 + $3)))
+  static ToHexString(byte[]): string => PackedByteArray($1).hex_encode().to_upper()
+  static FromHexString(string): byte[] => Array($1.hex_decode())
+
+type Buffer
+  static ByteLength(Array): int => $1.size()
+  static GetByte(Array, int): byte => int($1[$2]) & 255
+  static SetByte(Array, int, byte): void => $1[$2] = $3
+
+type Array
+  static Reverse(Array, int, int): void => U.array_reverse_range($1, $2, $3)
+  static Sort(Array, int, int): void => U.array_sort_range($1, $2, $3)
+  static Sort(Array, Array): void => U.array_sort_keys_items($1, $2)
+  static IndexOf(Array, object, int, int): int => U.array_index_of_range($1, $2, $3, $4)
+  static LastIndexOf(Array, object, int): int => U.array_last_index_of($1, $2, $3)
+  static TrueForAll(Array, object): bool => !unsupported Array.TrueForAll requires a delegate
+  static FindIndex(Array, object): int => !unsupported Array.FindIndex requires a delegate
+  static ForEach(Array, object): void => !unsupported Array.ForEach requires a delegate
+  static ConvertAll(Array, object): Array => !unsupported Array.ConvertAll requires a delegate
+  static CreateInstance(Type, int): Array => U.new_array($2, null)
+  static CreateInstance(Type, int, int): Array => U.new_array_nd([$2, $3], null)
+  GetLowerBound(int): int => 0
+  GetUpperBound(int): int => (U.array_get_length($0, $1) - 1)
+  GetLongLength(int): long => U.array_get_length($0, $1)
+  GetValue(int, int): object => $0[$1][$2]
+  SetValue(object, int, int): void => $0[$2][$3] = $1
+  Initialize(): void => pass
+  IsFixedSize: bool => false
+  IsReadOnly: bool => $0.is_read_only()
+  IsSynchronized: bool => false
+  SyncRoot: object => $0
+  GetEnumerator(): object => $0
+
+type char
+  static ConvertFromUtf32(int): string => char($1)
+  static ConvertToUtf32(string, int): int => $1.unicode_at($2)
+  static GetNumericValue(char): double => (float($1.to_int()) if U.char_is_digit($1) else -1.0)
+  static IsControl(char): bool => ($1.unicode_at(0) < 32 or $1.unicode_at(0) == 127)
+  static IsSymbol(char): bool => "$+<=>^`|~".contains($1)
+  static IsSeparator(char): bool => ($1 == " ")
+  static IsSurrogate(char): bool => false
+  static IsAscii(char): bool => ($1.unicode_at(0) < 128)
+  static ToUpperInvariant(char): char => $1.to_upper()
+  static ToLowerInvariant(char): char => $1.to_lower()
+  static Parse(string): char => $1.substr(0, 1)
+  static TryParse(string, out char): bool => $2 = $1.substr(0, 1) ;; ($1.length() == 1)
+
+type bool
+  static Parse(string): bool => ($1.to_lower() == "true")
+
+type float
+  static Round(float): float => U.round_even($1)

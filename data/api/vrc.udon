@@ -1,0 +1,668 @@
+# VRChat SDK surface → the `udon_runtime` abstraction layer.
+#
+# Everything here routes through the `Udon` autoload (the world provider a Godot game
+# implements) or through adapter objects it returns (UdonPlayer, UdonPickup, UdonStation,
+# UdonObjectSync, UdonObjectPool, UdonVideoPlayer). Behaviour-level calls resolve on the
+# `UdonBehaviour` base class of every converted script.
+
+type UdonBehaviour : Behaviour kind=behaviour gd=Node extern=VRCUdonUdonBehaviour
+  DisableInteractive: bool => $0.DisableInteractive
+  set DisableInteractive: bool => $0.DisableInteractive = $v
+  InteractionText: string => $0.InteractionText
+  set InteractionText: string => $0.InteractionText = $v
+  enabled: bool => $0.enabled
+  set enabled: bool => $0.enabled = $v
+  SendCustomEvent(string): void => U.send_custom_event($0, $1)
+  SendCustomEventDelayedSeconds(string, float): void => U.send_custom_event_delayed_seconds($0, $1, $2, 0)
+  SendCustomEventDelayedSeconds(string, float, EventTiming): void => U.send_custom_event_delayed_seconds($0, $1, $2, $3)
+  SendCustomEventDelayedFrames(string, int): void => U.send_custom_event_delayed_frames($0, $1, $2, 0)
+  SendCustomEventDelayedFrames(string, int, EventTiming): void => U.send_custom_event_delayed_frames($0, $1, $2, $3)
+  SendCustomNetworkEvent(NetworkEventTarget, string): void => U.send_custom_network_event($0, $1, $2, [])
+  SendCustomNetworkEvent(NetworkEventTarget, string, params object[]): void => U.send_custom_network_event($0, $1, $2, $params)
+  RequestSerialization(): void => U.request_serialization($0)
+  GetProgramVariable(string): object => $0.get($1)
+  SetProgramVariable(string, object): void => $0.set($1, $2)
+  GetProgramVariableType(string): Type => U.type_of($0.get($1))
+  Interact(): void => U.send_custom_event($0, "Interact")
+  SyncMethod: int => 0
+  set SyncMethod: int => pass
+  SyncIsManual: bool => $0.udon_sync_mode() == "manual"
+
+type UdonSharpBehaviour : UdonBehaviour kind=behaviour gd=Node extern=UdonSharpUdonSharpBehaviour
+  static VRCInstantiate(GameObject): GameObject => Udon.instantiate($1)
+  static GetUdonTypeID(): long => 0
+  static GetUdonTypeName(): string => ""
+  RequestSerialization(): void => U.request_serialization($0)
+
+type EventTiming kind=enum extern=VRCUdonCommonEnumsEventTiming
+  enum Update = 0
+  enum LateUpdate = 1
+
+type NetworkEventTarget kind=enum extern=VRCUdonCommonInterfacesNetworkEventTarget
+  enum Owner = 0
+  enum All = 1
+  enum Others = 2
+  enum Self = 3
+
+type BehaviourSyncMode kind=enum extern=UdonSharpBehaviourSyncMode
+  enum Any = 0
+  enum None = 1
+  enum Continuous = 2
+  enum Manual = 3
+  enum NoVariableSync = 4
+
+type NetworkCalling kind=static extern=VRCSDK3UdonNetworkCallingNetworkCalling
+  static CallingPlayer: VRCPlayerApi => Udon.calling_player()
+  static InNetworkCall: bool => Udon.in_network_call()
+  static SendCustomNetworkEvent(UdonBehaviour, NetworkEventTarget, string): void => U.send_custom_network_event($1, $2, $3, [])
+  static SendCustomNetworkEvent(UdonBehaviour, NetworkEventTarget, string, params object[]): void => U.send_custom_network_event($1, $2, $3, $params)
+  static GetQueuedEvents(UdonBehaviour, string): int => 0
+  static GetAllQueuedEvents(): int => 0
+
+type Networking kind=static extern=VRCSDKBaseNetworking
+  static LocalPlayer: VRCPlayerApi => Udon.local_player()
+  static Master: VRCPlayerApi => Udon.master()
+  static InstanceOwner: VRCPlayerApi => Udon.instance_owner()
+  static IsMaster: bool => Udon.is_master()
+  static IsInstanceOwner: bool => Udon.is_instance_owner()
+  static IsClogged: bool => Udon.is_clogged()
+  static IsNetworkSettled: bool => Udon.is_network_settled()
+  static IsOwner(GameObject): bool => Udon.is_owner($1)
+  static IsOwner(VRCPlayerApi, GameObject): bool => Udon.is_owner_player($1, $2)
+  static GetOwner(GameObject): VRCPlayerApi => Udon.owner_of($1)
+  static SetOwner(VRCPlayerApi, GameObject): void => Udon.transfer_owner($1, $2)
+  static IsObjectReady(GameObject): bool => Udon.is_object_ready($1)
+  static GetUniqueName(GameObject): string => Udon.get_unique_name($1)
+  static GetServerTimeInMilliseconds(): int => Udon.server_time_ms()
+  static GetServerTimeInSeconds(): double => Udon.server_time_s()
+  static CalculateServerDeltaTime(double, double): double => Udon.server_delta_time($1, $2)
+  static GetNetworkDateTime(): DateTime => Udon.network_date_time()
+  static SimulationTime(GameObject): float => Udon.simulation_time($1)
+  static SimulationTime(VRCPlayerApi): float => Udon.simulation_time_player($1)
+  static Destroy(GameObject): void => Udon.destroy($1)
+  static GetPlayerObjects(VRCPlayerApi): GameObject[] => Udon.get_player_objects($1)
+  static FindComponentInPlayerObjects(VRCPlayerApi, Component): Component => Udon.find_component_in_player_objects($1, $2)
+  static GetPlayerDataStorageLimit(): int => 100000
+  static GetPlayerDataStorageUsage(VRCPlayerApi): int => 0
+  static GetPlayerObjectStorageLimit(): int => 100000
+  static GetPlayerObjectStorageUsage(VRCPlayerApi): int => 0
+  static RequestStorageUsageUpdate(): void => pass
+  static SceneEventHandler: object => !unsupported Networking.SceneEventHandler is not supported
+  static GetEventDispatcher(): object => !unsupported Networking.GetEventDispatcher is not supported
+
+type Utilities kind=static extern=VRCSDKBaseUtilities
+  static IsValid(object): bool => Udon.is_valid($1)
+  static ShuffleArray(Array): void => $1.shuffle()
+  static ShuffleArray(int[]): void => $1.shuffle()
+
+type VRCPlayerApi kind=class gd=Object extern=VRCSDKBaseVRCPlayerApi
+  displayName: string => $0.display_name
+  playerId: int => $0.player_id
+  isLocal: bool => $0.is_local
+  isMaster: bool => $0.is_master
+  isInstanceOwner: bool => $0.is_instance_owner
+  isSuspended: bool => $0.is_suspended
+  IsValid(): bool => Udon.is_valid($0)
+  IsUserInVR(): bool => $0.is_user_in_vr()
+  IsOwner(GameObject): bool => Udon.is_owner_player($0, $1)
+  IsPlayerGrounded(): bool => $0.is_player_grounded()
+  GetPosition(): Vector3 => $0.get_position()
+  GetRotation(): Quaternion => $0.get_rotation()
+  GetVelocity(): Vector3 => $0.get_velocity()
+  SetVelocity(Vector3): void => $0.set_velocity($1)
+  GetTrackingData(TrackingDataType): TrackingData => $0.get_tracking_data($1)
+  GetBonePosition(HumanBodyBones): Vector3 => $0.get_bone_position($1)
+  GetBoneRotation(HumanBodyBones): Quaternion => $0.get_bone_rotation($1)
+  TeleportTo(Vector3, Quaternion): void => $0.teleport_to($1, $2, 0, false)
+  TeleportTo(Vector3, Quaternion, SpawnOrientation): void => $0.teleport_to($1, $2, $3, false)
+  TeleportTo(Vector3, Quaternion, SpawnOrientation, bool): void => $0.teleport_to($1, $2, $3, $4)
+  Respawn(): void => $0.respawn(0)
+  Respawn(int): void => $0.respawn($1)
+  Immobilize(bool): void => $0.immobilize($1)
+  UseAttachedStation(): void => $0.use_attached_station()
+  UseLegacyLocomotion(): void => pass
+  EnablePickups(bool): void => $0.enable_pickups($1)
+  GetPickupInHand(PickupHand): VRC_Pickup => $0.get_pickup_in_hand($1)
+  PlayHapticEventInHand(PickupHand, float, float, float): void => $0.play_haptic_event_in_hand($1, $2, $3, $4)
+  SetPlayerTag(string, string): void => $0.set_player_tag($1, $2)
+  GetPlayerTag(string): string => $0.get_player_tag($1)
+  ClearPlayerTags(): void => $0.clear_player_tags()
+  GetPlayersWithTag(string, string): object => Udon.get_players_with_tag($1, $2)
+  SetSilencedToTagged(int, string, string): void => pass
+  SetSilencedToUntagged(int, string, string): void => pass
+  ClearSilence(): void => pass
+  GetVoiceGain(): float => $0.get_voice("gain")
+  SetVoiceGain(float): void => $0.set_voice("gain", $1)
+  GetVoiceDistanceNear(): float => $0.get_voice("distance_near")
+  SetVoiceDistanceNear(float): void => $0.set_voice("distance_near", $1)
+  GetVoiceDistanceFar(): float => $0.get_voice("distance_far")
+  SetVoiceDistanceFar(float): void => $0.set_voice("distance_far", $1)
+  GetVoiceVolumetricRadius(): float => $0.get_voice("volumetric_radius")
+  SetVoiceVolumetricRadius(float): void => $0.set_voice("volumetric_radius", $1)
+  GetVoiceLowpass(): bool => $0.get_voice("lowpass")
+  SetVoiceLowpass(bool): void => $0.set_voice("lowpass", $1)
+  SetAvatarAudioGain(float): void => $0.set_avatar_audio("gain", $1)
+  SetAvatarAudioNearRadius(float): void => $0.set_avatar_audio("near_radius", $1)
+  SetAvatarAudioFarRadius(float): void => $0.set_avatar_audio("far_radius", $1)
+  SetAvatarAudioVolumetricRadius(float): void => $0.set_avatar_audio("volumetric_radius", $1)
+  SetAvatarAudioForceSpatial(bool): void => $0.set_avatar_audio("force_spatial", $1)
+  SetAvatarAudioCustomCurve(bool): void => $0.set_avatar_audio("custom_curve", $1)
+  GetWalkSpeed(): float => $0.get_locomotion("walk_speed")
+  SetWalkSpeed(float): void => $0.set_locomotion("walk_speed", $1)
+  GetRunSpeed(): float => $0.get_locomotion("run_speed")
+  SetRunSpeed(float): void => $0.set_locomotion("run_speed", $1)
+  GetStrafeSpeed(): float => $0.get_locomotion("strafe_speed")
+  SetStrafeSpeed(float): void => $0.set_locomotion("strafe_speed", $1)
+  GetJumpImpulse(): float => $0.get_locomotion("jump_impulse")
+  SetJumpImpulse(float): void => $0.set_locomotion("jump_impulse", $1)
+  GetGravityStrength(): float => $0.get_locomotion("gravity_strength")
+  SetGravityStrength(float): void => $0.set_locomotion("gravity_strength", $1)
+  GetAvatarEyeHeightAsMeters(): float => $0.get_avatar_eye_height()
+  GetAvatarEyeHeightMinimumAsMeters(): float => 0.2
+  GetAvatarEyeHeightMaximumAsMeters(): float => 5.0
+  SetAvatarEyeHeightByMeters(float): void => $0.set_avatar_eye_height($1)
+  SetAvatarEyeHeightByMultiplier(float): void => $0.set_avatar_eye_height($0.get_avatar_eye_height() * $1)
+  SetAvatarEyeHeightMinimumByMeters(float): void => pass
+  SetAvatarEyeHeightMaximumByMeters(float): void => pass
+  GetManualAvatarScalingAllowed(): bool => true
+  SetManualAvatarScalingAllowed(bool): void => pass
+  GetCurrentLanguage(): string => $0.get_language()
+  GetAvailableLanguages(): string[] => ["en"]
+  GetPlayerObjects(): GameObject[] => Udon.get_player_objects($0)
+  FindComponentInPlayerObjects(Component): Component => Udon.find_component_in_player_objects($0, $1)
+  GetDrone(): object => null
+  CombatSetup(): void => pass
+  CombatSetMaxHitpoints(float): void => $0.combat_set("max_hitpoints", $1)
+  CombatSetCurrentHitpoints(float): void => $0.combat_set("hitpoints", $1)
+  CombatGetCurrentHitpoints(): float => $0.combat_get("hitpoints")
+  CombatSetRespawn(bool, float, Transform): void => pass
+  CombatSetDamageGraphic(GameObject): void => pass
+  CombatGetDestructible(): object => null
+  ToString(): string => $0.display_name
+  Equals(object): bool => Udon.player_eq($0, $1)
+  GetHashCode(): int => $0.player_id
+  static GetPlayerById(int): VRCPlayerApi => Udon.get_player_by_id($1)
+  static GetPlayerId(VRCPlayerApi): int => $1.player_id
+  static GetPlayerCount(): int => Udon.player_count()
+  static GetPlayers(VRCPlayerApi[]): VRCPlayerApi[] => Udon.get_players($1)
+  static AllPlayers: object => Udon.get_players([])
+  op ==(VRCPlayerApi, VRCPlayerApi): bool => Udon.player_eq($1, $2)
+  op !=(VRCPlayerApi, VRCPlayerApi): bool => not Udon.player_eq($1, $2)
+
+type TrackingData kind=struct gd=Dictionary extern=VRCSDKBaseVRCPlayerApiTrackingData
+  position: Vector3 => $0.position
+  rotation: Quaternion => $0.rotation
+alias VRCPlayerApi.TrackingData = TrackingData
+
+type TrackingDataType kind=enum extern=VRCSDKBaseVRCPlayerApiTrackingDataType
+  enum Head = 0
+  enum LeftHand = 1
+  enum RightHand = 2
+  enum Origin = 3
+  enum AvatarRoot = 4
+alias VRCPlayerApi.TrackingDataType = TrackingDataType
+
+type SpawnOrientation kind=enum extern=VRCSDKBaseVRC_SceneDescriptorSpawnOrientation
+  enum Default = 0
+  enum AlignPlayerWithSpawnPoint = 1
+  enum AlignRoomWithSpawnPoint = 2
+alias VRC_SceneDescriptor.SpawnOrientation = SpawnOrientation
+
+type VRC_SceneDescriptor kind=static extern=VRCSDKBaseVRC_SceneDescriptor
+  static RespawnHeightY: float => -100.0
+
+type VRC_Pickup : Behaviour kind=component gd=Node extern=VRCSDK3ComponentsVRCPickup
+  IsHeld: bool => Udon.pickup($0).is_held
+  currentPlayer: VRCPlayerApi => Udon.pickup($0).current_player
+  currentHand: PickupHand => Udon.pickup($0).current_hand
+  currentLocalPlayer: VRCPlayerApi => Udon.pickup($0).current_player
+  pickupable: bool => Udon.pickup($0).pickupable
+  set pickupable: bool => Udon.pickup($0).pickupable = $v
+  InteractionText: string => Udon.pickup($0).interaction_text
+  set InteractionText: string => Udon.pickup($0).interaction_text = $v
+  UseText: string => Udon.pickup($0).use_text
+  set UseText: string => Udon.pickup($0).use_text = $v
+  proximity: float => Udon.pickup($0).proximity
+  set proximity: float => Udon.pickup($0).proximity = $v
+  Proximity: float => Udon.pickup($0).proximity
+  set Proximity: float => Udon.pickup($0).proximity = $v
+  orientation: PickupOrientation => Udon.pickup($0).orientation
+  set orientation: PickupOrientation => Udon.pickup($0).orientation = $v
+  DisallowTheft: bool => Udon.pickup($0).disallow_theft
+  set DisallowTheft: bool => Udon.pickup($0).disallow_theft = $v
+  ExactGrip: Transform => Udon.pickup($0).exact_grip
+  set ExactGrip: Transform => Udon.pickup($0).exact_grip = $v
+  ExactGun: Transform => Udon.pickup($0).exact_gun
+  set ExactGun: Transform => Udon.pickup($0).exact_gun = $v
+  AutoHold: AutoHoldMode => Udon.pickup($0).auto_hold
+  set AutoHold: AutoHoldMode => Udon.pickup($0).auto_hold = $v
+  allowManipulationWhenEquipped: bool => Udon.pickup($0).allow_manipulation_when_equipped
+  set allowManipulationWhenEquipped: bool => Udon.pickup($0).allow_manipulation_when_equipped = $v
+  MomentumTransferMethod: ForceMode => 0
+  set MomentumTransferMethod: ForceMode => pass
+  ThrowVelocityBoostMinSpeed: float => Udon.pickup($0).throw_boost_min_speed
+  set ThrowVelocityBoostMinSpeed: float => Udon.pickup($0).throw_boost_min_speed = $v
+  ThrowVelocityBoostScale: float => Udon.pickup($0).throw_boost_scale
+  set ThrowVelocityBoostScale: float => Udon.pickup($0).throw_boost_scale = $v
+  Drop(): void => Udon.pickup($0).drop(null)
+  Drop(VRCPlayerApi): void => Udon.pickup($0).drop($1)
+  GenerateHapticEvent(float, float, float): void => Udon.pickup($0).generate_haptic_event($1, $2, $3)
+  GenerateHapticEvent(): void => Udon.pickup($0).generate_haptic_event(0.25, 0.5, 0.5)
+  PlayHaptics(): void => Udon.pickup($0).generate_haptic_event(0.25, 0.5, 0.5)
+alias VRCPickup = VRC_Pickup
+
+type PickupHand kind=enum extern=VRCSDKBaseVRC_PickupPickupHand
+  enum None = 0
+  enum Left = 1
+  enum Right = 2
+alias VRC_Pickup.PickupHand = PickupHand
+alias VRCPickup.PickupHand = PickupHand
+
+type PickupOrientation kind=enum extern=VRCSDKBaseVRC_PickupPickupOrientation
+  enum Any = 0
+  enum Grip = 1
+  enum Gun = 2
+alias VRC_Pickup.PickupOrientation = PickupOrientation
+alias VRCPickup.PickupOrientation = PickupOrientation
+
+type AutoHoldMode kind=enum extern=VRCSDKBaseVRC_PickupAutoHoldMode
+  enum AutoDetect = 0
+  enum Yes = 1
+  enum No = 2
+alias VRC_Pickup.AutoHoldMode = AutoHoldMode
+alias VRCPickup.AutoHoldMode = AutoHoldMode
+
+type VRCStation : Behaviour kind=component gd=Node extern=VRCSDK3ComponentsVRCStation
+  PlayerMobility: Mobility => Udon.station($0).player_mobility
+  set PlayerMobility: Mobility => Udon.station($0).player_mobility = $v
+  seated: bool => Udon.station($0).seated
+  set seated: bool => Udon.station($0).seated = $v
+  disableStationExit: bool => Udon.station($0).disable_station_exit
+  set disableStationExit: bool => Udon.station($0).disable_station_exit = $v
+  canUseStationFromStation: bool => Udon.station($0).can_use_station_from_station
+  set canUseStationFromStation: bool => Udon.station($0).can_use_station_from_station = $v
+  stationEnterPlayerLocation: Transform => Udon.station($0).enter_location
+  set stationEnterPlayerLocation: Transform => Udon.station($0).enter_location = $v
+  stationExitPlayerLocation: Transform => Udon.station($0).exit_location
+  set stationExitPlayerLocation: Transform => Udon.station($0).exit_location = $v
+  animatorController: RuntimeAnimatorController => null
+  set animatorController: RuntimeAnimatorController => pass
+  UseStation(VRCPlayerApi): void => Udon.station($0).use_station($1)
+  ExitStation(VRCPlayerApi): void => Udon.station($0).exit_station($1)
+alias VRC_Station = VRCStation
+
+type Mobility kind=enum extern=VRCSDKBaseVRCStationMobility
+  enum Mobile = 0
+  enum Immobilize = 1
+  enum ImmobilizeForVehicle = 2
+alias VRCStation.Mobility = Mobility
+alias VRC_Station.Mobility = Mobility
+
+type VRCObjectSync : Behaviour kind=component gd=Node extern=VRCSDK3ComponentsVRCObjectSync
+  AllowCollisionOwnershipTransfer: bool => Udon.object_sync($0).allow_collision_ownership_transfer
+  set AllowCollisionOwnershipTransfer: bool => Udon.object_sync($0).allow_collision_ownership_transfer = $v
+  ForceKinematicOnRemote: bool => Udon.object_sync($0).force_kinematic_on_remote
+  set ForceKinematicOnRemote: bool => Udon.object_sync($0).force_kinematic_on_remote = $v
+  FlagDiscontinuity(): void => Udon.object_sync($0).flag_discontinuity()
+  Respawn(): void => Udon.object_sync($0).respawn()
+  SetGravity(bool): void => Udon.object_sync($0).set_gravity($1)
+  SetKinematic(bool): void => Udon.object_sync($0).set_kinematic($1)
+  TeleportTo(Transform): void => Udon.object_sync($0).teleport_to($1)
+alias VRC_ObjectSync = VRCObjectSync
+
+type VRCObjectPool : Behaviour kind=component gd=Node extern=VRCSDK3ComponentsVRCObjectPool
+  Pool: GameObject[] => Udon.object_pool($0).pool
+  set Pool: GameObject[] => Udon.object_pool($0).pool = $v
+  TryToSpawn(): GameObject => Udon.object_pool($0).try_to_spawn()
+  Return(GameObject): void => Udon.object_pool($0).return_object($1)
+  Shuffle(): void => Udon.object_pool($0).shuffle()
+
+type VRCAvatarPedestal : Behaviour kind=component gd=Node extern=VRCSDK3ComponentsVRCAvatarPedestal
+  SetAvatarUse(VRCPlayerApi): void => Udon.avatar_pedestal_use($0, $1)
+  SwitchAvatar(string): void => Udon.avatar_pedestal_switch($0, $1)
+  blueprintId: string => ""
+  set blueprintId: string => pass
+alias VRC_AvatarPedestal = VRCAvatarPedestal
+
+type VRCPortalMarker : Behaviour kind=component gd=Node extern=VRCSDK3ComponentsVRCPortalMarker
+  roomId: string => ""
+  set roomId: string => pass
+  RefreshPortal(): void => pass
+alias VRC_PortalMarker = VRCPortalMarker
+
+type VRCMirrorReflection : Behaviour kind=component gd=Node extern=VRCSDK3ComponentsVRCMirrorReflection
+  m_ReflectLayers: int => 0
+  set m_ReflectLayers: int => pass
+
+type VRCUrl kind=class gd=String extern=VRCSDKBaseVRCUrl
+  ctor(string) => $1
+  Get(): string => $0
+  ToString(): string => $0
+  Equals(object): bool => $0 == $1
+  static Empty: VRCUrl => ""
+  static IsNullOrEmpty(VRCUrl): bool => U.is_null_or_empty($1)
+
+type VRCUrlInputField : Selectable kind=component gd=LineEdit extern=VRCSDK3ComponentsVRCUrlInputField
+  GetUrl(): VRCUrl => $0.text
+  SetUrl(VRCUrl): void => $0.text = $1
+  text: string => $0.text
+  set text: string => $0.text = $v
+  interactable: bool => $0.editable
+  set interactable: bool => $0.editable = $v
+
+type BaseVRCVideoPlayer : Behaviour kind=component gd=Node extern=VRCSDK3VideoComponentsBaseBaseVRCVideoPlayer
+  IsPlaying: bool => Udon.video($0).is_playing
+  IsReady: bool => Udon.video($0).is_ready
+  Loop: bool => Udon.video($0).loop
+  set Loop: bool => Udon.video($0).loop = $v
+  EnableAutomaticResync: bool => Udon.video($0).auto_resync
+  set EnableAutomaticResync: bool => Udon.video($0).auto_resync = $v
+  PlayURL(VRCUrl): void => Udon.video($0).play_url($1)
+  LoadURL(VRCUrl): void => Udon.video($0).load_url($1)
+  Play(): void => Udon.video($0).play()
+  Pause(): void => Udon.video($0).pause()
+  Stop(): void => Udon.video($0).stop()
+  GetTime(): float => Udon.video($0).get_time()
+  SetTime(float): void => Udon.video($0).set_time($1)
+  GetDuration(): float => Udon.video($0).get_duration()
+  GetVideoWidth(): int => Udon.video($0).width
+  GetVideoHeight(): int => Udon.video($0).height
+
+type VRCUnityVideoPlayer : BaseVRCVideoPlayer kind=component gd=Node extern=VRCSDK3VideoComponentsVRCUnityVideoPlayer
+type VRCAVProVideoPlayer : BaseVRCVideoPlayer kind=component gd=Node extern=VRCSDK3VideoComponentsAVProVRCAVProVideoPlayer
+
+type VideoError kind=enum extern=VRCSDK3ComponentsVideoVideoError
+  enum Unknown = 0
+  enum InvalidURL = 1
+  enum AccessDenied = 2
+  enum PlayerError = 3
+  enum RateLimited = 4
+
+type InputManager kind=static extern=VRCSDKBaseInputManager
+  static IsUsingHandController(): bool => Udon.is_using_hand_controller()
+  static GetLastUsedInputMethod(): VRCInputMethod => Udon.last_input_method()
+  static EnableObjectHighlight(GameObject, bool): void => Udon.enable_object_highlight($1, $2)
+  static EnableObjectHighlight(Renderer, bool): void => Udon.enable_object_highlight($1, $2)
+
+type VRCInputMethod kind=enum extern=VRCSDKBaseVRCInputMethod
+  enum Keyboard = 0
+  enum Mouse = 1
+  enum Controller = 2
+  enum Gaze = 3
+  enum Vive = 5
+  enum Oculus = 6
+  enum ViveXr = 8
+  enum Index = 9
+  enum HPMotionController = 10
+  enum Osc = 11
+  enum QuestHands = 12
+  enum OpenXRGeneric = 13
+  enum Pico = 14
+  enum SteamVR2 = 15
+  enum Touch = 16
+  enum Count = 17
+
+type UdonInputEventArgs kind=struct gd=Dictionary extern=VRCUdonCommonUdonInputEventArgs
+  handType: HandType => $0.get("handType", 0)
+  eventType: UdonInputEventType => $0.get("eventType", 0)
+  boolValue: bool => $0.get("boolValue", false)
+  floatValue: float => $0.get("floatValue", 0.0)
+
+type HandType kind=enum extern=VRCUdonCommonHandType
+  enum RIGHT = 0
+  enum LEFT = 1
+
+type UdonInputEventType kind=enum extern=VRCUdonCommonUdonInputEventType
+  enum BUTTON = 0
+  enum AXIS = 1
+
+type DeserializationResult kind=struct gd=Dictionary extern=VRCUdonCommonDeserializationResult
+  sendTime: float => $0.get("sendTime", 0.0)
+  receiveTime: float => $0.get("receiveTime", 0.0)
+  Latency: float => ($0.get("receiveTime", 0.0) - $0.get("sendTime", 0.0))
+
+type SerializationResult kind=struct gd=Dictionary extern=VRCUdonCommonSerializationResult
+  success: bool => $0.get("success", true)
+  byteCount: int => $0.get("byteCount", 0)
+
+type VRCShader kind=static extern=VRCSDKBaseVRCShader
+  static PropertyToID(string): int => U.string_to_hash($1)
+  static SetGlobalFloat(int, float): void => U.set_global_shader_param($1, $2)
+  static SetGlobalColor(int, Color): void => U.set_global_shader_param($1, $2)
+  static SetGlobalVector(int, Vector4): void => U.set_global_shader_param($1, $2)
+  static SetGlobalInteger(int, int): void => U.set_global_shader_param($1, $2)
+  static SetGlobalTexture(int, Texture): void => U.set_global_shader_param($1, $2)
+  static SetGlobalMatrix(int, Matrix4x4): void => U.set_global_shader_param($1, $2)
+  static SetGlobalFloatArray(int, float[]): void => U.set_global_shader_param($1, $2)
+  static SetGlobalVectorArray(int, Vector4[]): void => U.set_global_shader_param($1, $2)
+
+type VRCGraphics kind=static extern=VRCSDKBaseVRCGraphics
+  static Blit(Texture, RenderTexture): void => pass
+  static Blit(Texture, RenderTexture, Material): void => pass
+  static DrawMeshInstanced(Mesh, int, Material, Matrix4x4[]): void => pass
+  static DrawMeshInstanced(Mesh, int, Material, Matrix4x4[], int): void => pass
+
+type VRCCameraSettings kind=class gd=Object extern=VRCSDK3RenderingVRCCameraSettings
+  static ScreenCamera: VRCCameraSettings => Udon.screen_camera()
+  static PhotoCamera: VRCCameraSettings => null
+  Position: Vector3 => $0.position
+  Rotation: Quaternion => $0.rotation
+  FieldOfView: float => $0.fov
+  NearClipPlane: float => $0.near
+  FarClipPlane: float => $0.far
+  Active: bool => $0.active
+  PixelWidth: int => $0.pixel_width
+  PixelHeight: int => $0.pixel_height
+
+type VRCQualitySettings kind=static extern=VRCSDK3RenderingVRCQualitySettings
+  static ShadowDistance: float => 100.0
+  static VSyncCount: int => 1
+
+type PlayerData kind=static extern=VRCSDK3PersistencePlayerData
+  static SetInt(string, int): void => Udon.player_data_set($1, $2)
+  static SetFloat(string, float): void => Udon.player_data_set($1, $2)
+  static SetBool(string, bool): void => Udon.player_data_set($1, $2)
+  static SetString(string, string): void => Udon.player_data_set($1, $2)
+  static SetDouble(string, double): void => Udon.player_data_set($1, $2)
+  static SetLong(string, long): void => Udon.player_data_set($1, $2)
+  static SetVector3(string, Vector3): void => Udon.player_data_set($1, $2)
+  static SetQuaternion(string, Quaternion): void => Udon.player_data_set($1, $2)
+  static SetColor(string, Color): void => Udon.player_data_set($1, $2)
+  static SetBytes(string, byte[]): void => Udon.player_data_set($1, $2)
+  static GetInt(VRCPlayerApi, string): int => int(Udon.player_data_get($1, $2, 0))
+  static GetFloat(VRCPlayerApi, string): float => float(Udon.player_data_get($1, $2, 0.0))
+  static GetBool(VRCPlayerApi, string): bool => bool(Udon.player_data_get($1, $2, false))
+  static GetString(VRCPlayerApi, string): string => str(Udon.player_data_get($1, $2, ""))
+  static GetDouble(VRCPlayerApi, string): double => float(Udon.player_data_get($1, $2, 0.0))
+  static GetLong(VRCPlayerApi, string): long => int(Udon.player_data_get($1, $2, 0))
+  static GetVector3(VRCPlayerApi, string): Vector3 => Udon.player_data_get($1, $2, Vector3.ZERO)
+  static GetQuaternion(VRCPlayerApi, string): Quaternion => Udon.player_data_get($1, $2, Quaternion())
+  static GetColor(VRCPlayerApi, string): Color => Udon.player_data_get($1, $2, Color.WHITE)
+  static GetBytes(VRCPlayerApi, string): byte[] => Udon.player_data_get($1, $2, [])
+  static HasKey(VRCPlayerApi, string): bool => Udon.player_data_has($1, $2)
+  static TryGetInt(VRCPlayerApi, string, out int): bool => $3 = int(Udon.player_data_get($1, $2, 0)) ;; Udon.player_data_has($1, $2)
+  static TryGetFloat(VRCPlayerApi, string, out float): bool => $3 = float(Udon.player_data_get($1, $2, 0.0)) ;; Udon.player_data_has($1, $2)
+  static TryGetBool(VRCPlayerApi, string, out bool): bool => $3 = bool(Udon.player_data_get($1, $2, false)) ;; Udon.player_data_has($1, $2)
+  static TryGetString(VRCPlayerApi, string, out string): bool => $3 = str(Udon.player_data_get($1, $2, "")) ;; Udon.player_data_has($1, $2)
+  static Remove(string): void => Udon.player_data_remove($1)
+  static GetType(VRCPlayerApi, string): Type => U.type_of(Udon.player_data_get($1, $2, null))
+
+type DataToken kind=struct gd=Variant extern=VRCSDK3DataDataToken
+  ctor(string) => $1
+  ctor(int) => $1
+  ctor(float) => $1
+  ctor(double) => $1
+  ctor(bool) => $1
+  ctor(long) => $1
+  ctor(short) => $1
+  ctor(byte) => $1
+  ctor(DataList) => $1
+  ctor(DataDictionary) => $1
+  ctor(object) => $1
+  ctor(DataError) => {"error": $1}
+  TokenType: TokenType => U.token_type($0)
+  String: string => str($0)
+  Int: int => int($0)
+  Short: short => int($0)
+  Byte: byte => int($0)
+  Long: long => int($0)
+  UInt: uint => int($0)
+  Float: float => float($0)
+  Double: double => float($0)
+  Number: double => float($0)
+  Boolean: bool => bool($0)
+  DataList: DataList => $0
+  DataDictionary: DataDictionary => $0
+  Reference: object => $0
+  Error: DataError => U.token_error($0)
+  IsNull: bool => ($0 == null)
+  IsNumber: bool => (typeof($0) == TYPE_INT or typeof($0) == TYPE_FLOAT)
+  IsError: bool => (typeof($0) == TYPE_DICTIONARY and $0.has("error"))
+  ToString(): string => str($0)
+  Equals(DataToken): bool => $0 == $1
+  CompareTo(DataToken): int => U.compare($0, $1)
+  static Empty: DataToken => null
+  static Null: DataToken => null
+  op ==(DataToken, DataToken): bool => $1 == $2
+  op !=(DataToken, DataToken): bool => $1 != $2
+  op implicit_DataToken(string): DataToken => $1
+  op implicit_DataToken(int): DataToken => $1
+  op implicit_DataToken(float): DataToken => $1
+  op implicit_DataToken(bool): DataToken => $1
+  op implicit_DataToken(DataList): DataToken => $1
+  op implicit_DataToken(DataDictionary): DataToken => $1
+
+type TokenType kind=enum extern=VRCSDK3DataTokenType
+  enum Null = 0
+  enum Boolean = 1
+  enum SByte = 2
+  enum Byte = 3
+  enum Short = 4
+  enum UShort = 5
+  enum Int = 6
+  enum UInt = 7
+  enum Long = 8
+  enum ULong = 9
+  enum Float = 10
+  enum Double = 11
+  enum String = 12
+  enum DataList = 13
+  enum DataDictionary = 14
+  enum Reference = 15
+  enum Error = 16
+
+type DataError kind=enum extern=VRCSDK3DataDataError
+  enum None = 0
+  enum KeyDoesNotExist = 1
+  enum IndexOutOfRange = 2
+  enum TypeUnsupported = 3
+  enum ValueUnsupported = 4
+  enum UnableToParse = 5
+  enum TypeMismatch = 6
+  enum KeyExists = 7
+  enum Unknown = 8
+
+type JsonExportType kind=enum extern=VRCSDK3DataJsonExportType
+  enum Minify = 0
+  enum Beautify = 1
+
+type DataList kind=class gd=Array extern=VRCSDK3DataDataList
+  ctor() => []
+  ctor(int) => []
+  ctor(DataToken[]) => Array($1)
+  Count: int => $0.size()
+  Capacity: int => $0.size()
+  this[int]: DataToken => $0[$1]
+  Add(DataToken): void => $0.append($1)
+  AddRange(DataList): void => $0.append_array($1)
+  Insert(int, DataToken): void => $0.insert($1, $2)
+  InsertRange(int, DataList): void => U.array_insert_range($0, $1, $2)
+  Remove(DataToken): bool => U.array_remove($0, $1)
+  RemoveAt(int): void => $0.remove_at($1)
+  RemoveRange(int, int): void => U.array_remove_range($0, $1, $2)
+  RemoveAll(DataToken): int => U.array_remove_all($0, $1)
+  Clear(): void => $0.clear()
+  Contains(DataToken): bool => $0.has($1)
+  IndexOf(DataToken): int => $0.find($1)
+  IndexOf(DataToken, int): int => $0.find($1, $2)
+  LastIndexOf(DataToken): int => $0.rfind($1)
+  TryGetValue(int, out DataToken): bool => $2 = ($0[$1] if $1 >= 0 and $1 < $0.size() else null) ;; ($1 >= 0 and $1 < $0.size())
+  TryGetValue(int, TokenType, out DataToken): bool => $3 = ($0[$1] if $1 >= 0 and $1 < $0.size() else null) ;; ($1 >= 0 and $1 < $0.size() and U.token_type($3) == $2)
+  SetValue(int, DataToken): void => $0[$1] = $2
+  GetRange(int, int): DataList => $0.slice($1, $1 + $2)
+  Reverse(): void => $0.reverse()
+  Reverse(int, int): void => U.array_reverse_range($0, $1, $2)
+  Sort(): void => $0.sort()
+  Sort(int, int): void => U.array_sort_range($0, $1, $2)
+  Shuffle(): void => $0.shuffle()
+  ToArray(): DataToken[] => $0.duplicate()
+  DeepClone(): DataList => $0.duplicate(true)
+  ShallowClone(): DataList => $0.duplicate(false)
+  TrimExcess(): void => pass
+  BinarySearch(DataToken): int => $0.bsearch($1)
+
+type DataDictionary kind=class gd=Dictionary extern=VRCSDK3DataDataDictionary
+  ctor() => {}
+  Count: int => $0.size()
+  this[DataToken]: DataToken => $0[$1]
+  Add(DataToken, DataToken): void => $0[$1] = $2
+  SetValue(DataToken, DataToken): void => $0[$1] = $2
+  ContainsKey(DataToken): bool => $0.has($1)
+  ContainsValue(DataToken): bool => $0.values().has($1)
+  TryGetValue(DataToken, out DataToken): bool => $2 = $0.get($1, null) ;; $0.has($1)
+  TryGetValue(DataToken, TokenType, out DataToken): bool => $3 = $0.get($1, null) ;; ($0.has($1) and U.token_type($3) == $2)
+  Remove(DataToken): bool => $0.erase($1)
+  Remove(DataToken, out DataToken): bool => $2 = $0.get($1, null) ;; $0.erase($1)
+  Clear(): void => $0.clear()
+  GetKeys(): DataList => $0.keys()
+  GetValues(): DataList => $0.values()
+  DeepClone(): DataDictionary => $0.duplicate(true)
+  ShallowClone(): DataDictionary => $0.duplicate(false)
+
+type VRCJson kind=static extern=VRCSDK3DataVRCJson
+  static TryDeserializeFromJson(string, out DataToken): bool => $2 = U.json_parse($1) ;; ($2 != null)
+  static TrySerializeToJson(DataToken, JsonExportType, out DataToken): bool => $3 = JSON.stringify($1, ("\t" if $2 == 1 else "")) ;; true
+
+type VRCStringDownloader kind=static extern=VRCSDK3StringLoadingVRCStringDownloader
+  static LoadUrl(VRCUrl, UdonBehaviour): object => Udon.load_url_string($1, $2)
+
+type IVRCStringDownload kind=class gd=Dictionary extern=VRCSDK3StringLoadingIVRCStringDownload
+  Result: string => $0.get("result", "")
+  Error: string => $0.get("error", "")
+  ErrorCode: int => $0.get("error_code", 0)
+  Url: VRCUrl => $0.get("url", "")
+  ResultBytes: byte[] => $0.get("bytes", [])
+  UdonBehaviour: UdonBehaviour => $0.get("behaviour", null)
+
+type VRCImageDownloader kind=class gd=Object extern=VRCSDK3ImageVRCImageDownloader
+  ctor() => Udon.new_image_downloader()
+  DownloadImage(VRCUrl, Material, UdonBehaviour): object => $0.download_image($1, $2, $3, null)
+  DownloadImage(VRCUrl, Material, UdonBehaviour, TextureInfo): object => $0.download_image($1, $2, $3, $4)
+  Dispose(): void => $0.dispose()
+
+type TextureInfo kind=class gd=Dictionary extern=VRCSDK3ImageTextureInfo
+  ctor() => {}
+  GenerateMipMaps: bool => $0.get("mipmaps", false)
+  set GenerateMipMaps: bool => $0.mipmaps = $v
+  MaterialProperty: string => $0.get("material_property", "_MainTex")
+  set MaterialProperty: string => $0.material_property = $v
+
+type IVRCImageDownload kind=class gd=Dictionary extern=VRCSDK3ImageIVRCImageDownload
+  Result: Texture2D => $0.get("result", null)
+  State: int => $0.get("state", 0)
+  Error: int => $0.get("error", 0)
+  ErrorMessage: string => $0.get("error_message", "")
+  Url: VRCUrl => $0.get("url", "")
+  Material: Material => $0.get("material", null)
+
+type VRCPhysBone : Behaviour kind=component gd=Node extern=VRCSDK3DynamicsPhysBoneComponentsVRCPhysBone
+  isAnimated: bool => false
+
+type VRCContactReceiver : Behaviour kind=component gd=Node extern=VRCSDK3DynamicsContactComponentsVRCContactReceiver
+  value: float => 0.0
+type VRCContactSender : Behaviour kind=component gd=Node extern=VRCSDK3DynamicsContactComponentsVRCContactSender
+  radius: float => 0.0
+
+type IUdonEventReceiver : UdonBehaviour kind=behaviour gd=Node extern=VRCUdonCommonInterfacesIUdonEventReceiver
+
+type VRC_PickupAttribute kind=static extern=VRCSDKBaseVRC_Pickup

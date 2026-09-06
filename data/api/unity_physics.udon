@@ -1,0 +1,403 @@
+# UnityEngine physics → Godot physics.
+#
+# Rigidbody → RigidBody3D. Colliders live on the same node in Unity, so a Collider-typed
+# expression denotes the CollisionObject3D node (body or Area3D). RaycastHit / Collision /
+# ContactPoint are Dictionaries with Godot-style keys plus a few Unity-style extras added by U.
+
+type Rigidbody : Component kind=component gd=RigidBody3D extern=UnityEngineRigidbody
+  velocity: Vector3 => $0.linear_velocity
+  set velocity: Vector3 => $0.linear_velocity = $v
+  linearVelocity: Vector3 => $0.linear_velocity
+  set linearVelocity: Vector3 => $0.linear_velocity = $v
+  angularVelocity: Vector3 => $0.angular_velocity
+  set angularVelocity: Vector3 => $0.angular_velocity = $v
+  mass: float => $0.mass
+  set mass: float => $0.mass = $v
+  drag: float => $0.linear_damp
+  set drag: float => $0.linear_damp = $v
+  linearDamping: float => $0.linear_damp
+  set linearDamping: float => $0.linear_damp = $v
+  angularDrag: float => $0.angular_damp
+  set angularDrag: float => $0.angular_damp = $v
+  angularDamping: float => $0.angular_damp
+  set angularDamping: float => $0.angular_damp = $v
+  useGravity: bool => ($0.gravity_scale != 0.0)
+  set useGravity: bool => $0.gravity_scale = (1.0 if $v else 0.0)
+  isKinematic: bool => $0.freeze
+  set isKinematic: bool => U.rb_set_kinematic($0, $v)
+  freezeRotation: bool => U.rb_get_freeze_rotation($0)
+  set freezeRotation: bool => U.rb_set_freeze_rotation($0, $v)
+  constraints: RigidbodyConstraints => U.rb_get_constraints($0)
+  set constraints: RigidbodyConstraints => U.rb_set_constraints($0, $v)
+  position: Vector3 => $0.global_position
+  set position: Vector3 => $0.global_position = $v
+  rotation: Quaternion => U.get_global_rotation($0)
+  set rotation: Quaternion => U.set_global_rotation($0, $v)
+  centerOfMass: Vector3 => $0.center_of_mass
+  set centerOfMass: Vector3 => U.rb_set_center_of_mass($0, $v)
+  worldCenterOfMass: Vector3 => $0.to_global($0.center_of_mass)
+  inertiaTensor: Vector3 => $0.inertia
+  set inertiaTensor: Vector3 => $0.inertia = $v
+  inertiaTensorRotation: Quaternion => Quaternion()
+  set inertiaTensorRotation: Quaternion => pass
+  maxAngularVelocity: float => U.rb_get_max_angular_velocity($0)
+  set maxAngularVelocity: float => U.rb_set_max_angular_velocity($0, $v)
+  maxDepenetrationVelocity: float => 1.0e32
+  set maxDepenetrationVelocity: float => pass
+  sleepThreshold: float => 0.005
+  set sleepThreshold: float => pass
+  solverIterations: int => 6
+  set solverIterations: int => pass
+  solverVelocityIterations: int => 1
+  set solverVelocityIterations: int => pass
+  detectCollisions: bool => true
+  set detectCollisions: bool => U.rb_set_detect_collisions($0, $v)
+  interpolation: RigidbodyInterpolation => 0
+  set interpolation: RigidbodyInterpolation => pass
+  collisionDetectionMode: CollisionDetectionMode => (1 if $0.continuous_cd else 0)
+  set collisionDetectionMode: CollisionDetectionMode => $0.continuous_cd = ($v != 0)
+  AddForce(Vector3): void => $0.apply_central_force($1)
+  AddForce(Vector3, ForceMode): void => U.rb_add_force($0, $1, $2)
+  AddForce(float, float, float): void => $0.apply_central_force(Vector3($1, $2, $3))
+  AddForce(float, float, float, ForceMode): void => U.rb_add_force($0, Vector3($1, $2, $3), $4)
+  AddRelativeForce(Vector3): void => U.rb_add_force($0, U.transform_direction($0, $1), 0)
+  AddRelativeForce(Vector3, ForceMode): void => U.rb_add_force($0, U.transform_direction($0, $1), $2)
+  AddTorque(Vector3): void => $0.apply_torque($1)
+  AddTorque(Vector3, ForceMode): void => U.rb_add_torque($0, $1, $2)
+  AddTorque(float, float, float): void => $0.apply_torque(Vector3($1, $2, $3))
+  AddRelativeTorque(Vector3): void => U.rb_add_torque($0, U.transform_direction($0, $1), 0)
+  AddRelativeTorque(Vector3, ForceMode): void => U.rb_add_torque($0, U.transform_direction($0, $1), $2)
+  AddForceAtPosition(Vector3, Vector3): void => U.rb_add_force_at_position($0, $1, $2, 0)
+  AddForceAtPosition(Vector3, Vector3, ForceMode): void => U.rb_add_force_at_position($0, $1, $2, $3)
+  AddExplosionForce(float, Vector3, float): void => U.rb_add_explosion_force($0, $1, $2, $3, 0.0, 0)
+  AddExplosionForce(float, Vector3, float, float): void => U.rb_add_explosion_force($0, $1, $2, $3, $4, 0)
+  AddExplosionForce(float, Vector3, float, float, ForceMode): void => U.rb_add_explosion_force($0, $1, $2, $3, $4, $5)
+  MovePosition(Vector3): void => U.rb_move_position($0, $1)
+  MoveRotation(Quaternion): void => U.rb_move_rotation($0, $1)
+  GetPointVelocity(Vector3): Vector3 => U.rb_point_velocity($0, $1)
+  GetRelativePointVelocity(Vector3): Vector3 => U.rb_point_velocity($0, $0.to_global($1))
+  Sleep(): void => $0.sleeping = true
+  WakeUp(): void => $0.sleeping = false
+  IsSleeping(): bool => $0.sleeping
+  ResetCenterOfMass(): void => $0.center_of_mass_mode = 0
+  ResetInertiaTensor(): void => $0.inertia = Vector3.ZERO
+  SetDensity(float): void => pass
+  SweepTest(Vector3, out RaycastHit): bool => $2 = U.rb_sweep_test($0, $1, INF) ;; not $2.is_empty()
+  SweepTest(Vector3, out RaycastHit, float): bool => $2 = U.rb_sweep_test($0, $1, $3) ;; not $2.is_empty()
+  ClosestPointOnBounds(Vector3): Vector3 => U.aabb_closest_point(U.collider_bounds($0), $1)
+
+type ForceMode kind=enum extern=UnityEngineForceMode
+  enum Force = 0
+  enum Impulse = 1
+  enum VelocityChange = 2
+  enum Acceleration = 5
+
+type RigidbodyConstraints kind=enum extern=UnityEngineRigidbodyConstraints
+  enum None = 0
+  enum FreezePositionX = 2
+  enum FreezePositionY = 4
+  enum FreezePositionZ = 8
+  enum FreezeRotationX = 16
+  enum FreezeRotationY = 32
+  enum FreezeRotationZ = 64
+  enum FreezePosition = 14
+  enum FreezeRotation = 112
+  enum FreezeAll = 126
+
+type RigidbodyInterpolation kind=enum extern=UnityEngineRigidbodyInterpolation
+  enum None = 0
+  enum Interpolate = 1
+  enum Extrapolate = 2
+
+type CollisionDetectionMode kind=enum extern=UnityEngineCollisionDetectionMode
+  enum Discrete = 0
+  enum Continuous = 1
+  enum ContinuousDynamic = 2
+  enum ContinuousSpeculative = 3
+
+type Collider : Component kind=component gd=Node extern=UnityEngineCollider
+  enabled: bool => U.collider_get_enabled($0)
+  set enabled: bool => U.collider_set_enabled($0, $v)
+  isTrigger: bool => U.collider_is_trigger($0)
+  set isTrigger: bool => U.collider_set_trigger($0, $v)
+  bounds: Bounds => U.collider_bounds($0)
+  attachedRigidbody: Rigidbody => U.collider_attached_rigidbody($0)
+  material: PhysicMaterial => U.collider_material($0)
+  sharedMaterial: PhysicMaterial => U.collider_material($0)
+  set material: PhysicMaterial => U.collider_set_material($0, $v)
+  set sharedMaterial: PhysicMaterial => U.collider_set_material($0, $v)
+  contactOffset: float => 0.01
+  ClosestPoint(Vector3): Vector3 => U.collider_closest_point($0, $1)
+  ClosestPointOnBounds(Vector3): Vector3 => U.aabb_closest_point(U.collider_bounds($0), $1)
+  Raycast(Ray, out RaycastHit, float): bool => $2 = U.collider_raycast($0, $1, $3) ;; not $2.is_empty()
+
+type BoxCollider : Collider kind=component gd=Node extern=UnityEngineBoxCollider
+  center: Vector3 => U.shape_get_center($0)
+  set center: Vector3 => U.shape_set_center($0, $v)
+  size: Vector3 => U.shape_get_size($0)
+  set size: Vector3 => U.shape_set_size($0, $v)
+
+type SphereCollider : Collider kind=component gd=Node extern=UnityEngineSphereCollider
+  center: Vector3 => U.shape_get_center($0)
+  set center: Vector3 => U.shape_set_center($0, $v)
+  radius: float => U.shape_get_radius($0)
+  set radius: float => U.shape_set_radius($0, $v)
+
+type CapsuleCollider : Collider kind=component gd=Node extern=UnityEngineCapsuleCollider
+  center: Vector3 => U.shape_get_center($0)
+  set center: Vector3 => U.shape_set_center($0, $v)
+  radius: float => U.shape_get_radius($0)
+  set radius: float => U.shape_set_radius($0, $v)
+  height: float => U.shape_get_height($0)
+  set height: float => U.shape_set_height($0, $v)
+  direction: int => 1
+
+type MeshCollider : Collider kind=component gd=Node extern=UnityEngineMeshCollider
+  convex: bool => true
+  set convex: bool => pass
+  sharedMesh: Mesh => U.mesh_of($0)
+  set sharedMesh: Mesh => pass
+
+type WheelCollider : Collider kind=component gd=VehicleWheel3D extern=UnityEngineWheelCollider
+  motorTorque: float => $0.engine_force
+  set motorTorque: float => $0.engine_force = $v
+  brakeTorque: float => $0.brake
+  set brakeTorque: float => $0.brake = $v
+  steerAngle: float => rad_to_deg($0.steering)
+  set steerAngle: float => $0.steering = deg_to_rad($v)
+  radius: float => $0.wheel_radius
+  set radius: float => $0.wheel_radius = $v
+  suspensionDistance: float => $0.suspension_travel
+  set suspensionDistance: float => $0.suspension_travel = $v
+  mass: float => 20.0
+  set mass: float => pass
+  rpm: float => $0.get_rpm()
+  isGrounded: bool => $0.is_in_contact()
+  wheelDampingRate: float => $0.damping_relaxation
+  set wheelDampingRate: float => $0.damping_relaxation = $v
+  forceAppPointDistance: float => 0.0
+  set forceAppPointDistance: float => pass
+  GetGroundHit(out WheelHit): bool => $1 = U.wheel_ground_hit($0) ;; $0.is_in_contact()
+  GetWorldPose(out Vector3, out Quaternion): void => $1 = $0.global_position ;; $2 = U.get_global_rotation($0)
+
+type WheelHit kind=struct gd=Dictionary extern=UnityEngineWheelHit
+  point: Vector3 => $0.get("point", Vector3.ZERO)
+  normal: Vector3 => $0.get("normal", Vector3.UP)
+  collider: Collider => $0.get("collider", null)
+  force: float => $0.get("force", 0.0)
+  forwardSlip: float => $0.get("forwardSlip", 0.0)
+  sidewaysSlip: float => $0.get("sidewaysSlip", 0.0)
+
+type PhysicMaterial kind=class gd=PhysicsMaterial extern=UnityEnginePhysicMaterial
+  dynamicFriction: float => $0.friction
+  set dynamicFriction: float => $0.friction = $v
+  staticFriction: float => $0.friction
+  set staticFriction: float => $0.friction = $v
+  bounciness: float => $0.bounce
+  set bounciness: float => $0.bounce = $v
+  ctor() => PhysicsMaterial.new()
+
+type Joint : Component kind=component gd=Joint3D extern=UnityEngineJoint
+  connectedBody: Rigidbody => U.joint_get_connected_body($0)
+  set connectedBody: Rigidbody => U.joint_set_connected_body($0, $v)
+  breakForce: float => INF
+  set breakForce: float => pass
+  breakTorque: float => INF
+  set breakTorque: float => pass
+  anchor: Vector3 => $0.position
+  set anchor: Vector3 => $0.position = $v
+  connectedAnchor: Vector3 => Vector3.ZERO
+  set connectedAnchor: Vector3 => pass
+
+type HingeJoint : Joint kind=component gd=HingeJoint3D extern=UnityEngineHingeJoint
+  angle: float => 0.0
+  useMotor: bool => $0.get_flag(1)
+  set useMotor: bool => $0.set_flag(1, $v)
+  motor: JointMotor => U.hinge_motor($0)
+  set motor: JointMotor => U.hinge_set_motor($0, $v)
+
+type JointMotor kind=struct gd=Dictionary extern=UnityEngineJointMotor
+  targetVelocity: float => $0.targetVelocity
+  set targetVelocity: float => $0.targetVelocity = $v
+  force: float => $0.force
+  set force: float => $0.force = $v
+
+type ConfigurableJoint : Joint kind=component gd=Generic6DOFJoint3D extern=UnityEngineConfigurableJoint
+  targetPosition: Vector3 => Vector3.ZERO
+  set targetPosition: Vector3 => pass
+  targetRotation: Quaternion => Quaternion()
+  set targetRotation: Quaternion => pass
+
+type ConstantForce : Component kind=component gd=RigidBody3D extern=UnityEngineConstantForce
+  force: Vector3 => $0.constant_force
+  set force: Vector3 => $0.constant_force = $v
+  torque: Vector3 => $0.constant_torque
+  set torque: Vector3 => $0.constant_torque = $v
+  relativeForce: Vector3 => U.inverse_transform_direction($0, $0.constant_force)
+  set relativeForce: Vector3 => $0.constant_force = U.transform_direction($0, $v)
+  relativeTorque: Vector3 => U.inverse_transform_direction($0, $0.constant_torque)
+  set relativeTorque: Vector3 => $0.constant_torque = U.transform_direction($0, $v)
+
+type RaycastHit kind=struct gd=Dictionary extern=UnityEngineRaycastHit
+  point: Vector3 => $0.get("position", Vector3.ZERO)
+  normal: Vector3 => $0.get("normal", Vector3.UP)
+  distance: float => $0.get("distance", 0.0)
+  collider: Collider => $0.get("collider", null)
+  transform: Transform => $0.get("collider", null)
+  rigidbody: Rigidbody => U.collider_attached_rigidbody($0.get("collider", null))
+  triangleIndex: int => $0.get("face_index", -1)
+  textureCoord: Vector2 => Vector2.ZERO
+  barycentricCoordinate: Vector3 => Vector3.ZERO
+  lightmapCoord: Vector2 => Vector2.ZERO
+  set point: Vector3 => $0.position = $v
+  set normal: Vector3 => $0.normal = $v
+  set distance: float => $0.distance = $v
+
+type Collision kind=struct gd=Dictionary extern=UnityEngineCollision
+  collider: Collider => $0.get("collider", null)
+  gameObject: GameObject => $0.get("collider", null)
+  transform: Transform => $0.get("collider", null)
+  rigidbody: Rigidbody => U.collider_attached_rigidbody($0.get("collider", null))
+  body: Component => $0.get("collider", null)
+  relativeVelocity: Vector3 => $0.get("relativeVelocity", Vector3.ZERO)
+  impulse: Vector3 => $0.get("impulse", Vector3.ZERO)
+  contacts: ContactPoint[] => $0.get("contacts", [])
+  contactCount: int => $0.get("contacts", []).size()
+  GetContact(int): ContactPoint => $0.get("contacts", [])[$1]
+
+type ContactPoint kind=struct gd=Dictionary extern=UnityEngineContactPoint
+  point: Vector3 => $0.get("point", Vector3.ZERO)
+  normal: Vector3 => $0.get("normal", Vector3.UP)
+  separation: float => $0.get("separation", 0.0)
+  thisCollider: Collider => $0.get("thisCollider", null)
+  otherCollider: Collider => $0.get("otherCollider", null)
+
+type Physics kind=static extern=UnityEnginePhysics
+  static gravity: Vector3 => U.gravity()
+  static set gravity: Vector3 => U.set_gravity($v)
+  static defaultContactOffset: float => 0.01
+  static Raycast(Vector3, Vector3): bool => not U.raycast($1, $2, INF, -1, 0).is_empty()
+  static Raycast(Vector3, Vector3, float): bool => not U.raycast($1, $2, $3, -1, 0).is_empty()
+  static Raycast(Vector3, Vector3, float, int): bool => not U.raycast($1, $2, $3, $4, 0).is_empty()
+  static Raycast(Vector3, Vector3, float, int, QueryTriggerInteraction): bool => not U.raycast($1, $2, $3, $4, $5).is_empty()
+  static Raycast(Vector3, Vector3, out RaycastHit): bool => $3 = U.raycast($1, $2, INF, -1, 0) ;; not $3.is_empty()
+  static Raycast(Vector3, Vector3, out RaycastHit, float): bool => $3 = U.raycast($1, $2, $4, -1, 0) ;; not $3.is_empty()
+  static Raycast(Vector3, Vector3, out RaycastHit, float, int): bool => $3 = U.raycast($1, $2, $4, $5, 0) ;; not $3.is_empty()
+  static Raycast(Vector3, Vector3, out RaycastHit, float, int, QueryTriggerInteraction): bool => $3 = U.raycast($1, $2, $4, $5, $6) ;; not $3.is_empty()
+  static Raycast(Ray): bool => not U.raycast($1.origin, $1.direction, INF, -1, 0).is_empty()
+  static Raycast(Ray, float): bool => not U.raycast($1.origin, $1.direction, $2, -1, 0).is_empty()
+  static Raycast(Ray, float, int): bool => not U.raycast($1.origin, $1.direction, $2, $3, 0).is_empty()
+  static Raycast(Ray, out RaycastHit): bool => $2 = U.raycast($1.origin, $1.direction, INF, -1, 0) ;; not $2.is_empty()
+  static Raycast(Ray, out RaycastHit, float): bool => $2 = U.raycast($1.origin, $1.direction, $3, -1, 0) ;; not $2.is_empty()
+  static Raycast(Ray, out RaycastHit, float, int): bool => $2 = U.raycast($1.origin, $1.direction, $3, $4, 0) ;; not $2.is_empty()
+  static Raycast(Ray, out RaycastHit, float, int, QueryTriggerInteraction): bool => $2 = U.raycast($1.origin, $1.direction, $3, $4, $5) ;; not $2.is_empty()
+  static RaycastAll(Vector3, Vector3): RaycastHit[] => U.raycast_all($1, $2, INF, -1, 0)
+  static RaycastAll(Vector3, Vector3, float): RaycastHit[] => U.raycast_all($1, $2, $3, -1, 0)
+  static RaycastAll(Vector3, Vector3, float, int): RaycastHit[] => U.raycast_all($1, $2, $3, $4, 0)
+  static RaycastAll(Vector3, Vector3, float, int, QueryTriggerInteraction): RaycastHit[] => U.raycast_all($1, $2, $3, $4, $5)
+  static RaycastAll(Ray, float, int): RaycastHit[] => U.raycast_all($1.origin, $1.direction, $2, $3, 0)
+  static RaycastNonAlloc(Vector3, Vector3, RaycastHit[], float, int): int => U.raycast_non_alloc($1, $2, $3, $4, $5, 0)
+  static RaycastNonAlloc(Ray, RaycastHit[], float, int): int => U.raycast_non_alloc($1.origin, $1.direction, $2, $3, $4, 0)
+  static Linecast(Vector3, Vector3): bool => not U.raycast($1, $2 - $1, ($2 - $1).length(), -1, 0).is_empty()
+  static Linecast(Vector3, Vector3, int): bool => not U.raycast($1, $2 - $1, ($2 - $1).length(), $3, 0).is_empty()
+  static Linecast(Vector3, Vector3, out RaycastHit): bool => $3 = U.raycast($1, $2 - $1, ($2 - $1).length(), -1, 0) ;; not $3.is_empty()
+  static Linecast(Vector3, Vector3, out RaycastHit, int): bool => $3 = U.raycast($1, $2 - $1, ($2 - $1).length(), $4, 0) ;; not $3.is_empty()
+  static Linecast(Vector3, Vector3, out RaycastHit, int, QueryTriggerInteraction): bool => $3 = U.raycast($1, $2 - $1, ($2 - $1).length(), $4, $5) ;; not $3.is_empty()
+  static SphereCast(Vector3, float, Vector3, out RaycastHit): bool => $4 = U.sphere_cast($1, $2, $3, INF, -1, 0) ;; not $4.is_empty()
+  static SphereCast(Vector3, float, Vector3, out RaycastHit, float): bool => $4 = U.sphere_cast($1, $2, $3, $5, -1, 0) ;; not $4.is_empty()
+  static SphereCast(Vector3, float, Vector3, out RaycastHit, float, int): bool => $4 = U.sphere_cast($1, $2, $3, $5, $6, 0) ;; not $4.is_empty()
+  static SphereCast(Vector3, float, Vector3, out RaycastHit, float, int, QueryTriggerInteraction): bool => $4 = U.sphere_cast($1, $2, $3, $5, $6, $7) ;; not $4.is_empty()
+  static SphereCast(Ray, float, out RaycastHit, float, int): bool => $3 = U.sphere_cast($1.origin, $2, $1.direction, $4, $5, 0) ;; not $3.is_empty()
+  static SphereCast(Ray, float, float, int): bool => not U.sphere_cast($1.origin, $2, $1.direction, $3, $4, 0).is_empty()
+  static SphereCastAll(Vector3, float, Vector3, float, int): RaycastHit[] => U.sphere_cast_all($1, $2, $3, $4, $5, 0)
+  static SphereCastAll(Vector3, float, Vector3, float, int, QueryTriggerInteraction): RaycastHit[] => U.sphere_cast_all($1, $2, $3, $4, $5, $6)
+  static SphereCastAll(Vector3, float, Vector3, float): RaycastHit[] => U.sphere_cast_all($1, $2, $3, $4, -1, 0)
+  static SphereCastNonAlloc(Vector3, float, Vector3, RaycastHit[], float, int): int => U.sphere_cast_non_alloc($1, $2, $3, $4, $5, $6, 0)
+  static SphereCastNonAlloc(Vector3, float, Vector3, RaycastHit[], float, int, QueryTriggerInteraction): int => U.sphere_cast_non_alloc($1, $2, $3, $4, $5, $6, $7)
+  static CapsuleCast(Vector3, Vector3, float, Vector3, out RaycastHit, float, int): bool => $5 = U.capsule_cast($1, $2, $3, $4, $6, $7) ;; not $5.is_empty()
+  static BoxCast(Vector3, Vector3, Vector3, out RaycastHit, Quaternion, float, int): bool => $4 = U.box_cast($1, $2, $3, $5, $6, $7) ;; not $4.is_empty()
+  static OverlapSphere(Vector3, float): Collider[] => U.overlap_sphere($1, $2, -1, 0)
+  static OverlapSphere(Vector3, float, int): Collider[] => U.overlap_sphere($1, $2, $3, 0)
+  static OverlapSphere(Vector3, float, int, QueryTriggerInteraction): Collider[] => U.overlap_sphere($1, $2, $3, $4)
+  static OverlapSphereNonAlloc(Vector3, float, Collider[]): int => U.overlap_sphere_non_alloc($1, $2, $3, -1, 0)
+  static OverlapSphereNonAlloc(Vector3, float, Collider[], int): int => U.overlap_sphere_non_alloc($1, $2, $3, $4, 0)
+  static OverlapSphereNonAlloc(Vector3, float, Collider[], int, QueryTriggerInteraction): int => U.overlap_sphere_non_alloc($1, $2, $3, $4, $5)
+  static OverlapBox(Vector3, Vector3): Collider[] => U.overlap_box($1, $2, Quaternion(), -1, 0)
+  static OverlapBox(Vector3, Vector3, Quaternion): Collider[] => U.overlap_box($1, $2, $3, -1, 0)
+  static OverlapBox(Vector3, Vector3, Quaternion, int): Collider[] => U.overlap_box($1, $2, $3, $4, 0)
+  static OverlapBox(Vector3, Vector3, Quaternion, int, QueryTriggerInteraction): Collider[] => U.overlap_box($1, $2, $3, $4, $5)
+  static OverlapBoxNonAlloc(Vector3, Vector3, Collider[], Quaternion, int): int => U.overlap_box_non_alloc($1, $2, $3, $4, $5, 0)
+  static OverlapCapsule(Vector3, Vector3, float, int): Collider[] => U.overlap_capsule($1, $2, $3, $4, 0)
+  static CheckSphere(Vector3, float): bool => not U.overlap_sphere($1, $2, -1, 0).is_empty()
+  static CheckSphere(Vector3, float, int): bool => not U.overlap_sphere($1, $2, $3, 0).is_empty()
+  static CheckSphere(Vector3, float, int, QueryTriggerInteraction): bool => not U.overlap_sphere($1, $2, $3, $4).is_empty()
+  static CheckBox(Vector3, Vector3, Quaternion, int): bool => not U.overlap_box($1, $2, $3, $4, 0).is_empty()
+  static CheckCapsule(Vector3, Vector3, float, int): bool => not U.overlap_capsule($1, $2, $3, $4, 0).is_empty()
+  static IgnoreCollision(Collider, Collider): void => U.ignore_collision($1, $2, true)
+  static IgnoreCollision(Collider, Collider, bool): void => U.ignore_collision($1, $2, $3)
+  static IgnoreLayerCollision(int, int): void => pass
+  static IgnoreLayerCollision(int, int, bool): void => pass
+  static GetIgnoreLayerCollision(int, int): bool => false
+  static ComputePenetration(Collider, Vector3, Quaternion, Collider, Vector3, Quaternion, out Vector3, out float): bool => $7 = Vector3.ZERO ;; $8 = 0.0 ;; false
+  static ClosestPoint(Vector3, Collider, Vector3, Quaternion): Vector3 => U.collider_closest_point($2, $1)
+  static SyncTransforms(): void => pass
+  static autoSimulation: bool => true
+  static set autoSimulation: bool => pass
+  static Simulate(float): void => pass
+  static DefaultRaycastLayers: int => -5
+  static AllLayers: int => -1
+  static IgnoreRaycastLayer: int => 4
+
+type QueryTriggerInteraction kind=enum extern=UnityEngineQueryTriggerInteraction
+  enum UseGlobal = 0
+  enum Ignore = 1
+  enum Collide = 2
+
+type LayerMask kind=struct gd=int extern=UnityEngineLayerMask
+  value: int => $0
+  set value: int => $0 = $v
+  static GetMask(params string[]): int => U.layer_mask($params)
+  static NameToLayer(string): int => U.name_to_layer($1)
+  static LayerToName(int): string => U.layer_to_name($1)
+  cast int => $0
+  op implicit_int(LayerMask): int => $1
+  op ==(LayerMask, LayerMask): bool => $1 == $2
+  op !=(LayerMask, LayerMask): bool => $1 != $2
+  op &(LayerMask, int): int => $1 & $2
+  op &(int, LayerMask): int => $1 & $2
+  op |(LayerMask, int): int => $1 | $2
+  op |(LayerMask, LayerMask): int => $1 | $2
+
+type JointSpring kind=struct gd=Dictionary extern=UnityEngineJointSpring
+  spring: float => $0.get("spring", 0.0)
+  set spring: float => $0.spring = $v
+  damper: float => $0.get("damper", 0.0)
+  set damper: float => $0.damper = $v
+  targetPosition: float => $0.get("targetPosition", 0.0)
+  set targetPosition: float => $0.targetPosition = $v
+
+type WheelCollider
+  suspensionSpring: JointSpring => {"spring": $0.suspension_stiffness, "damper": $0.damping_compression, "targetPosition": 0.5}
+  set suspensionSpring: JointSpring => U.wheel_set_spring($0, $v)
+  sidewaysFriction: WheelFrictionCurve => {"stiffness": $0.wheel_friction_slip}
+  set sidewaysFriction: WheelFrictionCurve => $0.wheel_friction_slip = $v.get("stiffness", 1.0)
+  forwardFriction: WheelFrictionCurve => {"stiffness": $0.wheel_friction_slip}
+  set forwardFriction: WheelFrictionCurve => pass
+  center: Vector3 => $0.position
+  set center: Vector3 => $0.position = $v
+
+type WheelFrictionCurve kind=struct gd=Dictionary extern=UnityEngineWheelFrictionCurve
+  stiffness: float => $0.get("stiffness", 1.0)
+  set stiffness: float => $0.stiffness = $v
+  extremumSlip: float => $0.get("extremumSlip", 0.4)
+  set extremumSlip: float => $0.extremumSlip = $v
+  extremumValue: float => $0.get("extremumValue", 1.0)
+  set extremumValue: float => $0.extremumValue = $v
+  asymptoteSlip: float => $0.get("asymptoteSlip", 0.8)
+  set asymptoteSlip: float => $0.asymptoteSlip = $v
+  asymptoteValue: float => $0.get("asymptoteValue", 0.5)
+  set asymptoteValue: float => $0.asymptoteValue = $v
+
+type ConstantForce
+  isKinematic: bool => $0.freeze
+  set isKinematic: bool => U.rb_set_kinematic($0, $v)

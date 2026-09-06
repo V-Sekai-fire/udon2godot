@@ -1,0 +1,1406 @@
+# UnityEngine components: audio, animation, particles, rendering, UI, input.
+
+type AudioSource : Behaviour kind=component gd=AudioStreamPlayer3D extern=UnityEngineAudioSource
+  clip: AudioClip => $0.stream
+  set clip: AudioClip => $0.stream = $v
+  volume: float => U.audio_get_volume($0)
+  set volume: float => U.audio_set_volume($0, $v)
+  pitch: float => $0.pitch_scale
+  set pitch: float => $0.pitch_scale = $v
+  isPlaying: bool => $0.playing
+  loop: bool => U.audio_get_loop($0)
+  set loop: bool => U.audio_set_loop($0, $v)
+  mute: bool => U.audio_get_mute($0)
+  set mute: bool => U.audio_set_mute($0, $v)
+  time: float => $0.get_playback_position()
+  set time: float => $0.seek($v)
+  timeSamples: int => int($0.get_playback_position() * 44100.0)
+  set timeSamples: int => $0.seek($v / 44100.0)
+  playOnAwake: bool => $0.autoplay
+  set playOnAwake: bool => $0.autoplay = $v
+  spatialBlend: float => 1.0
+  set spatialBlend: float => pass
+  minDistance: float => $0.unit_size
+  set minDistance: float => $0.unit_size = $v
+  maxDistance: float => $0.max_distance
+  set maxDistance: float => $0.max_distance = $v
+  dopplerLevel: float => float($0.doppler_tracking)
+  set dopplerLevel: float => $0.doppler_tracking = (0 if $v <= 0.0 else 1)
+  priority: int => 128
+  set priority: int => pass
+  panStereo: float => 0.0
+  set panStereo: float => pass
+  spread: float => 0.0
+  set spread: float => pass
+  rolloffMode: AudioRolloffMode => $0.attenuation_model
+  set rolloffMode: AudioRolloffMode => $0.attenuation_model = $v
+  bypassEffects: bool => false
+  set bypassEffects: bool => pass
+  bypassListenerEffects: bool => false
+  set bypassListenerEffects: bool => pass
+  bypassReverbZones: bool => false
+  set bypassReverbZones: bool => pass
+  spatialize: bool => true
+  set spatialize: bool => pass
+  outputAudioMixerGroup: AudioMixerGroup => $0.bus
+  set outputAudioMixerGroup: AudioMixerGroup => U.audio_set_bus($0, $v)
+  enabled: bool => U.audio_get_enabled($0)
+  set enabled: bool => U.audio_set_enabled($0, $v)
+  Play(): void => $0.play()
+  Play(ulong): void => $0.play()
+  PlayDelayed(float): void => U.audio_play_delayed($0, $1)
+  PlayScheduled(double): void => U.audio_play_delayed($0, $1 - U.realtime())
+  PlayOneShot(AudioClip): void => U.audio_play_one_shot($0, $1, 1.0)
+  PlayOneShot(AudioClip, float): void => U.audio_play_one_shot($0, $1, $2)
+  Stop(): void => $0.stop()
+  Pause(): void => $0.stream_paused = true
+  UnPause(): void => $0.stream_paused = false
+  SetScheduledEndTime(double): void => pass
+  GetSpatializerFloat(int, out float): bool => $2 = 0.0 ;; false
+  static PlayClipAtPoint(AudioClip, Vector3): void => U.audio_play_at_point($1, $2, 1.0)
+  static PlayClipAtPoint(AudioClip, Vector3, float): void => U.audio_play_at_point($1, $2, $3)
+
+type AudioRolloffMode kind=enum extern=UnityEngineAudioRolloffMode
+  enum Logarithmic = 0
+  enum Linear = 1
+  enum Custom = 2
+
+type AudioClip : Object kind=class gd=AudioStream extern=UnityEngineAudioClip
+  length: float => $0.get_length()
+  name: string => $0.resource_name
+  samples: int => int($0.get_length() * 44100.0)
+  frequency: int => 44100
+  channels: int => 2
+
+type AudioMixerGroup : Object kind=class gd=String extern=UnityEngineAudioAudioMixerGroup
+  name: string => $0
+
+type AudioListener : Behaviour kind=component gd=AudioListener3D extern=UnityEngineAudioListener
+  static volume: float => db_to_linear(AudioServer.get_bus_volume_db(0))
+  static set volume: float => AudioServer.set_bus_volume_db(0, linear_to_db($v))
+  static pause: bool => false
+  static set pause: bool => pass
+
+type Animator : Behaviour kind=component gd=Node extern=UnityEngineAnimator
+  speed: float => U.anim_get_speed($0)
+  set speed: float => U.anim_set_speed($0, $v)
+  enabled: bool => U.anim_get_enabled($0)
+  set enabled: bool => U.anim_set_enabled($0, $v)
+  applyRootMotion: bool => false
+  set applyRootMotion: bool => pass
+  updateMode: int => 0
+  set updateMode: int => pass
+  cullingMode: int => 0
+  set cullingMode: int => pass
+  runtimeAnimatorController: RuntimeAnimatorController => U.anim_controller($0)
+  set runtimeAnimatorController: RuntimeAnimatorController => U.anim_set_controller($0, $v)
+  layerCount: int => U.anim_layer_count($0)
+  parameterCount: int => U.anim_parameter_count($0)
+  isInitialized: bool => is_instance_valid($0)
+  gameObject: GameObject => $0
+  SetBool(string, bool): void => U.anim_set($0, $1, $2)
+  SetBool(int, bool): void => U.anim_set($0, $1, $2)
+  GetBool(string): bool => bool(U.anim_get($0, $1, false))
+  GetBool(int): bool => bool(U.anim_get($0, $1, false))
+  SetFloat(string, float): void => U.anim_set($0, $1, $2)
+  SetFloat(int, float): void => U.anim_set($0, $1, $2)
+  SetFloat(string, float, float, float): void => U.anim_set_damped($0, $1, $2, $3, $4)
+  SetFloat(int, float, float, float): void => U.anim_set_damped($0, $1, $2, $3, $4)
+  GetFloat(string): float => float(U.anim_get($0, $1, 0.0))
+  GetFloat(int): float => float(U.anim_get($0, $1, 0.0))
+  SetInteger(string, int): void => U.anim_set($0, $1, $2)
+  SetInteger(int, int): void => U.anim_set($0, $1, $2)
+  GetInteger(string): int => int(U.anim_get($0, $1, 0))
+  GetInteger(int): int => int(U.anim_get($0, $1, 0))
+  SetTrigger(string): void => U.anim_trigger($0, $1)
+  SetTrigger(int): void => U.anim_trigger($0, $1)
+  ResetTrigger(string): void => U.anim_reset_trigger($0, $1)
+  ResetTrigger(int): void => U.anim_reset_trigger($0, $1)
+  Play(string): void => U.anim_play($0, $1, -1, -INF)
+  Play(int): void => U.anim_play($0, $1, -1, -INF)
+  Play(string, int): void => U.anim_play($0, $1, $2, -INF)
+  Play(string, int, float): void => U.anim_play($0, $1, $2, $3)
+  Play(int, int, float): void => U.anim_play($0, $1, $2, $3)
+  PlayInFixedTime(string): void => U.anim_play($0, $1, -1, -INF)
+  PlayInFixedTime(string, int, float): void => U.anim_play($0, $1, $2, $3)
+  CrossFade(string, float): void => U.anim_cross_fade($0, $1, $2, -1)
+  CrossFade(string, float, int): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFade(string, float, int, float): void => U.anim_cross_fade($0, $1, $2, $3)
+  CrossFadeInFixedTime(string, float): void => U.anim_cross_fade($0, $1, $2, -1)
+  CrossFadeInFixedTime(string, float, int): void => U.anim_cross_fade($0, $1, $2, $3)
+  Rebind(): void => pass
+  Update(float): void => pass
+  SetLayerWeight(int, float): void => U.anim_set_layer_weight($0, $1, $2)
+  GetLayerWeight(int): float => U.anim_get_layer_weight($0, $1)
+  GetLayerName(int): string => U.anim_layer_name($0, $1)
+  GetLayerIndex(string): int => U.anim_layer_index($0, $1)
+  GetCurrentAnimatorStateInfo(int): AnimatorStateInfo => U.anim_state_info($0, $1, false)
+  GetNextAnimatorStateInfo(int): AnimatorStateInfo => U.anim_state_info($0, $1, true)
+  IsInTransition(int): bool => U.anim_in_transition($0, $1)
+  HasState(int, int): bool => true
+  SetIKPosition(int, Vector3): void => pass
+  SetIKRotation(int, Quaternion): void => pass
+  SetIKPositionWeight(int, float): void => pass
+  SetIKRotationWeight(int, float): void => pass
+  GetBoneTransform(HumanBodyBones): Transform => U.anim_bone_transform($0, $1)
+  static StringToHash(string): int => U.string_to_hash($1)
+
+type RuntimeAnimatorController : Object kind=class gd=Variant extern=UnityEngineRuntimeAnimatorController
+
+type AnimatorStateInfo kind=struct gd=Dictionary extern=UnityEngineAnimatorStateInfo
+  normalizedTime: float => $0.get("normalizedTime", 0.0)
+  length: float => $0.get("length", 0.0)
+  speed: float => $0.get("speed", 1.0)
+  speedMultiplier: float => 1.0
+  loop: bool => $0.get("loop", false)
+  fullPathHash: int => U.string_to_hash($0.get("name", ""))
+  shortNameHash: int => U.string_to_hash($0.get("name", ""))
+  tagHash: int => 0
+  IsName(string): bool => ($0.get("name", "") == $1)
+  IsTag(string): bool => false
+
+type AnimationClip : Object kind=class gd=Animation extern=UnityEngineAnimationClip
+  length: float => $0.length
+  name: string => $0.resource_name
+  isLooping: bool => ($0.loop_mode != 0)
+  frameRate: float => 30.0
+
+type Animation : Behaviour kind=component gd=AnimationPlayer extern=UnityEngineAnimation
+  clip: AnimationClip => U.animation_current_clip($0)
+  isPlaying: bool => $0.is_playing()
+  Play(): bool => U.animation_play($0, "")
+  Play(string): bool => U.animation_play($0, $1)
+  Stop(): void => $0.stop()
+  Stop(string): void => $0.stop()
+  IsPlaying(string): bool => ($0.is_playing() and $0.current_animation == $1)
+  Rewind(): void => $0.seek(0.0)
+  Sample(): void => pass
+  CrossFade(string, float): void => $0.play($1, $2)
+
+type ParticleSystem : Component kind=component gd=GPUParticles3D extern=UnityEngineParticleSystem
+  isPlaying: bool => $0.emitting
+  isEmitting: bool => $0.emitting
+  isStopped: bool => not $0.emitting
+  isPaused: bool => not $0.emitting
+  particleCount: int => $0.amount
+  time: float => 0.0
+  main: MainModule => U.ps_main($0)
+  emission: EmissionModule => U.ps_emission($0)
+  shape: ShapeModule => U.ps_module($0, "shape")
+  velocityOverLifetime: VelocityOverLifetimeModule => U.ps_module($0, "velocityOverLifetime")
+  colorOverLifetime: ColorOverLifetimeModule => U.ps_module($0, "colorOverLifetime")
+  sizeOverLifetime: SizeOverLifetimeModule => U.ps_module($0, "sizeOverLifetime")
+  trails: TrailModule => U.ps_module($0, "trails")
+  noise: NoiseModule => U.ps_module($0, "noise")
+  forceOverLifetime: ForceOverLifetimeModule => U.ps_module($0, "forceOverLifetime")
+  Play(): void => U.ps_play($0, true)
+  Play(bool): void => U.ps_play($0, $1)
+  Stop(): void => U.ps_stop($0, true, 0)
+  Stop(bool): void => U.ps_stop($0, $1, 0)
+  Stop(bool, ParticleSystemStopBehavior): void => U.ps_stop($0, $1, $2)
+  Pause(): void => U.ps_pause($0, true)
+  Pause(bool): void => U.ps_pause($0, $1)
+  Clear(): void => U.ps_clear($0, true)
+  Clear(bool): void => U.ps_clear($0, $1)
+  Emit(int): void => U.ps_emit($0, $1)
+  Emit(EmitParams, int): void => U.ps_emit_params($0, $1, $2)
+  Simulate(float): void => pass
+  Simulate(float, bool, bool): void => pass
+  IsAlive(): bool => $0.emitting
+  IsAlive(bool): bool => $0.emitting
+  GetParticles(Particle[]): int => 0
+  SetParticles(Particle[], int): void => pass
+
+type ParticleSystemStopBehavior kind=enum extern=UnityEngineParticleSystemStopBehavior
+  enum StopEmittingAndClear = 0
+  enum StopEmitting = 1
+
+type ParticleSystemSimulationSpace kind=enum extern=UnityEngineParticleSystemSimulationSpace
+  enum Local = 0
+  enum World = 1
+  enum Custom = 2
+
+type MainModule kind=struct gd=Object extern=UnityEngineParticleSystemMainModule
+  duration: float => $0.duration
+  set duration: float => $0.duration = $v
+  loop: bool => $0.loop
+  set loop: bool => $0.loop = $v
+  startLifetime: MinMaxCurve => $0.startLifetime
+  set startLifetime: MinMaxCurve => $0.startLifetime = $v
+  startSpeed: MinMaxCurve => $0.startSpeed
+  set startSpeed: MinMaxCurve => $0.startSpeed = $v
+  startSize: MinMaxCurve => $0.startSize
+  set startSize: MinMaxCurve => $0.startSize = $v
+  startColor: MinMaxGradient => $0.startColor
+  set startColor: MinMaxGradient => $0.startColor = $v
+  startRotation: MinMaxCurve => $0.startRotation
+  set startRotation: MinMaxCurve => $0.startRotation = $v
+  gravityModifier: MinMaxCurve => $0.gravityModifier
+  set gravityModifier: MinMaxCurve => $0.gravityModifier = $v
+  simulationSpace: ParticleSystemSimulationSpace => $0.simulationSpace
+  set simulationSpace: ParticleSystemSimulationSpace => $0.simulationSpace = $v
+  simulationSpeed: float => $0.simulationSpeed
+  set simulationSpeed: float => $0.simulationSpeed = $v
+  maxParticles: int => $0.maxParticles
+  set maxParticles: int => $0.maxParticles = $v
+  playOnAwake: bool => $0.playOnAwake
+  set playOnAwake: bool => $0.playOnAwake = $v
+  startLifetimeMultiplier: float => $0.startLifetime
+  set startLifetimeMultiplier: float => $0.startLifetime = $v
+  startSpeedMultiplier: float => $0.startSpeed
+  set startSpeedMultiplier: float => $0.startSpeed = $v
+  startSizeMultiplier: float => $0.startSize
+  set startSizeMultiplier: float => $0.startSize = $v
+
+type EmissionModule kind=struct gd=Object extern=UnityEngineParticleSystemEmissionModule
+  enabled: bool => $0.enabled
+  set enabled: bool => $0.enabled = $v
+  rateOverTime: MinMaxCurve => $0.rateOverTime
+  set rateOverTime: MinMaxCurve => $0.rateOverTime = $v
+  rateOverTimeMultiplier: float => $0.rateOverTime
+  set rateOverTimeMultiplier: float => $0.rateOverTime = $v
+  rateOverDistance: MinMaxCurve => $0.rateOverDistance
+  set rateOverDistance: MinMaxCurve => $0.rateOverDistance = $v
+  rateOverDistanceMultiplier: float => $0.rateOverDistance
+  set rateOverDistanceMultiplier: float => $0.rateOverDistance = $v
+  burstCount: int => 0
+  SetBursts(Burst[]): void => pass
+
+type ShapeModule kind=struct gd=Object extern=UnityEngineParticleSystemShapeModule
+  enabled: bool => $0.enabled
+  set enabled: bool => $0.enabled = $v
+  radius: float => $0.radius
+  set radius: float => $0.radius = $v
+  angle: float => $0.angle
+  set angle: float => $0.angle = $v
+  scale: Vector3 => $0.scale
+  set scale: Vector3 => $0.scale = $v
+  rotation: Vector3 => $0.rotation
+  set rotation: Vector3 => $0.rotation = $v
+  position: Vector3 => $0.position
+  set position: Vector3 => $0.position = $v
+
+type VelocityOverLifetimeModule kind=struct gd=Object extern=UnityEngineParticleSystemVelocityOverLifetimeModule
+  enabled: bool => $0.enabled
+  set enabled: bool => $0.enabled = $v
+  speedModifier: MinMaxCurve => $0.speedModifier
+  set speedModifier: MinMaxCurve => $0.speedModifier = $v
+  speedModifierMultiplier: float => $0.speedModifier
+  set speedModifierMultiplier: float => $0.speedModifier = $v
+  x: MinMaxCurve => $0.x
+  set x: MinMaxCurve => $0.x = $v
+  y: MinMaxCurve => $0.y
+  set y: MinMaxCurve => $0.y = $v
+  z: MinMaxCurve => $0.z
+  set z: MinMaxCurve => $0.z = $v
+  xMultiplier: float => $0.x
+  set xMultiplier: float => $0.x = $v
+  yMultiplier: float => $0.y
+  set yMultiplier: float => $0.y = $v
+  zMultiplier: float => $0.z
+  set zMultiplier: float => $0.z = $v
+
+type ColorOverLifetimeModule kind=struct gd=Object extern=UnityEngineParticleSystemColorOverLifetimeModule
+  enabled: bool => $0.enabled
+  set enabled: bool => $0.enabled = $v
+  color: MinMaxGradient => $0.color
+  set color: MinMaxGradient => $0.color = $v
+
+type SizeOverLifetimeModule kind=struct gd=Object extern=UnityEngineParticleSystemSizeOverLifetimeModule
+  enabled: bool => $0.enabled
+  set enabled: bool => $0.enabled = $v
+  size: MinMaxCurve => $0.size
+  set size: MinMaxCurve => $0.size = $v
+  sizeMultiplier: float => $0.size
+  set sizeMultiplier: float => $0.size = $v
+
+type TrailModule kind=struct gd=Object extern=UnityEngineParticleSystemTrailModule
+  enabled: bool => $0.enabled
+  set enabled: bool => $0.enabled = $v
+
+type NoiseModule kind=struct gd=Object extern=UnityEngineParticleSystemNoiseModule
+  enabled: bool => $0.enabled
+  set enabled: bool => $0.enabled = $v
+  strength: MinMaxCurve => $0.strength
+  set strength: MinMaxCurve => $0.strength = $v
+  strengthMultiplier: float => $0.strength
+  set strengthMultiplier: float => $0.strength = $v
+
+type ForceOverLifetimeModule kind=struct gd=Object extern=UnityEngineParticleSystemForceOverLifetimeModule
+  enabled: bool => $0.enabled
+  set enabled: bool => $0.enabled = $v
+
+type MinMaxCurve kind=struct gd=float extern=UnityEngineParticleSystemMinMaxCurve
+  ctor(float) => $1
+  ctor(float, float) => $2
+  constant: float => $0
+  set constant: float => $0 = $v
+  constantMin: float => $0
+  set constantMin: float => $0 = $v
+  constantMax: float => $0
+  set constantMax: float => $0 = $v
+  curveMultiplier: float => $0
+  set curveMultiplier: float => $0 = $v
+  mode: int => 0
+  Evaluate(float): float => $0
+  cast float => $0
+  op implicit_float(float): MinMaxCurve => $1
+
+type MinMaxGradient kind=struct gd=Color extern=UnityEngineParticleSystemMinMaxGradient
+  ctor(Color) => $1
+  ctor(Color, Color) => $1
+  color: Color => $0
+  set color: Color => $0 = $v
+  colorMin: Color => $0
+  set colorMin: Color => $0 = $v
+  colorMax: Color => $0
+  set colorMax: Color => $0 = $v
+  mode: int => 0
+  Evaluate(float): Color => $0
+  op implicit_Color(Color): MinMaxGradient => $1
+
+type EmitParams kind=struct gd=Dictionary extern=UnityEngineParticleSystemEmitParams
+  ctor() => {}
+  position: Vector3 => $0.get("position", Vector3.ZERO)
+  set position: Vector3 => $0.position = $v
+  velocity: Vector3 => $0.get("velocity", Vector3.ZERO)
+  set velocity: Vector3 => $0.velocity = $v
+  startColor: Color => $0.get("startColor", Color.WHITE)
+  set startColor: Color => $0.startColor = $v
+  startSize: float => $0.get("startSize", 1.0)
+  set startSize: float => $0.startSize = $v
+  startLifetime: float => $0.get("startLifetime", 1.0)
+  set startLifetime: float => $0.startLifetime = $v
+  applyShapeToPosition: bool => $0.get("applyShapeToPosition", false)
+  set applyShapeToPosition: bool => $0.applyShapeToPosition = $v
+
+type Burst kind=struct gd=Dictionary extern=UnityEngineParticleSystemBurst
+  ctor(float, short) => {"time": $1, "count": $2}
+  ctor(float, short, short) => {"time": $1, "count": $2}
+  ctor(float, float) => {"time": $1, "count": $2}
+  time: float => $0.get("time", 0.0)
+  set time: float => $0.time = $v
+  count: MinMaxCurve => $0.get("count", 0)
+  set count: MinMaxCurve => $0.count = $v
+  minCount: short => int($0.get("count", 0))
+  set minCount: short => $0.count = $v
+  maxCount: short => int($0.get("count", 0))
+  set maxCount: short => $0.count = $v
+  cycleCount: int => $0.get("cycleCount", 1)
+  set cycleCount: int => $0.cycleCount = $v
+  repeatInterval: float => $0.get("repeatInterval", 0.01)
+  set repeatInterval: float => $0.repeatInterval = $v
+
+type Particle kind=struct gd=Dictionary extern=UnityEngineParticleSystemParticle
+  position: Vector3 => $0.get("position", Vector3.ZERO)
+  set position: Vector3 => $0.position = $v
+  velocity: Vector3 => $0.get("velocity", Vector3.ZERO)
+  set velocity: Vector3 => $0.velocity = $v
+  remainingLifetime: float => $0.get("remainingLifetime", 0.0)
+  set remainingLifetime: float => $0.remainingLifetime = $v
+  startLifetime: float => $0.get("startLifetime", 0.0)
+  startColor: Color32 => $0.get("startColor", Color.WHITE)
+  set startColor: Color32 => $0.startColor = $v
+
+type ParticleSystemRenderer : Renderer kind=component gd=GPUParticles3D extern=UnityEngineParticleSystemRenderer
+  material: Material => U.ps_material($0)
+  set material: Material => U.ps_set_material($0, $v)
+  sharedMaterial: Material => U.ps_material($0)
+  set sharedMaterial: Material => U.ps_set_material($0, $v)
+  trailMaterial: Material => null
+  set trailMaterial: Material => pass
+
+type Renderer : Component kind=component gd=GeometryInstance3D extern=UnityEngineRenderer
+  enabled: bool => $0.visible
+  set enabled: bool => $0.visible = $v
+  isVisible: bool => $0.visible
+  material: Material => U.renderer_material($0)
+  set material: Material => U.renderer_set_material($0, $v)
+  sharedMaterial: Material => U.renderer_shared_material($0)
+  set sharedMaterial: Material => U.renderer_set_material($0, $v)
+  materials: Material[] => U.renderer_materials($0)
+  set materials: Material[] => U.renderer_set_materials($0, $v)
+  sharedMaterials: Material[] => U.renderer_materials($0)
+  set sharedMaterials: Material[] => U.renderer_set_materials($0, $v)
+  bounds: Bounds => U.renderer_bounds($0)
+  localBounds: Bounds => $0.get_aabb()
+  shadowCastingMode: int => $0.cast_shadow
+  set shadowCastingMode: int => $0.cast_shadow = $v
+  receiveShadows: bool => true
+  set receiveShadows: bool => pass
+  sortingOrder: int => 0
+  set sortingOrder: int => pass
+  lightmapIndex: int => -1
+  SetPropertyBlock(MaterialPropertyBlock): void => U.renderer_set_property_block($0, $1)
+  SetPropertyBlock(MaterialPropertyBlock, int): void => U.renderer_set_property_block($0, $1)
+  GetPropertyBlock(MaterialPropertyBlock): void => U.renderer_get_property_block($0, $1)
+
+type MeshRenderer : Renderer kind=component gd=MeshInstance3D extern=UnityEngineMeshRenderer
+
+type SkinnedMeshRenderer : Renderer kind=component gd=MeshInstance3D extern=UnityEngineSkinnedMeshRenderer
+  sharedMesh: Mesh => $0.mesh
+  set sharedMesh: Mesh => $0.mesh = $v
+  rootBone: Transform => $0.get_node_or_null($0.skeleton)
+  GetBlendShapeWeight(int): float => U.blend_shape_get($0, $1)
+  SetBlendShapeWeight(int, float): void => U.blend_shape_set($0, $1, $2)
+
+type LineRenderer : Renderer kind=component gd=Node extern=UnityEngineLineRenderer
+  positionCount: int => U.line_get_count($0)
+  set positionCount: int => U.line_set_count($0, $v)
+  startWidth: float => U.line_get_prop($0, "startWidth", 0.1)
+  set startWidth: float => U.line_set_prop($0, "startWidth", $v)
+  endWidth: float => U.line_get_prop($0, "endWidth", 0.1)
+  set endWidth: float => U.line_set_prop($0, "endWidth", $v)
+  widthMultiplier: float => U.line_get_prop($0, "widthMultiplier", 1.0)
+  set widthMultiplier: float => U.line_set_prop($0, "widthMultiplier", $v)
+  startColor: Color => U.line_get_prop($0, "startColor", Color.WHITE)
+  set startColor: Color => U.line_set_prop($0, "startColor", $v)
+  endColor: Color => U.line_get_prop($0, "endColor", Color.WHITE)
+  set endColor: Color => U.line_set_prop($0, "endColor", $v)
+  useWorldSpace: bool => U.line_get_prop($0, "useWorldSpace", true)
+  set useWorldSpace: bool => U.line_set_prop($0, "useWorldSpace", $v)
+  loop: bool => U.line_get_prop($0, "loop", false)
+  set loop: bool => U.line_set_prop($0, "loop", $v)
+  SetPosition(int, Vector3): void => U.line_set_position($0, $1, $2)
+  GetPosition(int): Vector3 => U.line_get_position($0, $1)
+  SetPositions(Vector3[]): void => U.line_set_positions($0, $1)
+  GetPositions(Vector3[]): int => U.line_get_positions($0, $1)
+  SetWidth(float, float): void => U.line_set_prop($0, "startWidth", $1) ;; U.line_set_prop($0, "endWidth", $2)
+
+type TrailRenderer : Renderer kind=component gd=Node extern=UnityEngineTrailRenderer
+  emitting: bool => U.line_get_prop($0, "emitting", true)
+  set emitting: bool => U.line_set_prop($0, "emitting", $v)
+  time: float => U.line_get_prop($0, "time", 1.0)
+  set time: float => U.line_set_prop($0, "time", $v)
+  startWidth: float => U.line_get_prop($0, "startWidth", 0.1)
+  set startWidth: float => U.line_set_prop($0, "startWidth", $v)
+  endWidth: float => U.line_get_prop($0, "endWidth", 0.1)
+  set endWidth: float => U.line_set_prop($0, "endWidth", $v)
+  widthMultiplier: float => U.line_get_prop($0, "widthMultiplier", 1.0)
+  set widthMultiplier: float => U.line_set_prop($0, "widthMultiplier", $v)
+  startColor: Color => U.line_get_prop($0, "startColor", Color.WHITE)
+  set startColor: Color => U.line_set_prop($0, "startColor", $v)
+  endColor: Color => U.line_get_prop($0, "endColor", Color.WHITE)
+  set endColor: Color => U.line_set_prop($0, "endColor", $v)
+  positionCount: int => U.line_get_count($0)
+  Clear(): void => U.line_clear($0)
+
+type Material : Object kind=class gd=Material extern=UnityEngineMaterial
+  color: Color => U.mat_get($0, "_Color", Color.WHITE)
+  set color: Color => U.mat_set($0, "_Color", $v)
+  mainTexture: Texture => U.mat_get($0, "_MainTex", null)
+  set mainTexture: Texture => U.mat_set($0, "_MainTex", $v)
+  mainTextureOffset: Vector2 => U.mat_get($0, "_MainTex_Offset", Vector2.ZERO)
+  set mainTextureOffset: Vector2 => U.mat_set($0, "_MainTex_Offset", $v)
+  mainTextureScale: Vector2 => U.mat_get($0, "_MainTex_Scale", Vector2.ONE)
+  set mainTextureScale: Vector2 => U.mat_set($0, "_MainTex_Scale", $v)
+  shader: Shader => null
+  set shader: Shader => pass
+  renderQueue: int => $0.render_priority
+  set renderQueue: int => $0.render_priority = $v
+  name: string => $0.resource_name
+  ctor(Material) => $1.duplicate()
+  ctor(Shader) => U.new_material($1)
+  SetColor(string, Color): void => U.mat_set($0, $1, $2)
+  SetColor(int, Color): void => U.mat_set($0, $1, $2)
+  GetColor(string): Color => U.mat_get($0, $1, Color.WHITE)
+  GetColor(int): Color => U.mat_get($0, $1, Color.WHITE)
+  SetFloat(string, float): void => U.mat_set($0, $1, $2)
+  SetFloat(int, float): void => U.mat_set($0, $1, $2)
+  GetFloat(string): float => U.mat_get($0, $1, 0.0)
+  GetFloat(int): float => U.mat_get($0, $1, 0.0)
+  SetInt(string, int): void => U.mat_set($0, $1, $2)
+  SetInt(int, int): void => U.mat_set($0, $1, $2)
+  GetInt(string): int => U.mat_get($0, $1, 0)
+  SetInteger(string, int): void => U.mat_set($0, $1, $2)
+  GetInteger(string): int => U.mat_get($0, $1, 0)
+  SetVector(string, Vector4): void => U.mat_set($0, $1, $2)
+  SetVector(int, Vector4): void => U.mat_set($0, $1, $2)
+  GetVector(string): Vector4 => U.mat_get($0, $1, Vector4.ZERO)
+  SetTexture(string, Texture): void => U.mat_set($0, $1, $2)
+  SetTexture(int, Texture): void => U.mat_set($0, $1, $2)
+  GetTexture(string): Texture => U.mat_get($0, $1, null)
+  SetTextureOffset(string, Vector2): void => U.mat_set($0, $1 + "_Offset", $2)
+  SetTextureScale(string, Vector2): void => U.mat_set($0, $1 + "_Scale", $2)
+  GetTextureOffset(string): Vector2 => U.mat_get($0, $1 + "_Offset", Vector2.ZERO)
+  GetTextureScale(string): Vector2 => U.mat_get($0, $1 + "_Scale", Vector2.ONE)
+  SetMatrix(string, Matrix4x4): void => U.mat_set($0, $1, $2)
+  SetFloatArray(string, float[]): void => U.mat_set($0, $1, $2)
+  SetVectorArray(string, Vector4[]): void => U.mat_set($0, $1, $2)
+  SetColorArray(string, Color[]): void => U.mat_set($0, $1, $2)
+  HasProperty(string): bool => U.mat_has($0, $1)
+  HasProperty(int): bool => U.mat_has($0, $1)
+  EnableKeyword(string): void => U.mat_set($0, "keyword_" + $1, true)
+  DisableKeyword(string): void => U.mat_set($0, "keyword_" + $1, false)
+  IsKeywordEnabled(string): bool => U.mat_get($0, "keyword_" + $1, false)
+  SetOverrideTag(string, string): void => pass
+  SetShaderPassEnabled(string, bool): void => pass
+  CopyPropertiesFromMaterial(Material): void => U.mat_copy($0, $1)
+  Lerp(Material, Material, float): void => pass
+
+type MaterialPropertyBlock kind=class gd=Dictionary extern=UnityEngineMaterialPropertyBlock
+  ctor() => {}
+  isEmpty: bool => $0.is_empty()
+  SetColor(string, Color): void => $0[$1] = $2
+  SetColor(int, Color): void => $0[$1] = $2
+  SetFloat(string, float): void => $0[$1] = $2
+  SetFloat(int, float): void => $0[$1] = $2
+  SetInt(string, int): void => $0[$1] = $2
+  SetInteger(string, int): void => $0[$1] = $2
+  SetVector(string, Vector4): void => $0[$1] = $2
+  SetVector(int, Vector4): void => $0[$1] = $2
+  SetTexture(string, Texture): void => $0[$1] = $2
+  SetMatrix(string, Matrix4x4): void => $0[$1] = $2
+  SetFloatArray(string, float[]): void => $0[$1] = $2
+  SetVectorArray(string, Vector4[]): void => $0[$1] = $2
+  GetColor(string): Color => $0.get($1, Color.WHITE)
+  GetFloat(string): float => $0.get($1, 0.0)
+  GetInt(string): int => $0.get($1, 0)
+  GetVector(string): Vector4 => $0.get($1, Vector4.ZERO)
+  GetTexture(string): Texture => $0.get($1, null)
+  Clear(): void => $0.clear()
+
+type Shader : Object kind=class gd=Shader extern=UnityEngineShader
+  name: string => $0.resource_name
+  static PropertyToID(string): int => U.string_to_hash($1)
+  static Find(string): Shader => U.find_shader($1)
+  static SetGlobalFloat(string, float): void => RenderingServer.global_shader_parameter_set($1, $2)
+  static SetGlobalFloat(int, float): void => U.set_global_shader_param($1, $2)
+  static SetGlobalColor(string, Color): void => RenderingServer.global_shader_parameter_set($1, $2)
+  static SetGlobalVector(string, Vector4): void => RenderingServer.global_shader_parameter_set($1, $2)
+  static SetGlobalInt(string, int): void => RenderingServer.global_shader_parameter_set($1, $2)
+  static SetGlobalTexture(string, Texture): void => RenderingServer.global_shader_parameter_set($1, $2)
+  static SetGlobalMatrix(string, Matrix4x4): void => RenderingServer.global_shader_parameter_set($1, $2)
+  static GetGlobalFloat(string): float => RenderingServer.global_shader_parameter_get($1)
+
+type Texture : Object kind=class gd=Texture2D extern=UnityEngineTexture
+  width: int => $0.get_width()
+  height: int => $0.get_height()
+  name: string => $0.resource_name
+  wrapMode: int => 0
+  set wrapMode: int => pass
+  filterMode: int => 0
+  set filterMode: int => pass
+
+type Texture2D : Texture kind=class gd=Texture2D extern=UnityEngineTexture2D
+  ctor(int, int) => U.new_texture($1, $2)
+  GetPixel(int, int): Color => U.texture_get_pixel($0, $1, $2)
+  GetPixelBilinear(float, float): Color => U.texture_get_pixel($0, int($1 * $0.get_width()), int($2 * $0.get_height()))
+  SetPixel(int, int, Color): void => U.texture_set_pixel($0, $1, $2, $3)
+  SetPixels(Color[]): void => U.texture_set_pixels($0, $1)
+  GetPixels(): Color[] => U.texture_get_pixels($0)
+  Apply(): void => U.texture_apply($0)
+  Apply(bool): void => U.texture_apply($0)
+  ReadPixels(Rect, int, int): void => pass
+  static whiteTexture: Texture2D => U.white_texture()
+  static blackTexture: Texture2D => U.black_texture()
+
+type RenderTexture : Texture kind=class gd=ViewportTexture extern=UnityEngineRenderTexture
+  ctor(int, int, int) => U.new_render_texture($1, $2)
+  Release(): void => pass
+  Create(): bool => true
+  static active: RenderTexture => null
+  static set active: RenderTexture => pass
+
+type Sprite : Object kind=class gd=Texture2D extern=UnityEngineSprite
+  texture: Texture2D => $0
+  name: string => $0.resource_name
+
+type Mesh : Object kind=class gd=Mesh extern=UnityEngineMesh
+  vertexCount: int => U.mesh_vertex_count($0)
+  vertices: Vector3[] => U.mesh_vertices($0)
+  set vertices: Vector3[] => pass
+  triangles: int[] => U.mesh_triangles($0)
+  set triangles: int[] => pass
+  normals: Vector3[] => U.mesh_normals($0)
+  set normals: Vector3[] => pass
+  bounds: Bounds => $0.get_aabb()
+  name: string => $0.resource_name
+  subMeshCount: int => $0.get_surface_count()
+  RecalculateNormals(): void => pass
+  RecalculateBounds(): void => pass
+  Clear(): void => pass
+
+type MeshFilter : Component kind=component gd=MeshInstance3D extern=UnityEngineMeshFilter
+  mesh: Mesh => $0.mesh
+  set mesh: Mesh => $0.mesh = $v
+  sharedMesh: Mesh => $0.mesh
+  set sharedMesh: Mesh => $0.mesh = $v
+
+type Camera : Behaviour kind=component gd=Camera3D extern=UnityEngineCamera
+  fieldOfView: float => $0.fov
+  set fieldOfView: float => $0.fov = $v
+  nearClipPlane: float => $0.near
+  set nearClipPlane: float => $0.near = $v
+  farClipPlane: float => $0.far
+  set farClipPlane: float => $0.far = $v
+  orthographic: bool => ($0.projection == 1)
+  set orthographic: bool => $0.projection = (1 if $v else 0)
+  orthographicSize: float => ($0.size / 2.0)
+  set orthographicSize: float => $0.size = $v * 2.0
+  aspect: float => U.camera_aspect($0)
+  cullingMask: int => $0.cull_mask
+  set cullingMask: int => $0.cull_mask = $v
+  depth: float => 0.0
+  set depth: float => pass
+  enabled: bool => $0.current
+  set enabled: bool => U.camera_set_enabled($0, $v)
+  backgroundColor: Color => U.camera_get_bg($0)
+  set backgroundColor: Color => U.camera_set_bg($0, $v)
+  clearFlags: int => 1
+  set clearFlags: int => pass
+  targetTexture: RenderTexture => null
+  set targetTexture: RenderTexture => U.camera_set_target_texture($0, $v)
+  pixelWidth: int => U.camera_pixel_size($0).x
+  pixelHeight: int => U.camera_pixel_size($0).y
+  rect: Rect => Rect2(0.0, 0.0, 1.0, 1.0)
+  set rect: Rect => pass
+  stereoTargetEye: int => 3
+  set stereoTargetEye: int => pass
+  useOcclusionCulling: bool => true
+  set useOcclusionCulling: bool => pass
+  allowHDR: bool => true
+  set allowHDR: bool => pass
+  allowMSAA: bool => true
+  set allowMSAA: bool => pass
+  WorldToScreenPoint(Vector3): Vector3 => U.world_to_screen($0, $1)
+  WorldToViewportPoint(Vector3): Vector3 => U.world_to_viewport($0, $1)
+  ScreenToWorldPoint(Vector3): Vector3 => U.screen_to_world($0, $1)
+  ViewportToWorldPoint(Vector3): Vector3 => U.viewport_to_world($0, $1)
+  ScreenPointToRay(Vector3): Ray => U.screen_point_to_ray($0, $1)
+  ScreenPointToRay(Vector2): Ray => U.screen_point_to_ray($0, Vector3($1.x, $1.y, 0.0))
+  ViewportPointToRay(Vector3): Ray => U.viewport_point_to_ray($0, $1)
+  Render(): void => pass
+  ResetProjectionMatrix(): void => pass
+  ResetAspect(): void => pass
+  static main: Camera => U.main_camera()
+  static current: Camera => U.main_camera()
+  static allCamerasCount: int => 1
+
+type Light : Behaviour kind=component gd=Light3D extern=UnityEngineLight
+  intensity: float => $0.light_energy
+  set intensity: float => $0.light_energy = $v
+  color: Color => $0.light_color
+  set color: Color => $0.light_color = $v
+  range: float => U.light_get_range($0)
+  set range: float => U.light_set_range($0, $v)
+  spotAngle: float => U.light_get_spot_angle($0)
+  set spotAngle: float => U.light_set_spot_angle($0, $v)
+  enabled: bool => $0.visible
+  set enabled: bool => $0.visible = $v
+  shadows: int => (1 if $0.shadow_enabled else 0)
+  set shadows: int => $0.shadow_enabled = ($v != 0)
+  type: LightType => U.light_type($0)
+  bounceIntensity: float => $0.light_indirect_energy
+  set bounceIntensity: float => $0.light_indirect_energy = $v
+  cullingMask: int => $0.light_cull_mask
+  set cullingMask: int => $0.light_cull_mask = $v
+
+type LightType kind=enum extern=UnityEngineLightType
+  enum Spot = 0
+  enum Directional = 1
+  enum Point = 2
+  enum Area = 3
+
+type ReflectionProbe : Behaviour kind=component gd=ReflectionProbe extern=UnityEngineReflectionProbe
+  intensity: float => $0.intensity
+  set intensity: float => $0.intensity = $v
+  RenderProbe(): int => 0
+
+type Canvas : Behaviour kind=component gd=CanvasLayer extern=UnityEngineCanvas
+  enabled: bool => $0.visible
+  set enabled: bool => $0.visible = $v
+  worldCamera: Camera => null
+  set worldCamera: Camera => pass
+  sortingOrder: int => $0.layer
+  set sortingOrder: int => $0.layer = $v
+  renderMode: int => 2
+  set renderMode: int => pass
+  scaleFactor: float => 1.0
+
+type CanvasGroup : Behaviour kind=component gd=Control extern=UnityEngineCanvasGroup
+  alpha: float => $0.modulate.a
+  set alpha: float => $0.modulate.a = $v
+  interactable: bool => ($0.mouse_filter != 2)
+  set interactable: bool => $0.mouse_filter = (0 if $v else 2)
+  blocksRaycasts: bool => ($0.mouse_filter != 2)
+  set blocksRaycasts: bool => $0.mouse_filter = (0 if $v else 2)
+  ignoreParentGroups: bool => false
+  set ignoreParentGroups: bool => pass
+
+type Graphic : Behaviour kind=component gd=Control extern=UnityEngineUIGraphic
+  color: Color => U.ui_get_color($0)
+  set color: Color => U.ui_set_color($0, $v)
+  enabled: bool => $0.visible
+  set enabled: bool => $0.visible = $v
+  raycastTarget: bool => ($0.mouse_filter != 2)
+  set raycastTarget: bool => $0.mouse_filter = (0 if $v else 2)
+  rectTransform: RectTransform => $0
+  canvasRenderer: Component => $0
+  material: Material => $0.material
+  set material: Material => $0.material = $v
+  SetAllDirty(): void => pass
+  SetVerticesDirty(): void => pass
+  CrossFadeAlpha(float, float, bool): void => U.ui_fade_alpha($0, $1, $2)
+  CrossFadeColor(Color, float, bool, bool): void => U.ui_set_color($0, $1)
+
+type Text : Graphic kind=component gd=Control extern=UnityEngineUIText
+  text: string => U.ui_get_text($0)
+  set text: string => U.ui_set_text($0, $v)
+  fontSize: int => U.ui_get_font_size($0)
+  set fontSize: int => U.ui_set_font_size($0, $v)
+  alignment: int => 0
+  set alignment: int => pass
+  fontStyle: int => 0
+  set fontStyle: int => pass
+  supportRichText: bool => true
+  set supportRichText: bool => pass
+  resizeTextForBestFit: bool => false
+  set resizeTextForBestFit: bool => pass
+  lineSpacing: float => 1.0
+  set lineSpacing: float => pass
+  preferredWidth: float => $0.size.x
+  preferredHeight: float => $0.size.y
+
+type TMP_Text : Graphic kind=component gd=Control extern=TMProTMP_Text
+  text: string => U.ui_get_text($0)
+  set text: string => U.ui_set_text($0, $v)
+  fontSize: float => float(U.ui_get_font_size($0))
+  set fontSize: float => U.ui_set_font_size($0, int($v))
+  color: Color => U.ui_get_color($0)
+  set color: Color => U.ui_set_color($0, $v)
+  alignment: int => 0
+  set alignment: int => pass
+  fontStyle: int => 0
+  set fontStyle: int => pass
+  richText: bool => true
+  set richText: bool => pass
+  enableAutoSizing: bool => false
+  set enableAutoSizing: bool => pass
+  enableWordWrapping: bool => true
+  set enableWordWrapping: bool => pass
+  characterSpacing: float => 0.0
+  set characterSpacing: float => pass
+  lineSpacing: float => 0.0
+  set lineSpacing: float => pass
+  outlineWidth: float => 0.0
+  set outlineWidth: float => pass
+  outlineColor: Color32 => Color.BLACK
+  set outlineColor: Color32 => pass
+  faceColor: Color32 => U.ui_get_color($0)
+  set faceColor: Color32 => U.ui_set_color($0, $v)
+  preferredWidth: float => $0.size.x
+  preferredHeight: float => $0.size.y
+  maxVisibleCharacters: int => 99999
+  set maxVisibleCharacters: int => U.ui_set_visible_characters($0, $v)
+  textInfo: TMP_TextInfo => U.ui_text_info($0)
+  SetText(string): void => U.ui_set_text($0, $1)
+  SetText(string, float): void => U.ui_set_text($0, U.format($1, [$2]))
+  SetText(string, float, float): void => U.ui_set_text($0, U.format($1, [$2, $3]))
+  SetText(string, float, float, float): void => U.ui_set_text($0, U.format($1, [$2, $3, $4]))
+  ForceMeshUpdate(): void => pass
+  ForceMeshUpdate(bool): void => pass
+  ForceMeshUpdate(bool, bool): void => pass
+  GetPreferredValues(): Vector2 => $0.size
+  GetPreferredValues(string): Vector2 => $0.size
+
+type TMP_TextInfo kind=class gd=Dictionary extern=TMProTMP_TextInfo
+  characterCount: int => $0.get("characterCount", 0)
+  lineCount: int => $0.get("lineCount", 0)
+
+type TextMeshProUGUI : TMP_Text kind=component gd=Control extern=TMProTextMeshProUGUI
+type TextMeshPro : TMP_Text kind=component gd=Node extern=TMProTextMeshPro
+
+type TMP_InputField : Graphic kind=component gd=LineEdit extern=TMProTMP_InputField
+  text: string => $0.text
+  set text: string => $0.text = $v
+  interactable: bool => $0.editable
+  set interactable: bool => $0.editable = $v
+  characterLimit: int => $0.max_length
+  set characterLimit: int => $0.max_length = $v
+  ActivateInputField(): void => $0.grab_focus()
+  DeactivateInputField(): void => $0.release_focus()
+  SetTextWithoutNotify(string): void => $0.text = $1
+
+type TMP_Dropdown : Graphic kind=component gd=OptionButton extern=TMProTMP_Dropdown
+  value: int => $0.selected
+  set value: int => $0.select($v)
+  interactable: bool => not $0.disabled
+  set interactable: bool => $0.disabled = not $v
+  SetValueWithoutNotify(int): void => $0.select($1)
+  ClearOptions(): void => $0.clear()
+  RefreshShownValue(): void => pass
+
+type Image : Graphic kind=component gd=Control extern=UnityEngineUIImage
+  sprite: Sprite => U.ui_get_texture($0)
+  set sprite: Sprite => U.ui_set_texture($0, $v)
+  fillAmount: float => U.ui_get_fill($0)
+  set fillAmount: float => U.ui_set_fill($0, $v)
+  fillMethod: int => 0
+  set fillMethod: int => pass
+  fillOrigin: int => 0
+  set fillOrigin: int => pass
+  fillClockwise: bool => true
+  set fillClockwise: bool => pass
+  type: int => 0
+  set type: int => pass
+  preserveAspect: bool => true
+  set preserveAspect: bool => pass
+  overrideSprite: Sprite => U.ui_get_texture($0)
+  set overrideSprite: Sprite => U.ui_set_texture($0, $v)
+
+type RawImage : Graphic kind=component gd=TextureRect extern=UnityEngineUIRawImage
+  texture: Texture => $0.texture
+  set texture: Texture => $0.texture = $v
+  uvRect: Rect => Rect2(0.0, 0.0, 1.0, 1.0)
+  set uvRect: Rect => pass
+
+type Selectable : Behaviour kind=component gd=Control extern=UnityEngineUISelectable
+  interactable: bool => U.ui_get_interactable($0)
+  set interactable: bool => U.ui_set_interactable($0, $v)
+  image: Image => $0
+  targetGraphic: Graphic => $0
+  Select(): void => $0.grab_focus()
+
+type Button : Selectable kind=component gd=BaseButton extern=UnityEngineUIButton
+  interactable: bool => not $0.disabled
+  set interactable: bool => $0.disabled = not $v
+  onClick: UnityEvent => $0.pressed
+
+type Toggle : Selectable kind=component gd=BaseButton extern=UnityEngineUIToggle
+  isOn: bool => $0.button_pressed
+  set isOn: bool => $0.button_pressed = $v
+  interactable: bool => not $0.disabled
+  set interactable: bool => $0.disabled = not $v
+  SetIsOnWithoutNotify(bool): void => $0.set_pressed_no_signal($1)
+  onValueChanged: UnityEvent => $0.toggled
+  graphic: Graphic => $0
+  group: ToggleGroup => null
+  set group: ToggleGroup => pass
+
+type ToggleGroup : Behaviour kind=component gd=ButtonGroup extern=UnityEngineUIToggleGroup
+  allowSwitchOff: bool => $0.allow_unpress
+  set allowSwitchOff: bool => $0.allow_unpress = $v
+  SetAllTogglesOff(): void => pass
+
+type Slider : Selectable kind=component gd=Range extern=UnityEngineUISlider
+  value: float => $0.value
+  set value: float => U.slider_set_value($0, $v)
+  minValue: float => $0.min_value
+  set minValue: float => $0.min_value = $v
+  maxValue: float => $0.max_value
+  set maxValue: float => $0.max_value = $v
+  normalizedValue: float => $0.ratio
+  set normalizedValue: float => $0.ratio = $v
+  wholeNumbers: bool => $0.rounded
+  set wholeNumbers: bool => $0.rounded = $v
+  interactable: bool => $0.editable
+  set interactable: bool => $0.editable = $v
+  SetValueWithoutNotify(float): void => $0.set_value_no_signal($1)
+  onValueChanged: UnityEvent => $0.value_changed
+
+type Scrollbar : Selectable kind=component gd=ScrollBar extern=UnityEngineUIScrollbar
+  value: float => $0.value
+  set value: float => $0.value = $v
+  size: float => $0.page
+  set size: float => $0.page = $v
+
+type ScrollRect : Behaviour kind=component gd=ScrollContainer extern=UnityEngineUIScrollRect
+  verticalNormalizedPosition: float => U.scroll_get_v($0)
+  set verticalNormalizedPosition: float => U.scroll_set_v($0, $v)
+  horizontalNormalizedPosition: float => U.scroll_get_h($0)
+  set horizontalNormalizedPosition: float => U.scroll_set_h($0, $v)
+  content: RectTransform => U.scroll_content($0)
+  velocity: Vector2 => Vector2.ZERO
+  set velocity: Vector2 => pass
+
+type Dropdown : Selectable kind=component gd=OptionButton extern=UnityEngineUIDropdown
+  value: int => $0.selected
+  set value: int => $0.select($v)
+  SetValueWithoutNotify(int): void => $0.select($1)
+  ClearOptions(): void => $0.clear()
+  RefreshShownValue(): void => pass
+
+type InputField : Selectable kind=component gd=LineEdit extern=UnityEngineUIInputField
+  text: string => $0.text
+  set text: string => $0.text = $v
+  characterLimit: int => $0.max_length
+  set characterLimit: int => $0.max_length = $v
+  ActivateInputField(): void => $0.grab_focus()
+  DeactivateInputField(): void => $0.release_focus()
+  SetTextWithoutNotify(string): void => $0.text = $1
+  isFocused: bool => $0.has_focus()
+
+type LayoutElement : Behaviour kind=component gd=Control extern=UnityEngineUILayoutElement
+  preferredWidth: float => $0.custom_minimum_size.x
+  set preferredWidth: float => $0.custom_minimum_size.x = $v
+  preferredHeight: float => $0.custom_minimum_size.y
+  set preferredHeight: float => $0.custom_minimum_size.y = $v
+  minWidth: float => $0.custom_minimum_size.x
+  set minWidth: float => $0.custom_minimum_size.x = $v
+  minHeight: float => $0.custom_minimum_size.y
+  set minHeight: float => $0.custom_minimum_size.y = $v
+  ignoreLayout: bool => false
+  set ignoreLayout: bool => pass
+
+type UnityEvent kind=class gd=Signal extern=UnityEngineEventsUnityEvent
+  Invoke(): void => $0.emit()
+  AddListener(object): void => !unsupported UnityEvent listeners need delegates
+  RemoveAllListeners(): void => pass
+
+type EventSystem : Behaviour kind=component gd=Node extern=UnityEngineEventSystemsEventSystem
+  static current: EventSystem => null
+  currentSelectedGameObject: GameObject => null
+  SetSelectedGameObject(GameObject): void => pass
+
+type Input kind=static extern=UnityEngineInput
+  static GetKey(KeyCode): bool => Udon.get_key($1)
+  static GetKey(string): bool => Udon.get_key_name($1)
+  static GetKeyDown(KeyCode): bool => Udon.get_key_down($1)
+  static GetKeyDown(string): bool => Udon.get_key_name_down($1)
+  static GetKeyUp(KeyCode): bool => Udon.get_key_up($1)
+  static GetKeyUp(string): bool => Udon.get_key_name_up($1)
+  static GetAxis(string): float => Udon.get_axis($1)
+  static GetAxisRaw(string): float => Udon.get_axis_raw($1)
+  static GetButton(string): bool => Udon.get_button($1)
+  static GetButtonDown(string): bool => Udon.get_button_down($1)
+  static GetButtonUp(string): bool => Udon.get_button_up($1)
+  static GetMouseButton(int): bool => Udon.get_mouse_button($1)
+  static GetMouseButtonDown(int): bool => Udon.get_mouse_button_down($1)
+  static GetMouseButtonUp(int): bool => Udon.get_mouse_button_up($1)
+  static mousePosition: Vector3 => Udon.mouse_position()
+  static mouseScrollDelta: Vector2 => Udon.mouse_scroll_delta()
+  static anyKey: bool => Udon.any_key()
+  static anyKeyDown: bool => Udon.any_key_down()
+  static inputString: string => ""
+  static touchCount: int => 0
+  static mousePresent: bool => true
+
+type KeyCode kind=enum extern=UnityEngineKeyCode
+  enum None = 0
+  enum Backspace = 8
+  enum Tab = 9
+  enum Clear = 12
+  enum Return = 13
+  enum Pause = 19
+  enum Escape = 27
+  enum Space = 32
+  enum Exclaim = 33
+  enum DoubleQuote = 34
+  enum Hash = 35
+  enum Dollar = 36
+  enum Percent = 37
+  enum Ampersand = 38
+  enum Quote = 39
+  enum LeftParen = 40
+  enum RightParen = 41
+  enum Asterisk = 42
+  enum Plus = 43
+  enum Comma = 44
+  enum Minus = 45
+  enum Period = 46
+  enum Slash = 47
+  enum Alpha0 = 48
+  enum Alpha1 = 49
+  enum Alpha2 = 50
+  enum Alpha3 = 51
+  enum Alpha4 = 52
+  enum Alpha5 = 53
+  enum Alpha6 = 54
+  enum Alpha7 = 55
+  enum Alpha8 = 56
+  enum Alpha9 = 57
+  enum Colon = 58
+  enum Semicolon = 59
+  enum Less = 60
+  enum Equals = 61
+  enum Greater = 62
+  enum Question = 63
+  enum At = 64
+  enum LeftBracket = 91
+  enum Backslash = 92
+  enum RightBracket = 93
+  enum Caret = 94
+  enum Underscore = 95
+  enum BackQuote = 96
+  enum A = 97
+  enum B = 98
+  enum C = 99
+  enum D = 100
+  enum E = 101
+  enum F = 102
+  enum G = 103
+  enum H = 104
+  enum I = 105
+  enum J = 106
+  enum K = 107
+  enum L = 108
+  enum M = 109
+  enum N = 110
+  enum O = 111
+  enum P = 112
+  enum Q = 113
+  enum R = 114
+  enum S = 115
+  enum T = 116
+  enum U = 117
+  enum V = 118
+  enum W = 119
+  enum X = 120
+  enum Y = 121
+  enum Z = 122
+  enum LeftCurlyBracket = 123
+  enum Pipe = 124
+  enum RightCurlyBracket = 125
+  enum Tilde = 126
+  enum Delete = 127
+  enum Keypad0 = 256
+  enum Keypad1 = 257
+  enum Keypad2 = 258
+  enum Keypad3 = 259
+  enum Keypad4 = 260
+  enum Keypad5 = 261
+  enum Keypad6 = 262
+  enum Keypad7 = 263
+  enum Keypad8 = 264
+  enum Keypad9 = 265
+  enum KeypadPeriod = 266
+  enum KeypadDivide = 267
+  enum KeypadMultiply = 268
+  enum KeypadMinus = 269
+  enum KeypadPlus = 270
+  enum KeypadEnter = 271
+  enum KeypadEquals = 272
+  enum UpArrow = 273
+  enum DownArrow = 274
+  enum RightArrow = 275
+  enum LeftArrow = 276
+  enum Insert = 277
+  enum Home = 278
+  enum End = 279
+  enum PageUp = 280
+  enum PageDown = 281
+  enum F1 = 282
+  enum F2 = 283
+  enum F3 = 284
+  enum F4 = 285
+  enum F5 = 286
+  enum F6 = 287
+  enum F7 = 288
+  enum F8 = 289
+  enum F9 = 290
+  enum F10 = 291
+  enum F11 = 292
+  enum F12 = 293
+  enum F13 = 294
+  enum F14 = 295
+  enum F15 = 296
+  enum Numlock = 300
+  enum CapsLock = 301
+  enum ScrollLock = 302
+  enum RightShift = 303
+  enum LeftShift = 304
+  enum RightControl = 305
+  enum LeftControl = 306
+  enum RightAlt = 307
+  enum LeftAlt = 308
+  enum RightCommand = 309
+  enum RightApple = 309
+  enum LeftCommand = 310
+  enum LeftApple = 310
+  enum LeftWindows = 311
+  enum RightWindows = 312
+  enum AltGr = 313
+  enum Help = 315
+  enum Print = 316
+  enum SysReq = 317
+  enum Break = 318
+  enum Menu = 319
+  enum Mouse0 = 323
+  enum Mouse1 = 324
+  enum Mouse2 = 325
+  enum Mouse3 = 326
+  enum Mouse4 = 327
+  enum Mouse5 = 328
+  enum Mouse6 = 329
+  enum JoystickButton0 = 330
+  enum JoystickButton1 = 331
+  enum JoystickButton2 = 332
+  enum JoystickButton3 = 333
+  enum JoystickButton4 = 334
+  enum JoystickButton5 = 335
+  enum JoystickButton6 = 336
+  enum JoystickButton7 = 337
+  enum JoystickButton8 = 338
+  enum JoystickButton9 = 339
+  enum JoystickButton10 = 340
+  enum JoystickButton11 = 341
+  enum JoystickButton12 = 342
+  enum JoystickButton13 = 343
+  enum JoystickButton14 = 344
+  enum JoystickButton15 = 345
+  enum JoystickButton16 = 346
+  enum JoystickButton17 = 347
+  enum JoystickButton18 = 348
+  enum JoystickButton19 = 349
+
+type HumanBodyBones kind=enum extern=UnityEngineHumanBodyBones
+  enum Hips = 0
+  enum LeftUpperLeg = 1
+  enum RightUpperLeg = 2
+  enum LeftLowerLeg = 3
+  enum RightLowerLeg = 4
+  enum LeftFoot = 5
+  enum RightFoot = 6
+  enum Spine = 7
+  enum Chest = 8
+  enum UpperChest = 54
+  enum Neck = 9
+  enum Head = 10
+  enum LeftShoulder = 11
+  enum RightShoulder = 12
+  enum LeftUpperArm = 13
+  enum RightUpperArm = 14
+  enum LeftLowerArm = 15
+  enum RightLowerArm = 16
+  enum LeftHand = 17
+  enum RightHand = 18
+  enum LeftToes = 19
+  enum RightToes = 20
+  enum LeftEye = 21
+  enum RightEye = 22
+  enum Jaw = 23
+  enum LeftThumbProximal = 24
+  enum LeftThumbIntermediate = 25
+  enum LeftThumbDistal = 26
+  enum LeftIndexProximal = 27
+  enum LeftIndexIntermediate = 28
+  enum LeftIndexDistal = 29
+  enum LeftMiddleProximal = 30
+  enum LeftMiddleIntermediate = 31
+  enum LeftMiddleDistal = 32
+  enum LeftRingProximal = 33
+  enum LeftRingIntermediate = 34
+  enum LeftRingDistal = 35
+  enum LeftLittleProximal = 36
+  enum LeftLittleIntermediate = 37
+  enum LeftLittleDistal = 38
+  enum RightThumbProximal = 39
+  enum RightThumbIntermediate = 40
+  enum RightThumbDistal = 41
+  enum RightIndexProximal = 42
+  enum RightIndexIntermediate = 43
+  enum RightIndexDistal = 44
+  enum RightMiddleProximal = 45
+  enum RightMiddleIntermediate = 46
+  enum RightMiddleDistal = 47
+  enum RightRingProximal = 48
+  enum RightRingIntermediate = 49
+  enum RightRingDistal = 50
+  enum RightLittleProximal = 51
+  enum RightLittleIntermediate = 52
+  enum RightLittleDistal = 53
+  enum LastBone = 55
+
+type Cursor kind=static extern=UnityEngineCursor
+  static visible: bool => (Input.mouse_mode != 2)
+  static set visible: bool => Input.mouse_mode = (0 if $v else 2)
+  static lockState: int => (2 if Input.mouse_mode == 2 else 0)
+  static set lockState: int => Input.mouse_mode = (2 if $v == 1 else 0)
+
+type QualitySettings kind=static extern=UnityEngineQualitySettings
+  static vSyncCount: int => (1 if DisplayServer.window_get_vsync_mode() != 0 else 0)
+  static set vSyncCount: int => DisplayServer.window_set_vsync_mode(1 if $v > 0 else 0)
+  static shadowDistance: float => 100.0
+  static set shadowDistance: float => pass
+  static GetQualityLevel(): int => 0
+
+alias ParticleSystem.MainModule = MainModule
+alias ParticleSystem.EmissionModule = EmissionModule
+alias ParticleSystem.ShapeModule = ShapeModule
+alias ParticleSystem.VelocityOverLifetimeModule = VelocityOverLifetimeModule
+alias ParticleSystem.ColorOverLifetimeModule = ColorOverLifetimeModule
+alias ParticleSystem.SizeOverLifetimeModule = SizeOverLifetimeModule
+alias ParticleSystem.TrailModule = TrailModule
+alias ParticleSystem.NoiseModule = NoiseModule
+alias ParticleSystem.ForceOverLifetimeModule = ForceOverLifetimeModule
+alias ParticleSystem.MinMaxCurve = MinMaxCurve
+alias ParticleSystem.MinMaxGradient = MinMaxGradient
+alias ParticleSystem.EmitParams = EmitParams
+alias ParticleSystem.Burst = Burst
+alias ParticleSystem.Particle = Particle
+
+type EmissionModule
+  GetBurst(int): Burst => {"time": 0.0, "count": 0}
+  SetBurst(int, Burst): void => pass
+
+type Animator
+  WriteDefaultValues(): void => pass
+  GetCurrentAnimatorClipInfo(int): Array => []
+  GetCurrentAnimatorClipInfoCount(int): int => 0
+
+type AnimationCurve kind=class gd=Curve extern=UnityEngineAnimationCurve
+  ctor() => Curve.new()
+  ctor(params Keyframe[]) => U.curve_from_keys($params)
+  keys: Keyframe[] => U.curve_keys($0)
+  length: int => $0.point_count
+  Evaluate(float): float => $0.sample($1)
+  AddKey(float, float): int => U.curve_add_key($0, $1, $2)
+  AddKey(Keyframe): int => U.curve_add_key($0, $1.time, $1.value, $1.get("inTangent", 0.0), $1.get("outTangent", 0.0))
+  RemoveKey(int): void => $0.remove_point($1)
+  MoveKey(int, Keyframe): int => U.curve_move_key($0, $1, $2)
+  SmoothTangents(int, float): void => pass
+  static Linear(float, float, float, float): AnimationCurve => U.curve_linear($1, $2, $3, $4)
+  static EaseInOut(float, float, float, float): AnimationCurve => U.curve_ease_in_out($1, $2, $3, $4)
+  static Constant(float, float, float): AnimationCurve => U.curve_linear($1, $3, $2, $3)
+
+type Keyframe kind=struct gd=Dictionary extern=UnityEngineKeyframe
+  ctor(float, float) => {"time": $1, "value": $2, "inTangent": 0.0, "outTangent": 0.0}
+  ctor(float, float, float, float) => {"time": $1, "value": $2, "inTangent": $3, "outTangent": $4}
+  time: float => $0.time
+  set time: float => $0.time = $v
+  value: float => $0.value
+  set value: float => $0.value = $v
+  inTangent: float => $0.get("inTangent", 0.0)
+  set inTangent: float => $0.inTangent = $v
+  outTangent: float => $0.get("outTangent", 0.0)
+  set outTangent: float => $0.outTangent = $v
+
+type Gradient kind=class gd=Gradient extern=UnityEngineGradient
+  ctor() => Gradient.new()
+  Evaluate(float): Color => $0.sample($1)
+  colorKeys: Array => []
+  set colorKeys: Array => pass
+  alphaKeys: Array => []
+  set alphaKeys: Array => pass
+  SetKeys(Array, Array): void => pass
+
+type IConstraint kind=component gd=Node extern=UnityEngineAnimationsIConstraint
+  constraintActive: bool => U.constraint_get($0, "active", false)
+  set constraintActive: bool => U.constraint_set($0, "active", $v)
+  weight: float => U.constraint_get($0, "weight", 1.0)
+  set weight: float => U.constraint_set($0, "weight", $v)
+  locked: bool => U.constraint_get($0, "locked", false)
+  set locked: bool => U.constraint_set($0, "locked", $v)
+  sourceCount: int => U.constraint_sources($0).size()
+  GetSource(int): ConstraintSource => U.constraint_sources($0)[$1]
+  SetSource(int, ConstraintSource): void => U.constraint_set_source($0, $1, $2)
+  AddSource(ConstraintSource): int => U.constraint_add_source($0, $1)
+  RemoveSource(int): void => U.constraint_remove_source($0, $1)
+
+type PositionConstraint : Behaviour kind=component gd=Node extern=UnityEngineAnimationsPositionConstraint
+  constraintActive: bool => U.constraint_get($0, "active", false)
+  set constraintActive: bool => U.constraint_set($0, "active", $v)
+  weight: float => U.constraint_get($0, "weight", 1.0)
+  set weight: float => U.constraint_set($0, "weight", $v)
+  locked: bool => U.constraint_get($0, "locked", false)
+  set locked: bool => U.constraint_set($0, "locked", $v)
+  translationOffset: Vector3 => U.constraint_get($0, "translationOffset", Vector3.ZERO)
+  set translationOffset: Vector3 => U.constraint_set($0, "translationOffset", $v)
+  translationAtRest: Vector3 => U.constraint_get($0, "translationAtRest", Vector3.ZERO)
+  set translationAtRest: Vector3 => U.constraint_set($0, "translationAtRest", $v)
+  sourceCount: int => U.constraint_sources($0).size()
+  GetSource(int): ConstraintSource => U.constraint_sources($0)[$1]
+  SetSource(int, ConstraintSource): void => U.constraint_set_source($0, $1, $2)
+  AddSource(ConstraintSource): int => U.constraint_add_source($0, $1)
+  RemoveSource(int): void => U.constraint_remove_source($0, $1)
+
+type RotationConstraint : Behaviour kind=component gd=Node extern=UnityEngineAnimationsRotationConstraint
+  constraintActive: bool => U.constraint_get($0, "active", false)
+  set constraintActive: bool => U.constraint_set($0, "active", $v)
+  weight: float => U.constraint_get($0, "weight", 1.0)
+  set weight: float => U.constraint_set($0, "weight", $v)
+  rotationOffset: Vector3 => U.constraint_get($0, "rotationOffset", Vector3.ZERO)
+  set rotationOffset: Vector3 => U.constraint_set($0, "rotationOffset", $v)
+  rotationAtRest: Vector3 => U.constraint_get($0, "rotationAtRest", Vector3.ZERO)
+  set rotationAtRest: Vector3 => U.constraint_set($0, "rotationAtRest", $v)
+  sourceCount: int => U.constraint_sources($0).size()
+  GetSource(int): ConstraintSource => U.constraint_sources($0)[$1]
+  SetSource(int, ConstraintSource): void => U.constraint_set_source($0, $1, $2)
+  AddSource(ConstraintSource): int => U.constraint_add_source($0, $1)
+
+type ParentConstraint : Behaviour kind=component gd=Node extern=UnityEngineAnimationsParentConstraint
+  constraintActive: bool => U.constraint_get($0, "active", false)
+  set constraintActive: bool => U.constraint_set($0, "active", $v)
+  weight: float => U.constraint_get($0, "weight", 1.0)
+  set weight: float => U.constraint_set($0, "weight", $v)
+  sourceCount: int => U.constraint_sources($0).size()
+  GetSource(int): ConstraintSource => U.constraint_sources($0)[$1]
+  SetSource(int, ConstraintSource): void => U.constraint_set_source($0, $1, $2)
+  AddSource(ConstraintSource): int => U.constraint_add_source($0, $1)
+  SetTranslationOffset(int, Vector3): void => pass
+  SetRotationOffset(int, Vector3): void => pass
+
+type AimConstraint : Behaviour kind=component gd=Node extern=UnityEngineAnimationsAimConstraint
+  constraintActive: bool => U.constraint_get($0, "active", false)
+  set constraintActive: bool => U.constraint_set($0, "active", $v)
+  weight: float => U.constraint_get($0, "weight", 1.0)
+  set weight: float => U.constraint_set($0, "weight", $v)
+  sourceCount: int => U.constraint_sources($0).size()
+  GetSource(int): ConstraintSource => U.constraint_sources($0)[$1]
+  SetSource(int, ConstraintSource): void => U.constraint_set_source($0, $1, $2)
+  AddSource(ConstraintSource): int => U.constraint_add_source($0, $1)
+
+type LookAtConstraint : Behaviour kind=component gd=Node extern=UnityEngineAnimationsLookAtConstraint
+  constraintActive: bool => U.constraint_get($0, "active", false)
+  set constraintActive: bool => U.constraint_set($0, "active", $v)
+  weight: float => U.constraint_get($0, "weight", 1.0)
+  set weight: float => U.constraint_set($0, "weight", $v)
+  sourceCount: int => U.constraint_sources($0).size()
+  GetSource(int): ConstraintSource => U.constraint_sources($0)[$1]
+  SetSource(int, ConstraintSource): void => U.constraint_set_source($0, $1, $2)
+  AddSource(ConstraintSource): int => U.constraint_add_source($0, $1)
+
+type ScaleConstraint : Behaviour kind=component gd=Node extern=UnityEngineAnimationsScaleConstraint
+  constraintActive: bool => U.constraint_get($0, "active", false)
+  set constraintActive: bool => U.constraint_set($0, "active", $v)
+  weight: float => U.constraint_get($0, "weight", 1.0)
+  set weight: float => U.constraint_set($0, "weight", $v)
+
+type ConstraintSource kind=struct gd=Dictionary extern=UnityEngineAnimationsConstraintSource
+  ctor() => {"sourceTransform": null, "weight": 1.0}
+  sourceTransform: Transform => $0.get("sourceTransform", null)
+  set sourceTransform: Transform => $0.sourceTransform = $v
+  weight: float => $0.get("weight", 1.0)
+  set weight: float => $0.weight = $v
+
+type ReflectionProbe
+  mode: ReflectionProbeMode => 0
+  set mode: ReflectionProbeMode => pass
+  refreshMode: ReflectionProbeRefreshMode => 0
+  set refreshMode: ReflectionProbeRefreshMode => pass
+  timeSlicingMode: ReflectionProbeTimeSlicingMode => 0
+  set timeSlicingMode: ReflectionProbeTimeSlicingMode => pass
+  enabled: bool => $0.visible
+  set enabled: bool => $0.visible = $v
+
+type ReflectionProbeMode kind=enum extern=UnityEngineRenderingReflectionProbeMode
+  enum Baked = 0
+  enum Realtime = 1
+  enum Custom = 2
+
+type ReflectionProbeRefreshMode kind=enum extern=UnityEngineRenderingReflectionProbeRefreshMode
+  enum OnAwake = 0
+  enum EveryFrame = 1
+  enum ViaScripting = 2
+
+type ReflectionProbeTimeSlicingMode kind=enum extern=UnityEngineRenderingReflectionProbeTimeSlicingMode
+  enum AllFacesAtOnce = 0
+  enum IndividualFaces = 1
+  enum NoTimeSlicing = 2
+
+type MeshFilter
+  enabled: bool => $0.visible
+  set enabled: bool => $0.visible = $v
+  material: Material => U.renderer_material($0)
+  set material: Material => U.renderer_set_material($0, $v)
+
+type Gizmos kind=static extern=UnityEngineGizmos
+  static DrawLine(Vector3, Vector3): void => pass
+  static DrawSphere(Vector3, float): void => pass
+  static DrawWireSphere(Vector3, float): void => pass
+  static DrawRay(Vector3, Vector3): void => pass
+  static DrawCube(Vector3, Vector3): void => pass
+  static DrawWireCube(Vector3, Vector3): void => pass
+  static color: Color => Color.WHITE
+  static set color: Color => pass
