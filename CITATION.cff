@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: udon2godot
+message: >-
+  A fork placed in the Weftspun goal manifest at a pinned commit. It translates
+  UdonSharp C# to SafeGDScript for the Godot sandbox; the teacher's Udon trait
+  runs its translations as constructed fixture inputs, never as a data source.
+type: software
+authors:
+  - name: fireflyk64
+license: BSD-2-Clause
+repository-code: https://github.com/fireflyk64/udon2godot
+url: https://github.com/v-sekai-fabric/udon2godot
+version: 10c57e0a259f5d080cc638faa253ff92e9632efb
+date-accessed: "2026-09-08"
